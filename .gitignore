@@ -1,0 +1,28 @@
+# Gitignore File
+
+# IntelliJ project files:
+
+.idea
+*.iml
+out
+gen
+
+# VSCode files:
+
+.vscode/
+
+# Python Environments:
+
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Python Files:
+
+__pycache__/
+*.py[cod]
+*$py.class
