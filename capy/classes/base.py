@@ -2,19 +2,29 @@
 General classes for representing curseforge information.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from typing import Any, Optional, Tuple
+from os.path import isdir, basename
+from urllib.parse import urlparse
 
 from capy.classes.search import BaseSearch
+from capy.formatters import BaseFormat, NullFormatter
+from capy.proto import URLProtocol
 
 # Set the number of instances:
 
 NUM_INST = 7
 
+# Map of all packet types:
+
+
+
 
 @dataclass
 class BaseCurseInstance(object):
-
+ 
     """
     BaseCurseInstance - Class all child instances must inherit!
 
@@ -32,6 +42,11 @@ class BaseCurseInstance(object):
     THis can really be anything the backend thinks is helpful,
     although we recommend keeping it to connection details and statistics.
 
+    Packets can also have the raw, unformatted data attached to them.
+    This data is NOT standardized,
+    meaning that the raw data will most likely be diffrent across diffrent handlers.
+    Be aware, that handlers are under no obligation to attach raw data to the packet!
+
     You can use the INST_ID field to identify instances.
 
     We have the following parameters:
@@ -43,13 +58,144 @@ class BaseCurseInstance(object):
 
     raw: Any = field(init=False, repr=False)  # RAW packet data
     meta: Any = field(init=False, repr=False)  # Metadata on this packet
-    hands: Any = field(init=False, repr=False, compare=False)  # Handler Collection instance
-    INST_ID: int = field(default=0, init=False)
+    hands: 'HandlerCollection' = field(init=False, repr=False, compare=False)  # Handler Collection instance
+    INST_ID: int = field(default=0, init=False)  # Instance ID of the packet
+
+
+@dataclass
+class BaseWriter(BaseCurseInstance):
+    """
+    Parent class that adds writing functionality to the instance.
+
+    This class provides tools for writing content to external files,
+    and offers entry points for child classes to fine-tune and configure these writes.
+    """
+
+    def low_write(self, data: bytes, path: str, append: bool=False) -> int:
+        """
+        Writes the given data to an external file.
+
+        By default, we overwrite the file at the given path!
+        If this is not something you want, you can pass 'True'
+        to the 'append' value. 
+        This will append the description to the end of the file provided.
+
+        We use the internal 'open' function built into python.
+        Standard exceptions associated with this function will be raised accordingly!
+
+        :param data: Data to write to the file
+        :type data: bytes
+        :param path: Path to the file to write, must be a path-like-object
+        :type path: str
+        :param append: Value determining if we are appending to the file, defaults to False
+        :type append: bool, optional
+        :return: Number of bytes written
+        :rtype: int
+        """
+
+        # Open the file-like object:
+
+        file = open(path, 'a' if append else 'w')
+
+        # Write the content:
+
+        return file.write(data)
+
+    def write(self, path: str, append: bool=False) -> int:
+        """
+        Write function for this class.
+
+        Child classes should implement this function!
+        This allows them to fine-tune the write process automatically,
+        and pass the content to be written without the user having to specify it.
+
+        Child classes should use the 'low_write' function to preform the operation.
+
+        :param path: Path to the file to write to
+        :type path: str
+        :param append: Value determining if we should append instead of overwrite, defaults to False
+        :type append: bool, optional
+        :raises NotImplementedError: Function should be overridden in child class!
+        :return: Number of bytes written
+        :rtype: int
+        """
+
+        raise NotImplementedError("Should be overloaded in child class!")
+
+
+@dataclass
+class BaseDownloader(BaseWriter):
+    """
+    Parent class for all instances that download information.
+
+    We expect the download URL to be present at the 'download_url' parameter,
+    and we expect the protocol to be HTTP. 
+    """
+
+    download_url: str = field(init=False)
+
+    def low_download(self, url: str, path: str=None) -> bytes:
+        """
+        Downloads the given data and returns it as bytes.
+
+        We use the 'URLProtocol' to get the information.
+
+        We also offer to save the downloaded information
+        to an external file.
+        You can pass the path to the file using the 'path' parameter.
+        If this value is none, then the data will not be saved.
+        The data will be returned regardless of weather it is saved or not.
+
+        :param url: URL of the content to download
+        :type url: str
+        :param path: Path to file to save downloaded data, optional
+        :type path: str, optional
+        :return: Bytes of the downloaded data
+        :rtype: bytes
+        """
+
+        # Create the URL protocol:
+
+        url = URLProtocol(url)
+
+        # Get the data:
+
+        data = url.get_data('')
+
+        # Determine if we should write to a file:
+
+        if path is not None:
+
+            # Save the data to a file:
+
+            self.low_write(data, path)
+
+        # Finally, return the data:
+
+        return data
+
+    def download(self, path: str=None) -> bytes:
+        """
+        Download function for this class!
+
+        Child classes should implement this function!
+        This allows them to fine-tune the download operation automatically,
+        and pass the necessary parmeters without the user having to specify them.
+
+        Implementations should use the 'low_download' function for this operation.
+
+        :param path: Path to file to save the downloaded information to, defaults to None
+        :type path: str, optional
+        :return: Downloaded bytes
+        :rtype: bytes
+        :raises: NotImplementedError: Must be overridden in child class!
+        """
+
+        raise NotImplementedError("Must be overridden in child class!")
 
 
 @dataclass
 class CurseAuthor(BaseCurseInstance):
-
     """
     CurseAuthor - Represents an author for a curses addon.
 
@@ -77,20 +223,20 @@ class CurseAuthor(BaseCurseInstance):
 
 
 @dataclass
-class CurseDescription(BaseCurseInstance):
+class CurseDescription(BaseWriter):
 
     """
     CurseDescription - Represents a decritpion of a addon.
 
     A 'description' is HTML code that the addon author can provide
-    that describes the addon in detail.
-    We also count file changelogs as a description!
+    that describes something in detail.
+    Addons and file descriptions fall into this category.
 
     Again, this description is in HTML,
     so some formatting may be necessary!
 
     We offer the ability to attach custom 'formatters' to this object.
-    A 'formatter' wll convert the HTML code into something.
+    A 'formatter' will convert the HTML code into something.
     The implementation of formatters is left ambiguous,
     as users may have diffrent use cases.
     Check out the formatter documentation for more info.
@@ -104,24 +250,103 @@ class CurseDescription(BaseCurseInstance):
 
     We contain the following parameters:
 
-        * description_raw - Raw, unformatted description
+        * description - Raw, unformatted description
         * formatter - Formatter instance attached to this object 
     """
 
     description: str
-    formatter: Any = field(init=False)
+    formatter: BaseFormat = field(default=NullFormatter, init=False)
 
     INST_ID = 7
 
+    def attach_formatter(self, form: BaseFormat):
+        """
+        Attaches the given formatter to this instance.
+
+        We do a check to make sure that the formatter inherits 'BaseFormat'.
+
+        :param form: Formatter to attach to this description
+        :type form: BaseFormat
+        :raises: ValueError: If the formatter does NOT inherit 'BaseFormat'
+        """
+
+        # Check of the formatter inherits 'BaseFormat':
+
+        if not isinstance(form, BaseFormat):
+
+            # Object does not inherit BaseFormat!
+
+            raise ValueError("Formatter must inherit 'BaseFormat'!")
+
+        # Attach the formatter to ourselves:
+
+        self.formatter = BaseFormat
+
+    def format(self) -> Any:
+        """
+        Sends the description through the formatter,
+        and returns the formatted content,
+        whatever that may be.
+
+        :return: Formatted data
+        :rtype: Any
+        """
+
+        return self.formatter.format(self.description)
+
+    def write(self, path: str, append: bool=False, raw: bool=False) -> int:
+        """
+        Writes the description to an external file.
+
+        We use the CurseWriter 'low_write' method for this operation.
+
+        We also format the description before writing the content to a file.
+        You can disable this operation using the 'raw' parameter.
+
+        :param path: Path to the file to write, must be a path-like-object
+        :type path: str
+        :param append: Value determining if we are appending to the file, defaults to False
+        :type append: bool, optional
+        :param raw: Determines if we should return unformatted, raw data, defaults to False
+        :type raw: bool, optional
+        :return: Number of bytes written
+        :rtype: int
+        """
+
+        # Check if we should format:
+
+        data = self.description
+
+        if not raw:
+
+            # We should format the data:
+
+            data = self.format()
+
+        # Use the 'low_write' method:
+
+        self.low_write(data, path, append=append)
+
+    def __str__(self) -> str:
+        """
+        Method called when this object's content is requested as a string.
+
+        We automatically send the description thorugh the attached formatter.
+
+        :return: Formatted description content
+        :rtype: str
+        """
+
+        return self.format()
+
 
 @dataclass
-class CurseAttachment(BaseCurseInstance):
-
+class CurseAttachment(BaseDownloader):
     """
-    CurseAttachment - Represents an attachment
+    CurseAttachment - Represents an attachment.
 
     An 'attachment' is a piece of media,
-    usually an image of thumbnail,
+    usually an image or thumbnail,
     that is shown on the addon page.
 
     These attachments can be the icon of the addon,
@@ -138,6 +363,7 @@ class CurseAttachment(BaseCurseInstance):
         * url - URL of the attachment
         * is_thumbnail - Boolean determining if this attachment is the thumbnail of the addon
         * addon_id - ID of the addon this attachment is a part of
+        * description - Description of this attachment
     """
 
     title: str
@@ -146,12 +372,65 @@ class CurseAttachment(BaseCurseInstance):
     url: str
     is_thumbnail: bool
     addon_id: int
+    description: str
 
     INST_ID = 4
 
+    def download(self, path: str=None) -> bytes:
+        """
+        Downloads the attachment.
+
+        You can use the 'path' parameter
+        to save the downloaded information to a file.
+
+        If you provide a path to a directory and not a file,
+        then we will use the name of the remote file as the name.
+
+        :param path: Path to save the data to, optional
+        :type path: str
+        :return: Downloaded bytes
+        :rtype: bytes
+        """
+
+        # Check if we are even working with paths:
+
+        temp_path = None
+
+        if path is not None:
+
+            # Check if we are working with a directory:
+
+            if isdir(path):
+
+                # Get the name of the file:
+
+                temp_path = self.title
+
+            else:
+
+                # Just use the name provided:
+
+                temp_path = path
+
+        # Call the 'low_download' function with our URL:
+
+        return self.low_download(self.url, path=temp_path)
+
+    def addon(self) -> CurseAddon:
+        """
+        Gets the addon this attachment is attached to.
+
+        :return: CurseAddon instance
+        :rtype: CurseAddon
+        """
+
+        # Get and return the CurseAddon:
+
+        return self.hands.addon(self.addon_id)
+
 
 @dataclass
-class CurseFile(BaseCurseInstance):
+class CurseFile(BaseDownloader):
 
     """
     CurseFile - Represents an addon file.
@@ -185,7 +464,7 @@ class CurseFile(BaseCurseInstance):
     download_url: str
     length: int
     version: Tuple[str, ...]
-    dependencies: Tuple[int,...]
+    dependencies: Tuple[int, ...]
 
     INST_ID = 6
 
@@ -203,6 +482,76 @@ class CurseFile(BaseCurseInstance):
         """
 
         return self.hands.handel(7, self.addon_id, self.id)
+
+    def get_dependencies(self) -> Tuple[CurseAddon, ...]:
+        """
+        Returns a tuple of all CurseAddons
+        that are the dependencies of this file.
+
+        :return: Tuple of CurseAddons
+        :rtype: Tuple[CurseAddon]
+        """
+
+        # Iterate over the dependency IDs:
+
+        final = []
+
+        for depen_id in self.dependencies:
+
+            # Get and create the CurseAddon instances:
+
+            final.append(self.hands.handel(6, depen_id))
+
+        # Return the final tuple:
+
+        return tuple(final)
+
+    def get_addon(self) -> CurseAddon:
+        """
+        Gets the CurseAddon this file is apart of.
+
+        :return: CurseAddon this file is apart of
+        :rtype: CurseAddon
+        """
+
+        return self.hands.handel(6, self.addon_id)
+
+    def download(self, path: str=None) -> bytes:
+        """
+        Downloads the file.
+
+        If the provided path points to a directory,
+        then the default file name will be used.
+
+        :param path: Path to download the file to, optional
+        :type path: str
+        :return: Downloaded file bytes
+        :rtype: bytes
+        """
+
+        # See if we should do some path handling:
+
+        temp_path = None
+
+        if path is not None:
+
+            # Check if we are working with a directory:
+
+            if path.isdir(temp_path):
+
+                # Join the paths:
+
+                temp_path = path.join(path, self.file_name)
+
+            else:
+
+                # Just set the target to what was given:
+
+                temp_path = path
+
+        # Do the download operation:
+
+        return self.low_download(self.download_url, path=temp_path)
 
 
 @dataclass
@@ -239,6 +588,13 @@ class CurseAddon(BaseCurseInstance):
         * available - Boolean determining if the addon is available
         * experimental - Boolean determining if the addon is expiremental
         * authors - Tuple of authors for this addon
+        * attachments - Tuple of attachments attributed with this addon
+        * category_id - ID of the category this addon is in
+        * is_featured - Boolean determining if this addon is featured
+        * popularity_score - Float representing this addon's popularity score
+        (Most likely used for popularity ranking)
+        * popularity_rank - Int representing the game's popularity rank
+        * game_name - Name of the game
     """
 
     name: str
@@ -254,8 +610,13 @@ class CurseAddon(BaseCurseInstance):
     game_id: int
     available: bool
     experimental: bool
-    authors: Tuple[CurseAuthor,...]
-    attachments: Tuple[CurseAttachment,...]
+    authors: Tuple[CurseAuthor, ...]
+    attachments: Tuple[CurseAttachment, ...]
+    category_id: int
+    is_featured: bool
+    popularity_score: int
+    popularity_rank: int
+    game_name: str
 
     INS_ID = 5
 
@@ -295,6 +656,29 @@ class CurseAddon(BaseCurseInstance):
         """
 
         return self.hands.addon_file(self.id, file_id)
+
+    def game(self) -> CurseGame:
+        """
+        Gets and returns the CurseGame instance
+        this addon is apart of.
+
+        :return: CurseGame instance
+        :rtype: CurseGame
+        """
+
+        return self.hands.game(self.game_id)
+
+    def category(self) -> CurseCategory:
+        """
+        Gets and returns the category we are a member of
+
+        :return: CurseCategory of the category we are in
+        :rtype: CurseCategory
+        """
+
+        # Get and return the category:
+
+        return self.hands.category(self.category_id)
 
 
 @dataclass
@@ -345,7 +729,7 @@ class CurseCategory(BaseCurseInstance):
 
     INST_ID = 1
 
-    def sub_categroies(self) -> Tuple[CurseAddon, ...]:
+    def sub_categories(self) -> Tuple[CurseAddon, ...]:
         """
         Gets all sub-catagories for this category.
 
@@ -354,6 +738,50 @@ class CurseCategory(BaseCurseInstance):
         """
 
         return self.hands.sub_category(self.id)
+
+    def parent_category(self) -> CurseCategory:
+        """
+        Gets and returns the parent category for this instance.
+
+        If there is no parent category, 
+        then 'None' will be returned instead
+
+        :return: CurseCategory instance, or None if there is no parent
+        :rtype: CurseCategory, None
+        """
+
+        # Check if we even have a parent:
+
+        if self.parent_category is None:
+
+            # No parent, return None:
+
+            return None
+
+        # Get the parent category:
+
+        return self.hands.category(self.parent_id)
+
+    def root_category(self) -> CurseCategory:
+        """
+        Gets and returns the root category for this instance.
+
+        If there is no parent category,
+        then 'None' will be returned instead.
+
+        :return: CurseCategory instance, or None if there is no parent
+        :rtype: CurseCategory, None
+        """
+
+        # Check if we even have a root category:
+
+        if self.parent_category is None:
+
+            # No parent, return None:
+
+            return None
+
+        return self.hands.category(self.root_id)
 
     def search(self, search_param: Optional[BaseSearch]=None) -> Tuple[int]:
         """
@@ -414,7 +842,7 @@ class CurseGame(BaseCurseInstance):
         """
         Gets a tuple of all root categories for this game.
 
-        :return: [description]
+        :return: Tuple of all root CurseCategories
         :rtype: Tuple[CurseCategory, ...]
         """
 

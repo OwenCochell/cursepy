@@ -18,11 +18,11 @@ There will be other components that the handler can overide if necessary.
 """
 
 from http.client import HTTPResponse
-from typing import Any, Optional, Tuple, Generic, Union
+from typing import Any, Optional, Tuple
 
 from capy.classes import base
 from capy.proto import BaseProtocol, URLProtocol
-from capy.errors import ProtocolMismatch
+from capy.errors import ProtocolMismatch, HandlerRaise
 from capy.classes.search import BaseSearch, URLSearch
 
 
@@ -36,14 +36,14 @@ class BaseHandler(object):
 
     Essentially, a module can define a few things:
 
+        * make_proto - Should return a valid protocol object for this handler
+        * check_search - Should check the incoming search object to ensure it is valid
         * proto_call - Call to the protocol of this handler, should return valid raw data
         * pre_process - Decodes data from the protocol before being send to the handler
         * format - Method called for formatting raw data from the protocol
-        * post_process - Finalist the formatted data(Adds metadata, raw data, ect.)
+        * post_process - Finalizes the formatted data(Adds metadata, raw data, ect.)
         * run - Ran after all other functions, with the instance as the argument, great for user-defined code
         * handle - Invokes the handling process for this handler
-        * make_proto - Should return a valid protocol object for this handler
-        * check_search - Should check the incoming search object to ensure it is valid
 
     This allows handlers to control many aspects of their implementation.
     With smart inheritance, it also removes a lot of repeated calls and instructions.
@@ -59,11 +59,22 @@ class BaseHandler(object):
     The default handle method will call all componets in order,
     so it is a good idea to use 'super()' once you have configured your methods.
     You can configure the handle method to accept any arguments you like, 
-    the HandlerCollection will pass all arguments that it receives to the handler that is being called. 
+    the HandlerCollection will pass all arguments that it receives to the 'handel' method,
+    so you should use this as the primary way to accept arguments. 
 
     The handler ID will be stored under the ID parameter.
     Unidentified handlers will have an ID of -1.
     Handlers must be identified if they are to be used for handler processes!
+
+    These handlers are designed to be customizable!
+    The framework of methods are designed to be a good default implementation,
+    that minimizes the amount of code developers have to write for handler development.
+
+    Don't like our implementation? No problem!
+    Most of the functions defined here are not necessary for handlers to work!
+    The only functions that NEED to be defined are 'handle' and 'make_proto'.
+    This means you can define your own methods and frameworks by creating a custom 'handel' method,
+    that can call/do anything you would like it too.
 
     Handlers can optionally provide a method to check search objects,
     to ensure that they are valid objects for this handler.
@@ -76,7 +87,6 @@ class BaseHandler(object):
 
     def __init__(self, name: str='') -> None:
         
-        self.backend = None  # Backend instance that has us loaded
         self.hand_collection: HandlerCollection  # Handlers instance we are apart of
         self.name = name  # Name of this handler, used to identify like-minded handlers
         self.search_type: Any = None  # Search type to use for search checking
@@ -170,6 +180,11 @@ class BaseHandler(object):
         This is useful if you want something to be ran each time certain data is handled.
         This is an optional implementation,
         as the handler collection will always return a CurseInstance representing the received data.
+        The final CurseInstance will be passed to this function.
+
+        This function can be added via inheritance of the relevant handler,
+        or this function can be overwritten on an already existing handler.
+        The HandlerCollection will offer methods to make this process easier! 
 
         :param data: Final CurseInstace representing the data we formatted
         :type data: BaseCurseInstance
@@ -181,12 +196,14 @@ class BaseHandler(object):
         """
         Default handle method.
 
-        We call all the componets in order.
+        This is the default handle method,
+        meaning that we call all components in order.
 
-        If you want to fine-tune this process,
-        then you can overload this method,
-        and not call the parent method.
-        TODO: Fix this description!
+        We pass all arguments to 'proto_call',
+        as this is the component that will need these arguments to fetch information.
+
+        We also check to see if we are working with a tuple of instances.
+        If this is the case, then we iterate over them and post-process each instance.
         """
 
         # First, call the proto_get method:
@@ -239,7 +256,7 @@ class BaseHandler(object):
 
         return data_final
 
-    def make_proto(self):
+    def make_proto(self) -> Any:
         """
         Function called when we need a valid protocol object.
 
@@ -476,14 +493,17 @@ class NullHandler(BaseHandler):
     """
     NullHandler - Does nothing
 
-    As in the name, all information given to it and requested
-    will simply be nothing.
+    As in the name, all information given to us will be ignored,
+    and we will simply return 'None'.
 
     Great if you want to disable a certain feature.
 
     The only thing that needs to be specified is what ID
     we are being registered to.
     This is optional, as you can manually provide your own ID in the HandlerCollection.
+
+    We are used as a default handler that is attached to ID's
+    that have no handlers associated with them.
     """
 
     def __init__(self, name: str='NullHandel', id: int=0) -> None:
@@ -491,6 +511,46 @@ class NullHandler(BaseHandler):
         super().__init__(name=name)
 
         ID: int = id
+
+    def handel(self, *args, **kwargs) -> None:
+        """
+        As we are a NullHandler, we simply return None.
+
+        :return: None
+        :rtype: None
+        """
+
+        return None
+
+
+class RaiseHandler(BaseHandler):
+    """
+    Raises an exception when the 'handel' method is called.
+
+    This is very simular to the NullHandler,
+    but we go a step further by raising an exception.
+
+    This can be used as a more explicit, forceful way
+    of disabling a feature, compared to just doing nothing.
+
+    You can optionally change the name of the handler,
+    as well as provide a custom ID. 
+    """
+
+    def __init__(self, name: str='RaiseHandler', id: int=0) -> None:
+
+        super().__init__(name=name)
+
+        ID: int = id
+
+    def handel(self, *args, **kwargs):
+        """
+        Raise a 'HandlerRaise' excpetion.
+
+        :raises: HandlerRaise: Always
+        """
+
+        raise HandlerRaise
 
 
 class HandlerCollection(object):
@@ -646,6 +706,11 @@ class HandlerCollection(object):
         We pass all arguments and keyword arguments
         to the handler at the given ID.
 
+        We also attach ourselves to valid CurseInstances automatically!
+        If the returned data does not inherit BaseCurseInstance,
+        then we will not attempt to attach ourselves to it,
+        and simply return it.
+
         :param id: ID of the handler to call
         :type id: int
         :return: The final class provided by the handler
@@ -659,6 +724,30 @@ class HandlerCollection(object):
         # Invoke the 'handle()' method:
 
         inst = hand.handel(*args, **kwargs)
+
+        # Check if we are working with a tuple:
+
+        if type(inst) == tuple:
+
+            # Iterate over the tuple:
+
+            for pack in inst:
+
+                # Check if we are working with a valid instance:
+
+                if isinstance(pack, base.BaseCurseInstance):
+
+                    # Attach ourselves to the instance:
+
+                    pack.hands = self
+
+        # Check if we are working with a valid handler:
+
+        elif isinstance(inst, base.BaseCurseInstance): 
+
+            # Attach ourselves to the pack:
+
+            inst.hands = self
 
         # Return the instance:
 
@@ -695,6 +784,18 @@ class HandlerCollection(object):
 
         return self.handel(2, id)
 
+    def category(self) -> Tuple[base.CurseCategory, ...]:
+        """
+        Gets ALL valid categories on CurseForge.
+
+        This call can get expensive, so call in moderation!
+
+        :return: Tuple of CurseCategory instances
+        :rtype: Tuple[base.CurseCategory, ...]
+        """
+
+        return self.handel(3)
+
     def category(self, category_id: int) -> base.CurseCategory:
         """
         Returns information on a category for a specific game.
@@ -710,7 +811,7 @@ class HandlerCollection(object):
         :rtype: base.CurseCategory
         """
 
-        return self.handel(3, category_id)
+        return self.handel(4, category_id)
 
     def sub_category(self, category_id: int) -> Tuple[base.CurseCategory, ...]:
         """
@@ -725,7 +826,7 @@ class HandlerCollection(object):
         :rtype: Tuple[base.CurseCategory, ...]
         """
 
-        return self.handel(4, category_id)
+        return self.handel(5, category_id)
 
     def addon(self, addon_id: int) -> base.CurseAddon:
         """
@@ -741,7 +842,7 @@ class HandlerCollection(object):
         :rtype: base.CurseAddon
         """
 
-        return self.handel(5, addon_id)
+        return self.handel(6, addon_id)
 
     def search(self, game_id: int, category_id: int, search: Any) -> Tuple[base.CurseAddon, ...]:
         """
@@ -769,7 +870,7 @@ class HandlerCollection(object):
 
         # Check to make sure the search object is valid:
 
-        if not self.handlers[5].check_search(search):
+        if not self.handlers[7].check_search(search):
 
             # Raise an exception, the search object is invalid!
 
@@ -777,7 +878,7 @@ class HandlerCollection(object):
 
         # Lets pass the data along:
 
-        return self.handel(6, game_id, category_id, search)
+        return self.handel(7, game_id, category_id, search)
 
     def addon_description(self, addon_id: int) -> base.CurseDescription:
         """
@@ -793,13 +894,13 @@ class HandlerCollection(object):
         :rtype: base.CurseDescription
         """
 
-        return self.handel(7, addon_id)
+        return self.handel(8, addon_id)
 
     def addon_files(self, addon_id: int) -> Tuple[base.CurseFile]:
         """
         Gets a list of files associated with the addon.
 
-        YOu will need to provide an addon ID,
+        You will need to provide an addon ID,
         which can be found by searching a game category.
 
         :param addon_id: Addon ID
@@ -809,7 +910,7 @@ class HandlerCollection(object):
         :rtype: Tuple[base.CurseFile]
         """
 
-        return self.handel(8, addon_id)
+        return self.handel(9, addon_id)
 
     def addon_file(self, addon_id: int, file_id:int) -> base.CurseFile:
         """
@@ -827,7 +928,7 @@ class HandlerCollection(object):
         :rtype: base.CurseFile
         """
 
-        return self.handel(9, addon_id, file_id)
+        return self.handel(10, addon_id, file_id)
 
     def file_description(self, addon_id: int, file_id: int) -> base.CurseDescription:
         """
@@ -844,4 +945,4 @@ class HandlerCollection(object):
         :rtype: base.CurseDescription
         """
 
-        return self.handel(10, addon_id, file_id)
+        return self.handel(11, addon_id, file_id)

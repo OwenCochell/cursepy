@@ -6,50 +6,54 @@ as well as doing a simple test to see which one is faster.
 """
 
 import time
+import pprint
+import timeit
 
 from capy.backend import ForgeSVCBackend
 from capy.wrapper import SVCWrap
 
 
-# Test the conventional, class based method:
+def conv():
+    
+    # Test the conventional, class based method:
 
-print("Testing class based backend ...")
+    #print("Testing class based backend ...")
 
-back = ForgeSVCBackend()
+    back = ForgeSVCBackend()
 
-# Time an expensive operation:
+    back_games = back.games()
 
-start = time.perf_counter()
+    #print("Game data:")
+    #pprint.pprint(back_games)
 
-back_games = back.games()
 
-conv_time = time.perf_counter() - start
+def hand():
 
-print("Time elapsed: {}".format(conv_time))
-print("Game data: {}".format(back_games))
+    # Test the new, handler based method:
 
-# Test the new, handler based method:
+    #print("Testing handler based backend ...")
 
-print("Testing handler based backend ...")
+    hand = SVCWrap()
 
-hand = SVCWrap()
+    hand_games = hand.games()
 
-# Time an expensive operation:
+    print("Game data:")
+    pprint.pprint(hand_games)
 
-start = time.perf_counter()
 
-hand_games = hand.games()
+# Run the functions:
 
-hand_time = time.perf_counter() - start
+print("Testing hand based backend ...")
 
-print("Time elapsed: {}".format(hand_time))
-print("Game data: {}".format(hand_games))
+hand_time = timeit.timeit(hand, number=3)
+print("Average hand time: {}".format(hand_time))
 
-# Check if data matches:
 
-if hand_games == back_games:
+print("Testing class-based backend ...")
 
-    print("Data matches!")
+conv_time = timeit.timeit(conv, number=3)
+print("Average conv time: {}".format(conv_time))
+
 
 if hand_time < conv_time:
 
@@ -57,5 +61,5 @@ if hand_time < conv_time:
 
 else:
 
-    print("Conv time faster by : {} secs!".format(hand_time-conv_time))
+    print("Conv time faster by : {} secs!".format(hand_time - conv_time))
 

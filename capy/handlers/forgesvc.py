@@ -3,8 +3,10 @@ ForgeSVC - Handlers for getting info via ForgeSVC.net
 """
 
 import json
+from dataclasses import dataclass
 from typing import Any, Tuple
 
+from capy.classes.search import URLSearch, ForgeSVCSearch
 from capy.handlers.base import URLHandler
 from capy.classes import base
 
@@ -62,24 +64,6 @@ class BaseSVCHandler(URLHandler):
         :rtype: BaseCurseInstance
         """
 
-        # Just process the instance:
-
-        return self._low_process(data)
-
-    def _low_process(self, data: base.BaseCurseInstance, raw: dict=None, meta:dict=None) -> base.BaseCurseInstance:
-        """
-        Does the actual format operation on the given packet.
-
-        :param data: Instance to be processed
-        :type data: base.BaseCurseInstance
-        :param raw: Raw data to be added
-        :type raw: dict
-        :param meta: Metadata to be added
-        :type meta: dict
-        :return: Processed packet
-        :rtype: base.BaseCurseInstance
-        """
-
         # Add the raw data to the instance:
 
         data.raw = self.raw if raw is None else raw
@@ -91,6 +75,148 @@ class BaseSVCHandler(URLHandler):
         # Return the final packet:
 
         return data
+
+    def check_search(self, search: ForgeSVCSearch) -> bool:
+        """
+        Checks to make sure the given search object
+        inherits 'ForgeSVCSearch'.
+
+        :param search: Search object to check
+        :type search: ForgeSVCSearch
+        :return: Value determining if the search object is valid
+        :rtype: bool
+        """
+
+        # Check if the search inherits 'ForgeSVCSearch':
+
+        return isinstance(search, ForgeSVCSearch)
+
+
+class SVCListGame(BaseSVCHandler):
+    """
+    Handler for getting a list of games.
+    """
+
+    ID: int = 1
+
+    def build_url(self) -> str:
+        """
+        Builds a valid URL for getting game info.
+
+        :return: URL for list of games
+        :rtype: str
+        """
+
+        return self.proto.url_build('game')
+
+    @staticmethod
+    def format(data: dict) -> Tuple[base.CurseGame, ...]:
+        
+        # Iterate over the games:
+
+        final = []
+
+        for game in data:
+
+            # Create the game and append it:
+
+            final.append(SVCGame.format(game))
+
+        # Return the final game:
+
+        return tuple(final)
+
+
+class SVCGame(BaseSVCHandler):
+
+    """
+    Handler for getting and representing a curseforge game,
+    whatever that may be.
+
+    We convert the incoming data to a CurseInstance,
+    as well as the function for creating a the valid URL.
+    """
+
+    ID: int = 2
+
+    def build_url(self, game_id: int) -> str:
+        """
+        Returns a URL to fetch game information
+
+        :param game_id: ID of the game to search for
+        :type game_id: int
+        :return: URL of the game info
+        :rtype: str
+        """
+
+        return self.proto.url_build('game/{}'.format(game_id))
+
+    @staticmethod
+    def format(data: dict) -> base.CurseGame:
+        """
+        Formats the given data into a CurseGame.
+
+        :param data: Decoded data to convert
+        :type data: dict
+        :return: CurseGame instance representing the game
+        :rtype: CurseGame
+        """
+        
+        # Create list of game categories:
+
+        final = []
+
+        for cat in data['categorySections']:
+
+            # Add the root ID's to the game:
+
+            final.append(cat['gameCategoryId'])
+
+        # Create CurseGame:
+
+        return base.CurseGame(data['name'], data['slug'], data['id'], data['supportsAddons'], tuple(final))
+
+
+class SVCListCategory(BaseSVCHandler):
+    """
+    Handler for getting all valid categories on CurseForge.
+
+    We convert the given data into a tuple of CurseCategory instacnes.
+    """
+
+    def build_url(self) -> str:
+        """
+        # Returns a valid URL for fetching category information
+
+        :return: URL for getting all catagories
+        :rtype: str
+        """
+
+        return self.proto.url_build('category')
+
+    def format(self, data: dict) -> Tuple[base.CurseCategory, ...]:
+        """
+        Formats the given data into a tuple of CurseCatagories
+
+        :param data: Data to be formatted
+        :type data: dict
+        :return: Tuple of CurseCatagories
+        :rtype: Tuple[CurseCatagories, ...]
+        """
+
+        # Iterate over the catagories:
+
+        final = []
+
+        for cat in data:
+
+            # Create the category:
+
+            final.append(SVCCategory.format(cat))
+
+        # Return the final tuple:
+
+        return tuple(final)
 
 
 class SVCCategory(BaseSVCHandler):
@@ -137,7 +263,7 @@ class SVCSubCategory(BaseSVCHandler):
 
     def build_url(self, category_id) -> str:
         """
-        Builds a valid URL for getting a list of games.
+        Builds a valid URL for getting a list of sub-categories.
 
         :param category_id: ID of the category
         :type category_id: int
@@ -157,91 +283,18 @@ class SVCSubCategory(BaseSVCHandler):
         :return: Tuple of CurseCategory instances
         :rtype: Tuple[CurseCategory, ...]
         """
-        return super().format(data)
 
-
-class SVCGame(BaseSVCHandler):
-
-    """
-    Handler for getting and representing a curseforge game,
-    whatever that may be.
-
-    We convert the incoming data to a CurseInstance,
-    as well as the function for creating a the valid URL.
-    """
-
-    ID: int = 2
-
-    def build_url(self, game_id: int) -> str:
-        """
-        Returns a URL to fetch game information
-
-        :param game_id: ID of the game to search for
-        :type game_id: int
-        :return: URL of the game info
-        :rtype: str
-        """
-
-        return self.proto.url_build('game/{}'.format(game_id))
-
-    @staticmethod
-    def format(data: dict) -> base.CurseGame:
-        """
-        Formats the given data into a CurseGame.
-
-        :param data: Decoded data to convert
-        :type data: dict
-        :return: CurseGame instance representing the game
-        :rtype: CurseGame
-        """
-        
-        # Create list of game categories:
+        # Iterate over the catagories:
 
         final = []
 
-        for cat in data['categorySections']:
+        for cat in data:
 
-            # Create a CurseCategory for each category:
+            # Format the data:
 
-            pass
-            #final.append(SVCCategory.format(cat))
+            final.append(SVCCategory.format(cat))
 
-        # Create CurseGame:
-
-        return base.CurseGame(data['name'], data['slug'], data['id'], data['supportsAddons'], tuple(final))
-
-
-class SVCListGame(BaseSVCHandler):
-    """
-    Handler for getting a list of games.
-    """
-
-    ID: int = 1
-
-    def build_url(self) -> str:
-        """
-        Builds a valid URL for getting game info.
-
-        :return: URL for list of games
-        :rtype: str
-        """
-
-        return self.proto.url_build('game')
-
-    @staticmethod
-    def format(data: dict) -> Tuple[base.CurseGame, ...]:
-        
-        # Iterate over the games:
-
-        final = []
-
-        for game in data:
-
-            # Create the game and append it:
-
-            final.append(SVCGame.format(game))
-
-        # Return the final game:
+        # Return the final tuple:
 
         return tuple(final)
 
@@ -296,14 +349,57 @@ class SVCAddon(BaseSVCHandler):
             # Convert and add the attachment:
 
             attach.append(base.CurseAttachment(attachment['title'], attachment['id'], attachment['thumbnailUrl'],
-            attachment['url'], attachment['isDefault'], attachment['projectId']))
+            attachment['url'], attachment['isDefault'], attachment['projectId'], attachment['description']))
 
         # Create the instance:
 
         return base.CurseAddon(data['name'], data['slug'], data['summary'], data['websiteUrl'],
                                data['primaryLanguage'], data['dateCreated'], data['dateModified'], data['dateRelease'],
                                data['id'], data['downloadCount'], data['gameId'], data['isAvailable'], data['isExperimental'],
-                               tuple(authors), tuple(attach))
+                               tuple(authors), tuple(attach), data['primaryCategoryId'], data['isFeatured'], data['popularityScore'],
+                               data['gamePopularityRank'], data['gameName'])
+
+
+class SVCSearch(BaseSVCHandler):
+    """
+    Handler for searching for addon information.
+    """
+
+    def build_url(self, game_id: int, section_id: int, search: URLSearch) -> str:
+        """
+        Generates a valid URL with the given search parameter.
+
+        :return: Valid URL for searching
+        :rtype: str
+        """
+
+        # Create and return the URL:
+
+        return self.proto.url_build('search?gameId={}&sectionId={}&{}'.format(game_id, section_id, search))
+
+    def format(self, data: dict) -> Tuple[base.CurseAddon, ...]:
+        """
+        Formats the given search results.
+
+        :param data: Data to be formatted
+        :type data: dict
+        :return: Tuple of CurseAddon instances
+        :rtype: Tuple[base.CurseAddon, ...]
+        """
+
+        # Iterate over the instances:
+
+        final = []
+
+        for addon in data:
+
+            # Create the instance:
+
+            final.append(SVCAddon.format(addon))
+
+        # Return the final tuple:
+
+        return tuple(final)
 
 
 class SVCAddonDescription(BaseSVCHandler):
@@ -419,7 +515,7 @@ class SVCFile(BaseSVCHandler):
         :rtype: str
         """
 
-        return self.proto.url_build('addon/{}/file/'.format(addon_id, file_id))
+        return self.proto.url_build('addon/{}/file/{}'.format(addon_id, file_id))
 
     def format(self, data: dict) -> base.CurseFile:
         """
@@ -456,8 +552,18 @@ class SVCFile(BaseSVCHandler):
         :rtype: base.CurseFile
         """
 
+        # Get the dependencies ID's:
+
+        final = []
+
+        for depen in data['dependencies']:
+
+            # Add the dependency ID's:
+
+            final.append(depen('addonId'))
+
         return base.CurseFile(data['id'], addon_id, data['displayName'], data['fileName'], data['fileDate'], 
-        data['downloadUrl'], data['fileLength'], tuple(data['gameVersion']), tuple(data['dependencies']))
+        data['downloadUrl'], data['fileLength'], tuple(data['gameVersion']), tuple(final))
 
 
 class SVCFileDescription(BaseSVCHandler):

@@ -10,22 +10,22 @@ from urllib.parse import urlencode
 from http.client import HTTPResponse
 from typing import Optional
 
-
+ 
 class BaseProtocol(object):
 
     """
     Base protocol implementation - All child protocols must inherit this class!
 
     A 'protocol' is a class that eases low level network communications.
-    Protocols only handles the getting(And maybe transmission) of information.
+    Protocols only handle the getting(And maybe transmission) of information.
     Protocols do not engage in any unnecessary content parsing, interpreting, or decoding!
 
     Protocols are designed to be modular, and can be 'attached' to implementations/backends.
-    This is not something the user will have to do, implementations/backends will auto-configure
+    This is not something the user will have to do, handlers will auto-configure
     the protocol they are designed to use.
 
     We keep this implementation ambiguous, although we do define some behavior that all
-    protocols MUST inherit!
+    protocols MUST implement!
     """
 
     def __init__(self, host:str, port, timeout:int=60) -> None:
@@ -115,7 +115,7 @@ class URLProtocol(BaseProtocol):
 
         req = self._request_build(url)
 
-        # Get the HTTPResponse object::
+        # Get the HTTPResponse object:
 
         self.last = urlopen(req, timeout=timeout if not None else self.timeout)
 

@@ -5,7 +5,7 @@ We provide a few implementations for diffrent protocols,
 and even some search options for specific games.
 """
 
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 from typing import Any, Optional
 from urllib.parse import urlencode
 
@@ -98,16 +98,13 @@ class ForgeSVCSearch(URLSearch):
     We define the needed attributes,
     as well as some constants that can be used
     to fine tune the search options.
-
-    :param URLSearch: [description]
-    :type URLSearch: [type]
     """
 
-    filter: Optional[str] = None # Term to search for
-    index: Optional[int] = None  # Page of search results to view
-    pageSize: Optional[int] = None  # Number of items to display per page
-    gameVersion: Optional[int] = None  # Game version to use
-    sort: Optional[int] = None # Sort method to use
+    filter: Optional[str] = field(default=None) # Term to search for
+    index: Optional[int] = field(default=None)  # Page of search results to view
+    pageSize: Optional[int] = field(default=None)  # Number of items to display per page
+    gameVersion: Optional[int] = field(default=None)  # Game version to use
+    sort: Optional[int] = field(default=None) # Sort method to use
 
     # Sort options:
 
