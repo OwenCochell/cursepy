@@ -1,6 +1,13 @@
 # capy
 A modular API for interacting with [CurseForge](https://curseforge.com).
 
+# Disclaimer
+
+capy is a work in progress!
+
+Use this library at your own risk!
+We will be complete with docs soon.
+
 # Introduction
 
 Curseforge Api PYthon(or capy for short) allows you to interact with CurseForge
