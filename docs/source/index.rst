@@ -7,7 +7,7 @@ an easy to use python library for querying and interacting with CurseForge proje
 This documentation houses the API reference, tutorials, and best practice recommendations. 
 
 If you are a user who simply wants to get information
-without any advanced configuration, check out the [TUTORIAl HERE]
+without any advanced configuration, check out the [TUTORIAL HERE]
 
 If you want to get down and dirty with handler development, check out the [TUTORIAL HERE]
 
