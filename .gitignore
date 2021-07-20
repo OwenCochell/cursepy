@@ -26,3 +26,8 @@ venv.bak/
 __pycache__/
 *.py[cod]
 *$py.class
+
+# Sphinx buid files
+
+docs/build/
+docs/source/_*

@@ -2,13 +2,19 @@
 ForgeSVC - Handlers for getting info via ForgeSVC.net
 """
 
+from __future__ import annotations
+
 import json
 from dataclasses import dataclass
 from typing import Any, Tuple
 
-from capy.classes.search import URLSearch, ForgeSVCSearch
+from capy.classes.search import SearchParam, url_convert
 from capy.handlers.base import URLHandler
 from capy.classes import base
+
+
+# Map the classes to ID's:
+
 
 
 class BaseSVCHandler(URLHandler):
@@ -75,21 +81,6 @@ class BaseSVCHandler(URLHandler):
         # Return the final packet:
 
         return data
-
-    def check_search(self, search: ForgeSVCSearch) -> bool:
-        """
-        Checks to make sure the given search object
-        inherits 'ForgeSVCSearch'.
-
-        :param search: Search object to check
-        :type search: ForgeSVCSearch
-        :return: Value determining if the search object is valid
-        :rtype: bool
-        """
-
-        # Check if the search inherits 'ForgeSVCSearch':
-
-        return isinstance(search, ForgeSVCSearch)
 
 
 class SVCListGame(BaseSVCHandler):
@@ -318,7 +309,8 @@ class SVCAddon(BaseSVCHandler):
 
         return self.proto.url_build('addon/{}'.format(addon_id))
 
-    def format(self, data: dict) -> base.CurseAddon:
+    @staticmethod
+    def format(data: dict) -> base.CurseAddon:
         """
         Formats decoded data into CurseAddon instances
 
@@ -365,7 +357,7 @@ class SVCSearch(BaseSVCHandler):
     Handler for searching for addon information.
     """
 
-    def build_url(self, game_id: int, section_id: int, search: URLSearch) -> str:
+    def build_url(self, game_id: int, section_id: int, search: SearchParam) -> str:
         """
         Generates a valid URL with the given search parameter.
 
@@ -375,7 +367,7 @@ class SVCSearch(BaseSVCHandler):
 
         # Create and return the URL:
 
-        return self.proto.url_build('search?gameId={}&sectionId={}&{}'.format(game_id, section_id, search))
+        return self.proto.url_build(url_convert(search, url='search?gameId={}&sectionId={}&'.format(game_id, section_id)))
 
     def format(self, data: dict) -> Tuple[base.CurseAddon, ...]:
         """
@@ -611,3 +603,15 @@ class SVCFileDescription(BaseSVCHandler):
         """
 
         return base.CurseDescription(data)
+
+svc_map = (SVCListGame(),
+    SVCGame(),
+    SVCListCategory(),
+    SVCCategory(),
+    SVCSubCategory(),
+    SVCAddon(),
+    SVCSearch(),
+    SVCAddonDescription(),
+    SVCAddonFiles(),
+    SVCFile(),
+    SVCFileDescription())

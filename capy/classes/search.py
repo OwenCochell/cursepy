@@ -1,8 +1,8 @@
 """
-We outline objects used for defining search parameters.
+Search objects for representing search parameters.
 
-We provide a few implementations for diffrent protocols,
-and even some search options for specific games.
+We also provide methods for conveting these values
+into something handlers can understand.
 """
 
 from dataclasses import dataclass, asdict, field
@@ -11,93 +11,26 @@ from urllib.parse import urlencode
 
 
 @dataclass
-class BaseSearch(object):
+class SearchParam:
     """
-    BaseSearch - Class all child search options should inherit!
+    SearchParam - Providing search options for efficient searching.
 
-    We define some parameters and features that should be used
-    and overloaded by child classes.
+    We define the following values:
 
-    We remain ambiguous, and specific implementations will be used 
-    for specific games.
-    """
+        * filter - Term to search for(i.e, 'Inventory Mods')
+        * index - Page index of results to view
+        * pageSize - Number of items to display per page
+        * gameVersion - Game version to search under
+        * sort - Sorting method to use
 
-    def convert(self) -> dict:
-        """
-        Converts the parameters of this class into something
-        the handlers will understand.
+    If any of these parameters are unnecessary,
+    then the handler can ignore them.
+    We use camel case for the parameter names.
 
-        By default, we just return a dictionary
-        representing this object. 
-        """
-
-        return self.to_dict()
-
-    def to_dict(self) -> dict:
-        """
-        Converts this dataclass into a dictionary.
-
-        :return: Dictionary of this dataclass
-        :rtype: dict
-        """
-
-        return asdict(self)
-
-
-@dataclass
-class URLSearch(BaseSearch):
-    """
-    URLSearch - Class for generating URL parameters.
-
-    We automatically iterate over our search attributes,
-    and use urllib to encode the attributes into a URL valid string.
-    """
-
-    def convert(self) -> str:
-        """
-        Converts the attributes in this class
-        into valid URL parameters.
-
-        This can be appended to the end of a URL
-        for a valid URL search.
-        
-        If any parameters are 'None',
-        then they will not be included.
-
-        :return: Encoded URL variables
-        :rtype: str
-        """
-
-        # Get a dictionary of parameters:
-
-        params = self.to_dict()
-        final = {}
-
-        # Iterate over the parameters:
-
-        for key in params:
-
-            # Check to ensure value is not None:
-
-            if params[key] is not None:
-
-                # Add this to the final:
-
-                final[key] = params[key]
-
-        # Encode and return the values:
-
-        return urlencode(final)
-
-
-@dataclass
-class ForgeSVCSearch(URLSearch):
-    """
-    Search class for ForgeSVC handlers.
-
-    We define the needed attributes,
-    as well as some constants that can be used
-    to fine tune the search options.
+    Users should probably use the setter methods for 
+    configuring this class!
+    Users can also use the 'set' method to configure
+    all search parameters in only one call.
     """
 
     filter: Optional[str] = field(default=None) # Term to search for
@@ -106,7 +39,7 @@ class ForgeSVCSearch(URLSearch):
     gameVersion: Optional[int] = field(default=None)  # Game version to use
     sort: Optional[int] = field(default=None) # Sort method to use
 
-    # Sort options:
+    # Some sort options defined here:
 
     FEATURED = 0
     POPULARITY = 1
@@ -114,3 +47,50 @@ class ForgeSVCSearch(URLSearch):
     NAME = 3
     AUTHOR = 4
     TOTAL_DOWNLOADS = 5
+
+
+    def asdict(self) -> dict:
+        """
+        Converts ourselves into a dictionary.
+
+        :return: Dictionary of SearchParam values
+        :rtype: dict
+        """
+
+        return asdict(self)
+
+
+def url_convert(search: SearchParam, url: str='') -> str:
+    """
+    Converts the given search object into valid URL parameters.
+    If the 'base_url' is provided,
+    then we will append the converted values to the base_url.
+
+    :param search: The SearchParam to convert
+    :type search: SearchParam
+    :param url: URL to build off of
+    :type url: str
+    :return: Converted SearchParameter value
+    :rtype: str
+    """
+
+    # Get a dictionary of parameters:
+
+    params = search.asdict()
+    final = {}
+
+    # Iterate over the parameters:
+
+    for key in params:
+
+        # Check to ensure value is not None:
+
+        if params[key] is not None:
+
+            # Add this to the final:
+
+            final[key] = params[key]
+
+    # Encode and return the values:
+
+    return url + urlencode(final)

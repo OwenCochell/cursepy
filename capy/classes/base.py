@@ -6,20 +6,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import Any, Optional, Tuple
-from os.path import isdir, basename
+from os.path import isdir, basename, join
 from urllib.parse import urlparse
 
-from capy.classes.search import BaseSearch
+from capy.classes.search import SearchParam
 from capy.formatters import BaseFormat, NullFormatter
 from capy.proto import URLProtocol
-
-# Set the number of instances:
-
-NUM_INST = 7
-
-# Map of all packet types:
-
-
 
 
 @dataclass
@@ -32,22 +24,20 @@ class BaseCurseInstance(object):
     This allows developers to work with this information in a connivent way.
 
     Some classes might even do operations on the data if needed,
-    or might be able to fetch data themselves(?).
+    or might be able to fetch data themselves.
 
     We seek to standardize curseforge information,
     allowing developers to work with with only one packet type,
     regardless of backend/method/source of information.
 
     We also provide a field for supplying metadata about the instance.
-    THis can really be anything the backend thinks is helpful,
+    This can really be anything the backend thinks is helpful,
     although we recommend keeping it to connection details and statistics.
 
     Packets can also have the raw, unformatted data attached to them.
     This data is NOT standardized,
     meaning that the raw data will most likely be diffrent across diffrent handlers.
     Be aware, that handlers are under no obligation to attach raw data to the packet!
-
-    You can use the INST_ID field to identify instances.
 
     We have the following parameters:
 
@@ -59,7 +49,6 @@ class BaseCurseInstance(object):
     raw: Any = field(init=False, repr=False)  # RAW packet data
     meta: Any = field(init=False, repr=False)  # Metadata on this packet
     hands: 'HandlerCollection' = field(init=False, repr=False, compare=False)  # Handler Collection instance
-    INST_ID: int = field(default=0, init=False)  # Instance ID of the packet
 
 
 @dataclass
@@ -71,9 +60,9 @@ class BaseWriter(BaseCurseInstance):
     and offers entry points for child classes to fine-tune and configure these writes.
     """
 
-    def low_write(self, data: bytes, path: str, append: bool=False) -> int:
+    def low_write_bytes(self, data: bytes, path: str, append: bool=False) -> int:
         """
-        Writes the given data to an external file.
+        Writes the given data to an external file in bytes.
 
         By default, we overwrite the file at the given path!
         If this is not something you want, you can pass 'True'
@@ -95,11 +84,34 @@ class BaseWriter(BaseCurseInstance):
 
         # Open the file-like object:
 
-        file = open(path, 'a' if append else 'w')
+        file = open(path, 'ab' if append else 'wb')
 
         # Write the content:
 
-        return file.write(data)
+        return file.write(bytes(data))
+
+    def low_write_string(self, data: str, path: str, append: bool=False) -> int:
+        """
+        Similar to low_write_bytes, 
+        except we write the content as a string.
+
+        :param data: Data to write to file
+        :type data: str
+        :param path: Path to file to write
+        :type path: str
+        :param append: Value determining if we are appending to the file, defaults to False
+        :type append: bool, optional
+        :return: Number of bytes written
+        :rtype: int
+        """
+
+        # Open the file-like object:
+
+        file = open(path, 'a' if append else 'wb')
+
+        # Write the content:
+
+        return file.write(str(data))
 
     def write(self, path: str, append: bool=False) -> int:
         """
@@ -156,11 +168,11 @@ class BaseDownloader(BaseWriter):
 
         # Create the URL protocol:
 
-        url = URLProtocol(url)
+        url_proto = URLProtocol(url)
 
         # Get the data:
 
-        data = url.get_data('')
+        data = url_proto.get_data('')
 
         # Determine if we should write to a file:
 
@@ -168,7 +180,7 @@ class BaseDownloader(BaseWriter):
 
             # Save the data to a file:
 
-            self.low_write(data, path)
+            self.low_write_bytes(data, path)
 
         # Finally, return the data:
 
@@ -255,7 +267,7 @@ class CurseDescription(BaseWriter):
     """
 
     description: str
-    formatter: BaseFormat = field(default=NullFormatter, init=False)
+    formatter: BaseFormat = field(default=NullFormatter(), init=False)
 
     INST_ID = 7
 
@@ -280,7 +292,7 @@ class CurseDescription(BaseWriter):
 
         # Attach the formatter to ourselves:
 
-        self.formatter = BaseFormat
+        self.formatter = form
 
     def format(self) -> Any:
         """
@@ -294,50 +306,37 @@ class CurseDescription(BaseWriter):
 
         return self.formatter.format(self.description)
 
-    def write(self, path: str, append: bool=False, raw: bool=False) -> int:
+    def write(self, path: str, append: bool=False) -> int:
         """
         Writes the description to an external file.
 
         We use the CurseWriter 'low_write' method for this operation.
 
-        We also format the description before writing the content to a file.
-        You can disable this operation using the 'raw' parameter.
+        We write the raw content, as formatters may not return writable components!
 
         :param path: Path to the file to write, must be a path-like-object
         :type path: str
         :param append: Value determining if we are appending to the file, defaults to False
         :type append: bool, optional
-        :param raw: Determines if we should return unformatted, raw data, defaults to False
-        :type raw: bool, optional
         :return: Number of bytes written
         :rtype: int
         """
 
-        # Check if we should format:
-
-        data = self.description
-
-        if not raw:
-
-            # We should format the data:
-
-            data = self.format()
-
         # Use the 'low_write' method:
 
-        self.low_write(data, path, append=append)
+        return self.low_write_string(self.description, path, append=append)
 
     def __str__(self) -> str:
         """
         Method called when this object's content is requested as a string.
 
-        We automatically send the description thorugh the attached formatter.
+        We return the raw data, as it may not return string content.
 
         :return: Formatted description content
         :rtype: str
         """
 
-        return self.format()
+        return self.description
 
 
 @dataclass
@@ -481,7 +480,7 @@ class CurseFile(BaseDownloader):
         :rtype: CurseDescription
         """
 
-        return self.hands.handel(7, self.addon_id, self.id)
+        return self.hands.file_description(self.addon_id, self.id)
 
     def get_dependencies(self) -> Tuple[CurseAddon, ...]:
         """
@@ -500,7 +499,7 @@ class CurseFile(BaseDownloader):
 
             # Get and create the CurseAddon instances:
 
-            final.append(self.hands.handel(6, depen_id))
+            final.append(self.hands.addon(depen_id))
 
         # Return the final tuple:
 
@@ -514,7 +513,7 @@ class CurseFile(BaseDownloader):
         :rtype: CurseAddon
         """
 
-        return self.hands.handel(6, self.addon_id)
+        return self.hands.addon(self.addon_id)
 
     def download(self, path: str=None) -> bytes:
         """
@@ -537,11 +536,11 @@ class CurseFile(BaseDownloader):
 
             # Check if we are working with a directory:
 
-            if path.isdir(temp_path):
+            if isdir(path):
 
                 # Join the paths:
 
-                temp_path = path.join(path, self.file_name)
+                temp_path = join(path, self.file_name)
 
             else:
 
@@ -783,7 +782,7 @@ class CurseCategory(BaseCurseInstance):
 
         return self.hands.category(self.root_id)
 
-    def search(self, search_param: Optional[BaseSearch]=None) -> Tuple[int]:
+    def search(self, search_param: Optional[SearchParam]=None) -> Tuple[int]:
         """
         Searches this category with the given search parameters.
 

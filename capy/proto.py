@@ -5,10 +5,13 @@ We offer components that can be used to get curseforge information from somewher
 in this case HTTP get requests.
 """
 
+import re
 from urllib.request import urlopen, Request
+from urllib.error import HTTPError
 from urllib.parse import urlencode
 from http.client import HTTPResponse
-from typing import Optional
+from typing import Any, Optional, Union
+from email.utils import parsedate
 
  
 class BaseProtocol(object):
@@ -48,9 +51,6 @@ class URLProtocol(BaseProtocol):
     but we also provide other features such as user defined headers,
     URL genration, and we implement the protocol caching system.
 
-    We also allow for the download of files using a given URL.
-    We write these files to external locations.
-
     The host will be used to automatically build URLs if used.
     If you want to provide URLs manually, you can use lower level methods to do so.
 
@@ -61,10 +61,11 @@ class URLProtocol(BaseProtocol):
 
         super().__init__(host, 80, timeout=timeout)
 
-        self.headers = {}  # Request headers to use
+        self.headers = {'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}  # Request headers to use
         self.extra = '/'  # Extra information to add before the path when building URLs
+        self.proto_id = 'URLProtocol'  # Protocol ID
     
-        self.last = None # HTTPResponse object of the last request
+        self.meta = {} # MetaData from the last request
 
     def get_data(self, url: str, timeout: Optional[int]=None, data: Optional[dict]=None) -> bytes:
         """
@@ -75,6 +76,9 @@ class URLProtocol(BaseProtocol):
 
         The user can optionally provide a dictionary of data,
         which will turn this call into a POST operation.
+
+        We handle caching, if enabled, and will automatically 
+        get and update values from said cache.
 
         :param url: URL to get data from
         :type url: str
@@ -90,9 +94,19 @@ class URLProtocol(BaseProtocol):
 
         req = self.low_get(url, timeout=timeout)
 
-        return req.read()
+        # Create the metadata:
 
-    def low_get(self, url: str, timeout: Optional[int]=None) -> HTTPResponse:
+        self._create_meta(req)
+
+        # Get the raw content:
+
+        cont = req.read()
+
+        # Finally, return the data:
+
+        return cont
+
+    def low_get(self, url: str, timeout: Optional[int]=None, heads: Optional[dict]=None) -> HTTPResponse:
         """
         Low-level get method.
 
@@ -107,13 +121,14 @@ class URLProtocol(BaseProtocol):
         :type url: str
         :param timeout: Timeout value, uses default value if None
         :type timeout: int, optional
+        :param heads: Extra headers to include with our defaults
         :return: HTTPResponse object contaning response from server
         :rtype: HTTPResponse
         """
 
         # Create the request:
 
-        req = self._request_build(url)
+        req = self._request_build(url, heads=heads)
 
         # Get the HTTPResponse object:
 
@@ -142,8 +157,7 @@ class URLProtocol(BaseProtocol):
 
     def make_meta(self) -> dict:
         """
-        Makes valid metadata about the request and connection
-        and returns it.
+        Gets and returns the metadata on the last made request.
 
         This is a good way to integrate connection stats into your CurseInstances!
 
@@ -156,14 +170,31 @@ class URLProtocol(BaseProtocol):
             * reason - Reason phase returned by server
     
         These values are returned in dictionary format.
+
+        :return: Dictionary of metadata 
+        :rtype: dict
         """
 
-        # Create and return the metadata:
+        # Return the created metadata:
 
-        return {'headers': self.last.getheaders(), 'version': self.last.version, 
-                'url': self.last.geturl(), 'status':self.last.status, 'reason': self.last.reason}
+        return self.meta
 
-    def _request_build(self, url: str, data: Optional[dict]=None) -> Request:
+    def _create_meta(self, resp: HTTPResponse):
+        """
+        Creates valid metadata from a HTTPResponse
+
+        :param: HTTPResponse object to create metadata from
+        :type resp: HTTPResponse
+        :return: Dictionary of metadata 
+        :rtype: dict
+        """
+
+        # Create and set the metadata:
+
+        self.meta = {'headers': self.last.getheaders(), 'version': self.last.version, 
+                        'url': self.last.geturl(), 'status':self.last.status, 'reason': self.last.reason}
+
+    def _request_build(self, url: str, data: Optional[dict]=None, heads: Optional[dict]=None) -> Request:
         """
         Builds an urllib request object using the given parameters.
 
@@ -174,6 +205,8 @@ class URLProtocol(BaseProtocol):
         :type url: str
         :param data: Data to add, None if there is no data
         :type data: dict
+        :param heads: Extra headers to optionally add to the request
+        :type heads: dict  
         :return: Request object of this request
         :rtype: Request
         """
@@ -186,6 +219,12 @@ class URLProtocol(BaseProtocol):
 
             encoded_data = urlencode(data).encode()
 
+        # Convert heads to empty dictionary if necessary: 
+
+        if heads is None:
+
+            heads = {}
+
         # Make and return the request:
 
-        return Request(url, data=encoded_data, headers=self.headers)
+        return Request(url, data=encoded_data, headers={**self.headers, **heads})

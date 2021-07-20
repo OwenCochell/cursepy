@@ -1,7 +1,7 @@
 """
 This file contains base components for handler development.
 
-A 'handler' is something that 'handels' data from a specific source of a specific type.
+A 'handler' is something that 'handles' data from a specific source of a specific type.
 Essentially, when data comes from a specific source,
 the handler is the thing that gets and formatts that data into something that is easy to work with.
 A handler may also fetch data from elsewhere to fill in the blanks.
@@ -12,18 +12,22 @@ and layout certain components that it will need to play nicely with everything e
 Because handlers can do a large variety of things,
 the specific implementation is left ambiguous.
 
-By default, the handler only works with the 'handel' method,
+By default, the HandlerCollection only works with the 'handle' method,
 which will accept raw data from the service we are talking to.
 There will be other components that the handler can overide if necessary.
 """
 
-from http.client import HTTPResponse
-from typing import Any, Optional, Tuple
+from typing import Any, Callable, Optional, Tuple
 
 from capy.classes import base
 from capy.proto import BaseProtocol, URLProtocol
 from capy.errors import ProtocolMismatch, HandlerRaise
-from capy.classes.search import BaseSearch, URLSearch
+from capy.classes.search import SearchParam
+
+
+# Define the default handler map, should be set in the init file:
+
+default_map = None
 
 
 class BaseHandler(object):
@@ -37,7 +41,6 @@ class BaseHandler(object):
     Essentially, a module can define a few things:
 
         * make_proto - Should return a valid protocol object for this handler
-        * check_search - Should check the incoming search object to ensure it is valid
         * proto_call - Call to the protocol of this handler, should return valid raw data
         * pre_process - Decodes data from the protocol before being send to the handler
         * format - Method called for formatting raw data from the protocol
@@ -51,7 +54,7 @@ class BaseHandler(object):
     Everything from getting information to formatting can be customized. 
 
     Handlers are identified by instance types.
-    Instance types are simply an intiger that represents an instance.
+    Instance types are simply an intiger that represents what this handler does.
 
     The handle method is the entry point for handlers.
     It will accept the arguments and information from the handler collection,
@@ -59,7 +62,7 @@ class BaseHandler(object):
     The default handle method will call all componets in order,
     so it is a good idea to use 'super()' once you have configured your methods.
     You can configure the handle method to accept any arguments you like, 
-    the HandlerCollection will pass all arguments that it receives to the 'handel' method,
+    the HandlerCollection will pass all arguments that it receives to the 'handle' method,
     so you should use this as the primary way to accept arguments. 
 
     The handler ID will be stored under the ID parameter.
@@ -73,14 +76,8 @@ class BaseHandler(object):
     Don't like our implementation? No problem!
     Most of the functions defined here are not necessary for handlers to work!
     The only functions that NEED to be defined are 'handle' and 'make_proto'.
-    This means you can define your own methods and frameworks by creating a custom 'handel' method,
+    This means you can define your own methods and frameworks by creating a custom 'handle' method,
     that can call/do anything you would like it too.
-
-    Handlers can optionally provide a method to check search objects,
-    to ensure that they are valid objects for this handler.
-    This ensures that the handler will always receive the correct search object.
-    If an invalid search object is provided,
-    then the HandlerCollection will raise an excpetion.
     """
 
     ID: int = -1
@@ -89,9 +86,8 @@ class BaseHandler(object):
         
         self.hand_collection: HandlerCollection  # Handlers instance we are apart of
         self.name = name  # Name of this handler, used to identify like-minded handlers
-        self.search_type: Any = None  # Search type to use for search checking
 
-        self.proto = None  # Underlying protocol object in use
+        self.proto: BaseProtocol  # Underlying protocol object in use
 
     def start(self):
         """
@@ -123,7 +119,7 @@ class BaseHandler(object):
 
         This formatter can do other things if necessary,
         and they don't necessarily have to be within the scope of formatting!
-        However, it is recommended to use the 'handel' method for other use cases.
+        However, it is recommended to use the 'handle' method for other use cases.
 
         :param data: Data to be formatted
         :type data: Any
@@ -184,7 +180,12 @@ class BaseHandler(object):
 
         This function can be added via inheritance of the relevant handler,
         or this function can be overwritten on an already existing handler.
-        The HandlerCollection will offer methods to make this process easier! 
+        The HandlerCollection will offer methods to make this process easier!
+
+        IT IS NOT RECOMMENDED TO IMPLEMENT THIS FUNCTION!
+        There is a chance that it will be overwritten by the HandlerCollection. 
+        Setting cutsom callbacks is welcome and encouraged,
+        so any custom stuff in here might get lost!
 
         :param data: Final CurseInstace representing the data we formatted
         :type data: BaseCurseInstance
@@ -192,7 +193,7 @@ class BaseHandler(object):
 
         pass
 
-    def handel(self, *args, **kwargs) -> Any:
+    def handle(self, *args, **kwargs) -> Any:
         """
         Default handle method.
 
@@ -312,33 +313,6 @@ class BaseHandler(object):
 
         return self.hand_collection.proto_map[self.name]
 
-    def check_search(self, search: BaseSearch) -> bool:
-        """
-        Checks the given search object,
-        and determines if it is valid.
-
-        This function can and should be overloaded
-        if we are a search handler.
-        This ensures that we will only receive the correct search objects.
-
-        This function should return True if the search object is valid.
-        Conversely, we should return False if the search object is invalid.
-        The process for determining weather a search object is valid
-        is purposefully left ambiguous.  
-
-        If this function is not overloaded, 
-        then we check to see if the search object inherits BaseSearch.
-
-        :param search: Search object to check
-        :type hand: BaseSearch
-        :return: Boolean determining if the search object is valid
-        :rtype: bool
-        """
-
-        # Check to see if search inherits BaseSearch:
-
-        return isinstance(search, BaseSearch)
-
 
 class URLHandler(BaseHandler):
     """
@@ -360,7 +334,6 @@ class URLHandler(BaseHandler):
         self.host = host  # Hostname of the remote entity
         self.extra = extra  # Extra paths at the end of the hostname
         self.path = path  # Path to the correct data, appended after extra
-        self.resp: HTTPResponse  # Last HTTPResponse from the protocol
 
         self.url = ''  # URL to use for the next request, can and SHOULD be overridden!
 
@@ -407,10 +380,9 @@ class URLHandler(BaseHandler):
         These values are returned in dictionary format.
         """
 
-        # Create and return the metadata:
+        # Get and return the metadata:
 
-        return {'headers': self.resp.getheaders(), 'version': self.resp.version, 
-                'url': self.resp.geturl(), 'status':self.resp.status, 'reason': self.resp.reason}
+        return self.proto.make_meta()
 
     def proto_call(self, *args) -> bytes:
         """
@@ -430,13 +402,9 @@ class URLHandler(BaseHandler):
 
         url = self.build_url(*args)
 
-        # Get and save the HTTPResponse
+        # Get and return the data:
 
-        self.resp = self.proto.low_get(url)
-
-        # Return bytes of the response:
-
-        return self.resp.read()
+        return self.proto.get_data(url)
 
     def build_url(self, *args) -> str:
         """
@@ -454,22 +422,7 @@ class URLHandler(BaseHandler):
 
         return self.proto.url_build(self.path)
 
-    def check_search(self, search: URLSearch) -> bool:
-        """
-        Checks to make sure the search object
-        inherits URLSearch.
-
-        :param search: Search object to check
-        :type search: URLSearch
-        :return: Boolean determining if the search object is valid
-        :rtype: bool
-        """
-
-        # Check to see if we inherit URLSearch:
-
-        return isinstance(search, URLSearch)
-
-    def handel(self, *args) -> Any:
+    def handle(self, *args) -> Any:
         """
         We do the same as the BaseHandler's handle method,
         except we call the 'build_url' method to generate a valid URL.
@@ -486,7 +439,7 @@ class URLHandler(BaseHandler):
 
         # Pass it along to the parent handler:
 
-        return super().handel()
+        return super().handle()
 
 
 class NullHandler(BaseHandler):
@@ -506,13 +459,13 @@ class NullHandler(BaseHandler):
     that have no handlers associated with them.
     """
 
-    def __init__(self, name: str='NullHandel', id: int=0) -> None:
+    def __init__(self, name: str='Nullhandle', id: int=0) -> None:
 
         super().__init__(name=name)
 
         ID: int = id
 
-    def handel(self, *args, **kwargs) -> None:
+    def handle(self, *args, **kwargs) -> None:
         """
         As we are a NullHandler, we simply return None.
 
@@ -525,9 +478,9 @@ class NullHandler(BaseHandler):
 
 class RaiseHandler(BaseHandler):
     """
-    Raises an exception when the 'handel' method is called.
+    Raises an exception when the 'handle' method is called.
 
-    This is very simular to the NullHandler,
+    This is very similar to the NullHandler,
     but we go a step further by raising an exception.
 
     This can be used as a more explicit, forceful way
@@ -543,7 +496,7 @@ class RaiseHandler(BaseHandler):
 
         ID: int = id
 
-    def handel(self, *args, **kwargs):
+    def handle(self, *args, **kwargs):
         """
         Raise a 'HandlerRaise' excpetion.
 
@@ -555,9 +508,8 @@ class RaiseHandler(BaseHandler):
 
 class HandlerCollection(object):
     """
-    Handlers - Manages and works with handlers! 
+    HandlerCollection - Manages and works with handlers! 
 
-    This class works with and manages handlers.
     This allows wrappers and backends to easily manage
     and work with handlers.
 
@@ -580,21 +532,33 @@ class HandlerCollection(object):
     You can utilise wrappers to change what functions expect and return.
     Be aware, that default dataclasses will call the functions defined here
     with the given arguments!
+
+    Sub-classing us is recommended and encouraged!
+    This allows developers to easily automate actions,
+    and make interacting with certain games much easier.
+
+    By default, we load the built in recommended handlers.
+    Users can optionally overwrite these handlers with there own,
+    or they can clear the HandlerCollection and start from scratch.
+    Upon instanciating the HandlerCollection,
+    users and sub-classes can disable the auto-load of the recommended handlers.
     """
 
-    LIST_GAMES = 1  # Gets a list of all valid games
-    GAME = 2  # Get information on a specific game
-    LIST_CATEGORY = 3  # Gets a list of all valid categories
-    CATEGORY = 4  # Get information on a specific category
-    SUB_CATEGORY = 5  # Get all sub-categories for the given category
-    ADDON = 6  # Get information on a specific addon
-    ADDON_SEARCH = 7  # Searches the game for addons
-    ADDON_DESC = 8 # Get description for a specific addon
-    ADDON_LIST_FILE = 9  # Gets a tuple of all files associated with an addon
-    ADDON_FILE = 10  # Get information on a specific file for an addon
-    FILE_DESCRIPTION = 11  # Description of a file
+    LIST_GAMES = 0  # Gets a list of all valid games
+    GAME = 1  # Get information on a specific game
+    LIST_CATEGORY = 2  # Gets a list of all valid categories
+    CATEGORY = 3  # Get information on a specific category
+    SUB_CATEGORY = 4  # Get all sub-categories for the given category
+    ADDON = 5  # Get information on a specific addon
+    ADDON_SEARCH = 6  # Searches the game for addons
+    ADDON_DESC = 7 # Get description for a specific addon
+    ADDON_LIST_FILE = 8  # Gets a tuple of all files associated with an addon
+    ADDON_FILE = 9  # Get information on a specific file for an addon
+    FILE_DESCRIPTION = 10  # Description of a file
     
-    def __init__(self):
+    DEFAULT_MAP: tuple = () # Default handler map
+
+    def __init__(self, load_default=True):
         
         self.handlers = {}  # Dictionary of handler objects
         self.proto_map = {}  # Maps handler names to protocol objects
@@ -602,6 +566,12 @@ class HandlerCollection(object):
         # Create a good starting state:
 
         self.reset()
+
+        # Add the default handlers, if applicable:
+
+        if load_default:
+
+            self.load_default()
 
     def reset(self):
         """
@@ -641,11 +611,23 @@ class HandlerCollection(object):
 
         We use 'remove_handler()' to remove the handler at this location.
 
+        The handler to be added MUST inherit BaseHandler!
+        If it does not, then a ValueError will be raised.
+
         :param hand: Handler to register
         :type hand: BaseHandler
         :param id: ID to register the handler to, None to use ID on given handler
         :type id: int
+        :raises: TypeError: If the handler does not inherit BaseHandler
         """
+
+        # Check if the handler is valid:
+
+        if not isinstance(hand, BaseHandler):
+
+            # Handler is not valid!
+
+            raise TypeError("Handler does not inherit BaseHandler!")
 
         # Remove the handler at this position:
 
@@ -696,9 +678,221 @@ class HandlerCollection(object):
 
         self.handlers[id] = NullHandler(id=id)
 
-    def handel(self, id: int, *args, **kwargs) -> Any:
+    def load_handlers(self, mapper: Any):
         """
-        Invokes the handel process at the handler with the given ID.
+        Loads handlers from the given iterable.
+
+        This function allows multiple handlers to be loaded at once,
+        and in a certain priority.
+
+        We use the iterables to determine the priority and ID of the handler.
+        During the load, if the handler at the given ID is NOT a NullHandler,
+        then it will be skipped.
+        This allows for handler priorities to be set.
+
+        The 'root' iterable should contain sub-iterables
+        that map handlers to ID's.
+        The lower the index, or key, of the handler map,
+        the higher priority they will have.
+        This allows lower priority handlers to 'fill in the blanks'
+        of there higher priority counterparts.
+
+        The iterables can be lists or tuples,
+        (Tuples are recommended for memory and speed reasons,
+        and are the iterable method used for built in handlers).
+        You can also use a dictionary to denote ordering.
+        The keys for the dictionary should be an intiger.
+        Higher integers mean they are lower priority.
+        
+        If the dictionary is used as a handler map,
+        then the key should be the ID that the handler is going to
+        associate with.
+
+        Here is an example of an iterable for loading handlers:
+
+        (
+            (
+                Hand1,
+                Hand1,
+                Hand1
+            ),
+            {
+                0: Hand2,
+                2: Hand2,
+                4: Hand2
+            }
+        )
+
+        In this example, the handler map will look like this:
+
+            * 0 - Hand1
+            * 1 - Hand1
+            * 2 - Hand1
+            * 4 - Hand2
+
+        Notice, that even though Hand2 was assigned to ID's 0 and 2,
+        it was not used, as Hand1 had a higher priority.
+        However, ID 4 had no handlers assigned to it,
+        so Hand2 was allowed to associate with it.
+
+        Here is another example, and instead of utilizing
+        dictionaries for skipped indexes, we simply use a NullHandler as a placeholder:
+
+        (
+            (
+                Hand1(),
+                Hand1(),
+                NullHandler(),
+                Hand1()
+            ),
+            (
+                Hand2(),
+                NullHandler(),
+                Hand2(),
+            )
+        )
+
+        In this example, we do nto assign a handler for the 2nd index
+        in the first priority handler map, and instead assign a NullHandler in it's place.
+        Because NullHandlers are ALWAYS a lower priority,
+        the lower priorities will overrite them, even though they have been specified.
+        This allows users to skip ID's without having to use dictionaries.
+
+        We use 'add_handler()' under the hood,
+        and we use recursion to iterate over the handlers.
+
+        :param loader: Iterable to load
+        :type loader: Any
+        """
+
+        iterable = None
+
+        # Dictionary check:
+
+        if type(mapper) == dict:
+
+            # Working with a dictionary, change the iter method:
+
+            iterable = sorted(mapper.items(), key= lambda item: item(0))
+
+        else:
+
+            # Check if what we are working with is a valid iterable:
+
+            try:
+
+                # Check if we can iterate:
+
+                iter(mapper)
+
+                # Set our iterable:
+
+                iterable = enumerate(mapper)
+
+            except TypeError:
+
+                # Not a valid iterable!
+
+                raise ValueError("Not a valid iterable!")
+
+        # Now, iterate over the content:
+
+        for num, value in iterable:
+
+            # Check if we are registering a handler:
+
+            if isinstance(value, BaseHandler) and type(self.get_handler(num)) == NullHandler:
+
+                # Got a valid handler!
+
+                self.add_handler(value, num)
+
+                continue
+
+            # Something else, lets use some recurision!
+
+            self.load_handlers(value)
+
+    def load_default(self):
+        """
+        Loads the default handlers for this HandlerCollection.
+
+        We are called at instantiation if load_default is True.
+        It can also be called at any point during the lifecycle of the collection.
+
+        This function should load a set of handlers that is relevant to the 
+        operation of the HandlerCollection.
+
+        By default, we load the default_map contaning the build-in handlers.
+        However, if your HandlerCollection instance needs or wants something diffrent,
+        then overloading this class is the recommended way of doing it!
+
+        It is probably best if this function used the 'load_handlers()'
+        method to do all the dirty work.
+        """
+
+        # Just load default Handlers:
+
+        self.load_handlers(HandlerCollection.default_map)
+
+    def get_handler(self, id: int) -> BaseHandler:
+        """
+        Returns the handler at the given ID.
+
+        :param id: ID of the handler to get
+        :type id: int
+        :return: The handler in question
+        :rtype: BaseHandler
+        """
+
+        return self.handlers[id]
+
+    def bind_callback(self, call: Callable, id: int) -> Callable:
+        """
+        Binds a callback function to the handler
+        at the given ID.
+
+        We can either be called the conventional way,
+        or we can be used as a decorator.
+
+        Your run function should take one parameter,
+        which will be the CurseInstance associated with the handler.
+
+        The callback will be called after the data is retrieved, decoded, and formatted!
+
+        :param call: Callback function to add to the handler
+        :type call: function
+        :param id: ID of the handler to bind the callback to
+        :type id: int
+        """
+
+        # Get the handler in question:
+
+        hand = self.get_handler(id)
+
+        # Set the callback function:
+
+        hand.run = call
+
+        # Return the function:
+
+        return call
+
+    def get_search(self) -> SearchParam:
+        """
+        Returns a SearchParam used for searching.
+
+        :return: SearchParam object used for searching
+        :rtype: SearchParam
+        """
+
+        # Return a SearchParam object:
+
+        return SearchParam()
+
+    def handle(self, id: int, *args, **kwargs) -> Any:
+        """
+        Invokes the handle process at the handler with the given ID.
 
         As outlined earlier,
         this gets and formats data from an external location.
@@ -723,7 +917,7 @@ class HandlerCollection(object):
 
         # Invoke the 'handle()' method:
 
-        inst = hand.handel(*args, **kwargs)
+        inst = hand.handle(*args, **kwargs)
 
         # Check if we are working with a tuple:
 
@@ -766,7 +960,7 @@ class HandlerCollection(object):
         :rtype: Tuple[base.CurseGame]
         """
 
-        return self.handel(1)
+        return self.handle(0)
 
     def game(self, id: int) -> base.CurseGame:
         """
@@ -782,9 +976,9 @@ class HandlerCollection(object):
         :rtype: base.CurseGame
         """
 
-        return self.handel(2, id)
+        return self.handle(1, id)
 
-    def category(self) -> Tuple[base.CurseCategory, ...]:
+    def catagories(self) -> Tuple[base.CurseCategory, ...]:
         """
         Gets ALL valid categories on CurseForge.
 
@@ -794,7 +988,7 @@ class HandlerCollection(object):
         :rtype: Tuple[base.CurseCategory, ...]
         """
 
-        return self.handel(3)
+        return self.handle(2)
 
     def category(self, category_id: int) -> base.CurseCategory:
         """
@@ -811,7 +1005,7 @@ class HandlerCollection(object):
         :rtype: base.CurseCategory
         """
 
-        return self.handel(4, category_id)
+        return self.handle(3, category_id)
 
     def sub_category(self, category_id: int) -> Tuple[base.CurseCategory, ...]:
         """
@@ -826,7 +1020,76 @@ class HandlerCollection(object):
         :rtype: Tuple[base.CurseCategory, ...]
         """
 
-        return self.handel(5, category_id)
+        return self.handle(4, category_id)
+
+    def iter_search(self, game_id: int, category_id: int, search: SearchParam=None) -> base.CurseAddon:
+        """
+        Iterates over all results from the search operation.
+
+        We automatically bump the SearchParam by one after
+        each call. We will keep yielding until
+        we receive a tuple that has a length of zero,
+        which at that point we will raise a 'StopIteration' exception.
+
+        Because we only bump the index value,
+        we will start on the index that was provided by the
+        SearchParam object. For example,
+        if the index starts at one, then we will return
+        each addon from that page on.
+
+        We use the 'search' method under the hood.
+
+        This method is best used in for loops/situations
+        where iterators are used!
+        Because we are a generator,
+        calling this method on it's own is not recommended!
+        If you want a list of values,
+        use the 'list()' method on us.
+
+        :param game_id: Game ID to search under
+        :type game_id: int
+        :param category_id: Category ID to search under
+        :type cat_id: int
+        :param search: Search Parameter to use
+        :type search: SearchParam
+        :return: Each CurseAddon that returned during the search operation.
+        :rtype: base.CurseAddon
+        :raises: StopIteration: When we have run out of search content
+        """
+
+        # Check if we should generate a SearchParam:
+
+        if search is None:
+
+            # None provided, let's create one:
+
+            search = self.get_search()
+
+        while True:
+
+            # Get the current page of results:
+
+            results = self.search(game_id, category_id, search)
+
+            # Check to see if the page is empty:
+
+            if not results:
+
+                # No results! Raise 'StopIteration'!
+
+                raise StopIteration()
+
+            # Iterate over the result:
+
+            for item in results:
+
+                # Yield the result:
+
+                yield item
+
+            # Bump the index and continue:
+
+            search.index =+ 1
 
     def addon(self, addon_id: int) -> base.CurseAddon:
         """
@@ -842,9 +1105,9 @@ class HandlerCollection(object):
         :rtype: base.CurseAddon
         """
 
-        return self.handel(6, addon_id)
+        return self.handle(5, addon_id)
 
-    def search(self, game_id: int, category_id: int, search: Any) -> Tuple[base.CurseAddon, ...]:
+    def search(self, game_id: int, category_id: int, search: SearchParam=None) -> Tuple[base.CurseAddon, ...]:
         """
         Searches the given game and category for addons.
 
@@ -861,24 +1124,22 @@ class HandlerCollection(object):
         :type game_id: int
         :param category_id: Category to search under
         :type category_id: int
-        :param search: Search options to fine tune the search
+        :param search: Search options to fine tune the search, optional
         :type search: Any
         :return: Tuple of addons that matched the search parameters
         :rtype: Tuple[base.CurseAddon, ...]
         :raises: TypeError: If the search object fails the search check
         """ 
 
-        # Check to make sure the search object is valid:
+        # Check if we should generate a dummy SearchParam:
 
-        if not self.handlers[7].check_search(search):
+        if search is None:
 
-            # Raise an exception, the search object is invalid!
+            # Create dummy search param:
 
-            raise TypeError("Invalid search object!")
+            search = SearchParam()
 
-        # Lets pass the data along:
-
-        return self.handel(7, game_id, category_id, search)
+        return self.handle(6, game_id, category_id, search)
 
     def addon_description(self, addon_id: int) -> base.CurseDescription:
         """
@@ -894,7 +1155,7 @@ class HandlerCollection(object):
         :rtype: base.CurseDescription
         """
 
-        return self.handel(8, addon_id)
+        return self.handle(7, addon_id)
 
     def addon_files(self, addon_id: int) -> Tuple[base.CurseFile]:
         """
@@ -910,7 +1171,7 @@ class HandlerCollection(object):
         :rtype: Tuple[base.CurseFile]
         """
 
-        return self.handel(9, addon_id)
+        return self.handle(8, addon_id)
 
     def addon_file(self, addon_id: int, file_id:int) -> base.CurseFile:
         """
@@ -928,7 +1189,7 @@ class HandlerCollection(object):
         :rtype: base.CurseFile
         """
 
-        return self.handel(10, addon_id, file_id)
+        return self.handle(9, addon_id, file_id)
 
     def file_description(self, addon_id: int, file_id: int) -> base.CurseDescription:
         """
@@ -945,4 +1206,4 @@ class HandlerCollection(object):
         :rtype: base.CurseDescription
         """
 
-        return self.handel(11, addon_id, file_id)
+        return self.handle(10, addon_id, file_id)

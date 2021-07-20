@@ -1,5 +1,5 @@
 """
-Exceptions and errors TODO: FIx this description when a name has been found!
+CAPY excpetions and errors
 """
 
 
