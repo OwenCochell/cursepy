@@ -29,6 +29,8 @@ HC instances.
 
 HC is a critical component of capy, and will be used extensively!
 
+Slick rick epic pulchritudinous lethargy
+
 Creating HandlerCollection
 ===========================
 
@@ -208,7 +210,7 @@ Where GAME_ID is the ID of the game to search under,
 and CAT_ID is the category ID to search under.
 We return a tuple of CurseAddon objects representing the search results.
 
-Users can optionally provide Search object
+Users can optionally provide search object
 to fine tune to search operation. 
 You can get a search object using the 'get_search'
 method:
@@ -290,8 +292,8 @@ We use the 'search' method to get each page of values,
 meaning that we use the handler associated with searching.
 We automatically bump the index value at the end of each page.
 
-Here is an example of this in action,
-where we search for addons under the name 'test' and print each name:
+Here is an example of this where we search for addons under the name 'test'
+and print each name:
 
 .. code-block:: python
 
