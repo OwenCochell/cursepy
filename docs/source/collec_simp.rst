@@ -7,7 +7,7 @@ Introduction
 
 This section contains documentation on how to use the 'HandlerCollection' class!
 This is a general guide that will show you how to do basic operations,
-and the types of calls you can make to get CurseForge information.
+and the types of calls you can make to get information from CurseForge.
 
 HandlerCollection
 =================
@@ -29,8 +29,6 @@ HC instances.
 
 HC is a critical component of capy, and will be used extensively!
 
-Slick rick epic pulchritudinous lethargy
-^ Cool Sentince
 
 Creating HandlerCollection
 ===========================
@@ -83,12 +81,11 @@ are the components that do all the dirty work
 The only thing the HC does is organize
 and call these handlers with the relevant information.
 
-Quinn is Cool
 
 With that being said, 
-for these next examples we assume that 
+for these next examples we will assume that
 all events are associated with a handler
-the accepts what we expect, and does what we expect
+that accepts what we expect, and does what we expect
 (Gets CurseForge info from somewhere and returns a CurseInstance that represents that info).
 Handlers are under no obligation to adhere to these rules or follow them,
 but it is strongly recommended that they do so!
@@ -99,7 +96,7 @@ To sum it all up: HC's manage handlers, but handlers provide the functionality!
 
 We will not be going into the dirty details
 about handler development and functionality.
-We will be keeping the content at surface level understanding only!
+We will be keeping the content at a surface level understanding only!
 If you want a more in-depth explanation of handler development, 
 you can go [HERE].
 
@@ -111,7 +108,7 @@ so developers have a standardized way of interacting with handlers.
 
 All methods will take a number of events to pass to the handler,
 and will return a CurseInstance representing the retrieved info.
-We will go over all types of information you can get.
+We will go over all the types of information you can get.
 
 .. note::
     You can read all about CurseInstances [HERE].
