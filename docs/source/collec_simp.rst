@@ -29,9 +29,6 @@ HC instances.
 
 HC is a critical component of capy, and will be used extensively!
 
-Slick rick epic pulchritudinous lethargy
-^ Cool Sentince
-
 Creating HandlerCollection
 ===========================
 

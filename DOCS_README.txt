@@ -27,11 +27,11 @@ Please refrain from editing files that are sill being written!
 Ready for checking:
 
 collec_simp.rst
+into_stip.rst
 
 Being written:
 
 index.rst
-into_simp.rst
 install.rst
 usage.rst
 
