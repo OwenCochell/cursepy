@@ -5,15 +5,13 @@ We offer components that can be used to get curseforge information from somewher
 in this case HTTP get requests.
 """
 
-import re
 from urllib.request import urlopen, Request
-from urllib.error import HTTPError
 from urllib.parse import urlencode
 from http.client import HTTPResponse
-from typing import Any, Optional, Union
+from typing import Optional
 from email.utils import parsedate
 
- 
+
 class BaseProtocol(object):
 
     """

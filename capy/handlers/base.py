@@ -504,7 +504,7 @@ class RaiseHandler(BaseHandler):
         :raises: HandlerRaise: Always
         """
 
-        raise HandlerRaise
+        raise HandlerRaise()
 
 
 class HandlerCollection(object):

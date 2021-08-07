@@ -228,7 +228,6 @@ for fine-tuning the search operation:
 Explaining Search Parameters
 ____________________________
 
-
 Most of these values are self-explanatory.
 
 'filter' is the actual search term to search for.
