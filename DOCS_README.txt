@@ -34,6 +34,7 @@ Being written:
 index.rst
 install.rst
 usage.rst
+curse_inst.rst
 
 Completed:
 

@@ -84,6 +84,13 @@ This architecture allows for addons to be organized
 into categories, and for files to be kept solely
 in the addon they belong to.
 
+Catagories, as stated before, can have sub-catagories 
+that offer another level of organization.
+Any category can have sub-catagories,
+and most catagories have parent catagories.
+The only catagories that don't are 'root catagories'.
+Keep this hierarchy in mind!
+
 capy allows you to work with components 
 in each layer of the hierarchy.
 You will understand how to do this in a later tutorial,
@@ -121,7 +128,7 @@ You can easily get a addon file like so:
 Where FILE_ID id the ID of the file to retrieve,
 and addon is a CurseAddon instance containing valid addon info.
 
-Don't worry about understanding addons just yet!
+Don't worry about understanding CurseInstances just yet!
 Just know that they contain info from CF,
 and offer convince methods for working with said info.
 We will go over the ins-and-outs of CurseAddon instances
@@ -163,3 +170,7 @@ here, just keep it's purpose in mind as you go though the tutorials.
 
 Conclusion
 ==========
+
+You should now have a basic understanding
+of capy, and the components in use.
+You can now continue with the basic usage tutorial!

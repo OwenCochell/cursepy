@@ -5,7 +5,7 @@ General classes for representing curseforge information.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Optional, Tuple
+from typing import Any, Optional, Tuple, Union
 from os.path import isdir, basename, join
 from urllib.parse import urlparse
 
@@ -279,7 +279,7 @@ class CurseDescription(BaseWriter):
 
         :param form: Formatter to attach to this description
         :type form: BaseFormat
-        :raises: ValueError: If the formatter does NOT inherit 'BaseFormat'
+        :raises: TypeError: If the formatter does NOT inherit 'BaseFormat'
         """
 
         # Check of the formatter inherits 'BaseFormat':
@@ -288,7 +288,7 @@ class CurseDescription(BaseWriter):
 
             # Object does not inherit BaseFormat!
 
-            raise ValueError("Formatter must inherit 'BaseFormat'!")
+            raise TypeError("Formatter must inherit 'BaseFormat'!")
 
         # Attach the formatter to ourselves:
 
@@ -361,7 +361,6 @@ class CurseAttachment(BaseDownloader):
         * thumb_url - URL of the thumbnail image(If attachment is image, then thumbnail is smaller image)
         * url - URL of the attachment
         * is_thumbnail - Boolean determining if this attachment is the thumbnail of the addon
-        * addon_id - ID of the addon this attachment is a part of
         * description - Description of this attachment
     """
 
@@ -391,41 +390,73 @@ class CurseAttachment(BaseDownloader):
         :rtype: bytes
         """
 
-        # Check if we are even working with paths:
+        # Get our paths:
 
-        temp_path = None
+        path = self._create_name(path)
 
-        if path is not None:
+        # Call the 'low_download' function with our URL:
+
+        return self.low_download(self.url, path=path)
+
+    def download_thumbnail(self, path: str=None) -> bytes:
+        """
+        Downloads the thumbnail of this attachment.
+
+        You can use the 'path' parameter 
+        to save the thumbnail to a file.
+
+        Like the download method,
+        we automaticallygenerate a name if the path is None,
+        or is just a directory.
+
+        :param path: Path to save the file to, defaults to None
+        :type path: str, optional
+        :return: downloaded bytes
+        :rtype: bytes
+        """
+
+        # Get our path:
+
+        path = self._create_name(path)
+
+        # Call the 'low_download' function with our URL:
+
+        return self.low_download(self.url, path=path)
+
+    def _create_name(self, name: str=None) -> str:
+        """
+        Creates a name for the download file.
+
+        If the name is none, then we return the
+        title of this addon.
+
+        We return this name as a path.
+
+        :param name: Name to use
+        :type name: str
+        :return: Path to save the file under
+        :rtype: str
+        """
+
+        if name is not None:
 
             # Check if we are working with a directory:
 
-            if isdir(path):
+            if isdir(name):
 
                 # Get the name of the file:
 
-                temp_path = self.title
+                return self.url.split('/')[-1]
 
             else:
 
                 # Just use the name provided:
 
-                temp_path = path
+                return name
 
-        # Call the 'low_download' function with our URL:
+        # Otherwise, return the None:
 
-        return self.low_download(self.url, path=temp_path)
-
-    def addon(self) -> CurseAddon:
-        """
-        Gets the addon this attachment is attached to.
-
-        :return: CurseAddon instance
-        :rtype: CurseAddon
-        """
-
-        # Get and return the CurseAddon:
-
-        return self.hands.addon(self.addon_id)
+        return None
 
 
 @dataclass
@@ -568,8 +599,7 @@ class CurseAddon(BaseCurseInstance):
     then the game wrappers might be helpful!
 
     This class contains useful metadata on a addon.
-    We do NOT contain a detailed description information,
-    and file information is converted into a CurseFile instance.
+    We do NOT contain a detailed description information.
 
     We contain the following parameters:
 
@@ -782,7 +812,7 @@ class CurseCategory(BaseCurseInstance):
 
         return self.hands.category(self.root_id)
 
-    def search(self, search_param: Optional[SearchParam]=None) -> Tuple[int]:
+    def search(self, search_param: Optional[SearchParam]=None) -> Tuple[CurseAddon]:
         """
         Searches this category with the given search parameters.
 
@@ -793,6 +823,24 @@ class CurseCategory(BaseCurseInstance):
         """
 
         return self.hands.search(self.game_id, self.id, search_param)
+
+    def iter_search(self, search_param: Optional[SearchParam]=None) -> CurseAddon:
+        """
+        Invokes the 'iter_search' method of the HC with the given search parameters.
+
+        You should check out HC's documentation on 'iter_search',
+        but in a nutshell it basically allows you to iterate
+        though all found addons, automatically incrementing the index when necessary.
+
+        :param search_param: [description], defaults to None
+        :type search_param: Optional[SearchParam], optional
+        :return: Each curse addon found
+        :rtype: CurseAddon
+        """
+
+        # Return the results from 'iter_search':
+
+        return self.hands.iter_search(self.game_id, self.id, search_param)
 
 
 @dataclass
@@ -825,7 +873,7 @@ class CurseGame(BaseCurseInstance):
         * slug - Slug of the game
         * id - ID of the game
         * support_addons - Boolean determining if this game supports addons
-        * catagories - ID's of the root categories associated with this game,
+        * cat_ids - ID's of the root categories associated with this game,
             use the 'categories' method to get CategoryInstances for these ID's
     """
 

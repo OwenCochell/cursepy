@@ -38,7 +38,7 @@ class BaseFormat(object):
         :raises: NotImplementedError: Must be overridden in child class!
         """
 
-        raise NotImplemented("Must be implemented in child class!")
+        raise NotImplementedError("Must be implemented in child class!")
 
 
 class NullFormatter(BaseFormat):

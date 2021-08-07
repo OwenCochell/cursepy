@@ -17,6 +17,7 @@ which will accept raw data from the service we are talking to.
 There will be other components that the handler can overide if necessary.
 """
 
+from capy.formatters import BaseFormat, NullFormatter
 from typing import Any, Callable, Optional, Tuple
 
 from capy.classes import base
@@ -562,6 +563,7 @@ class HandlerCollection(object):
         
         self.handlers = {}  # Dictionary of handler objects
         self.proto_map = {}  # Maps handler names to protocol objects
+        self.formatter = NullFormatter()  # Default formatter to attach to CurseDesciprion
 
         # Create a good starting state:
 
@@ -890,6 +892,31 @@ class HandlerCollection(object):
 
         return SearchParam()
 
+    def default_formatter(self, form: BaseFormat):
+        """
+        Registers a default formatter to this object.
+
+        We automatically attach the default formatter to
+        any CurseDesciprion objects we return.
+
+        If the CurseDescrpition does not inherit
+        BaseFormat, then we will raise a TypeError excpetion.
+
+        :param form: Formatter to register
+        :type form: BaseFormat
+        :raises: TypeError: If formatter does not inherit BaseFormat!
+        """
+
+        # Check if the given object inherits 'BaseFormatter':
+
+        if not isinstance(form, BaseFormat):
+
+            raise TypeError("Formatter must inherit 'BaseFormat'!")
+
+        # Save the formatter instance:
+
+        self.formatter = form
+
     def handle(self, id: int, *args, **kwargs) -> Any:
         """
         Invokes the handle process at the handler with the given ID.
@@ -929,19 +956,13 @@ class HandlerCollection(object):
 
                 # Check if we are working with a valid instance:
 
-                if isinstance(pack, base.BaseCurseInstance):
+                self._format_object(pack)
 
-                    # Attach ourselves to the instance:
+        else:
 
-                    pack.hands = self
+            # Check if we are working with a valid handler:
 
-        # Check if we are working with a valid handler:
-
-        elif isinstance(inst, base.BaseCurseInstance): 
-
-            # Attach ourselves to the pack:
-
-            inst.hands = self
+            self._format_object(inst)
 
         # Return the instance:
 
@@ -1207,3 +1228,25 @@ class HandlerCollection(object):
         """
 
         return self.handle(10, addon_id, file_id)
+
+    def _format_object(self, pack):
+        """
+        Adds ourselves to any valid CurseInstances.
+
+        :param pack: CurseInstance to format
+        :type pack: BaseFormat
+        """
+
+        if isinstance(pack, base.BaseCurseInstance):
+
+            # Attach ourselves to the instance:
+
+            pack.hands = self
+
+            # Check if we are working with CurseDescription:
+
+            if isinstance(pack, base.CurseDescription):
+
+                # Attach our formatter:
+
+                pack.attach_formatter(self.formatter)
