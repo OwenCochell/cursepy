@@ -131,7 +131,7 @@ Don't worry if you don't completely understand them yet,
 we will define them in detail later.
 
 Protocol Objects 
-________________ 
+----------------
 
 Protocol Objects are components that get data from somewhere.
 This can be anything from a remote entity to a file residing on your computer.
@@ -140,12 +140,17 @@ They are purposefully left ambiguous,
 as they can really do anything.
 Just keep in mind that they are the objects that get info from certain places.
 
-Wrappers 
-________ 
+CHF
+---
 
-Wrappers are similar to HandlerCollections,
-exc ept they change or optimize one or all features
-to work well with a specific game.
+The capy Handler Framework(CHF) is a design style 
+for handlers that aims to minimize the amount of code necessary 
+for writing handlers.
+Using CHF is completely optional, and is not necessary
+for writing handlers.
+
+We will not go into the details about CHF,
+as we will cover it later.
 
 Conclusion
 ==========

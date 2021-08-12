@@ -71,6 +71,9 @@ Important Things to Keep in Mind
 ================================
 
 As per the name, HC is a collection of handlers.
+These handlers are associated with certain events.
+When an event is 'fired', then the handler associated with the event 
+is called.
 We derive all functionality from said handlers,
 meaning that HC is only as useful as the handlers that
 are currently loaded!
@@ -79,7 +82,6 @@ are the components that do all the dirty work
 (Getting info, decoding it, formatting it).
 The only thing the HC does is organize
 and call these handlers with the relevant information.
-
 
 With that being said, 
 for these next examples we will assume that
@@ -99,6 +101,39 @@ We will be keeping the content at a surface level understanding only!
 If you want a more in-depth explanation of handler development, 
 you can go [HERE].
 
+HandlerCollection Constants
+===========================
+
+As stated earlier,
+HC objects organize handlers by attaching them to events.
+These events can be identified using integers.
+HC contains constants that can be used to identify these events:
+
+* [0]: LIST_GAMES - Gets a list of all valid games
+* [1]: GAME - Get information on a specific game
+* [2]: LIST_CATEGORY - Gets a list of all valid categories
+* [3]: CATEGORY - Get information on a specific category
+* [4]: SUB_CATEGORY - Get all sub-categories for the given category
+* [5]: ADDON - Get information on a specific addon
+* [6]: ADDON_SEARCH - Searches the game for addons
+* [7]: ADDON_DESC - Get description for a specific addon
+* [8]: ADDON_LIST_FILE - Gets a tuple of all files associated with an addon
+* [9]: ADDON_FILE - Get information on a specific file for an addon
+* [10]: FILE_DESCRIPTION - Description of a file
+
+Here is an example of printing the integer associated
+with getting game info:
+
+.. code-block:: python 
+
+    print(hands.GAME)
+
+These constants are automatically used when the entry level methods are called,
+so if you stick to those you should not have to worry about them.
+However, if you want to use the lower-level 'handle()' method,
+or register callbacks, 
+then having an understanding of these constants will be very useful!
+
 HandlerCollection Methods
 =========================
 
@@ -117,6 +152,47 @@ We will go over all the types of information you can get.
     For example, the CurseGame class
     contains all identifying information
     for a given game on CurseForge
+
+Handle Method
+-------------
+
+The lowest level method used to interact with handlers is the 'handle()' method.
+This method is one level above manually calling the handler yourself.
+The 'handle()' method also processes the returned objects,
+like attaching ourselves to any returned CurseInstance objects,
+which is necessary for them to operate correctly.
+
+With that being said, you should only call this method if you want low-level
+access to the loaded handlers.
+You should instead use the higher-level entry functions,
+as they automatically provide the necessary arguments to the 'handle()'
+function for you(among other things).
+
+Just because you might not use this method does not mean that you shouldn't understand it!
+have a look at this example of the 'handle()' function in action:
+
+.. code-block:: python
+
+    inst = hands.handle(ID)
+
+This will invoke the handler at the given ID,
+and process and return the object the handler 
+gives us(Usually a CurseInstance).
+Remember the event constants we listed earlier?
+You can use those for the 'ID' parameter.
+We also pass along all other arguments besides the ID 
+to the handler. Here is an example of this in action:
+
+.. code-block:: python 
+
+    inst = hands.handle(hands.ADDON, 1234)
+
+In this example, we call the handler that is associated with the addon event 
+and pass the integer '1234'.
+
+Again, most likely, you will not have to use the 'handle()' method.
+The high-level methods not only automatically configure the 'handle()' method for you,
+but also provide a standardized way of interacting with handlers. 
 
 Getting Game Info
 -----------------
@@ -219,11 +295,11 @@ method:
 The 'SearchParam' objects contains the following values
 for fine-tuning the search operation:
 
-    * filter - Value to search for 
-    * index - Page index to search under
-    * pageSize - Number of items to display per page
-    * gameVersion - Game version to search under
-    * sort - Sorting method to use
+* filter - Value to search for 
+* index - Page index to search under
+* pageSize - Number of items to display per page
+* gameVersion - Game version to search under
+* sort - Sorting method to use
 
 Explaining Search Parameters
 ____________________________
@@ -238,12 +314,12 @@ This varies from game to game, and should be a string.
 'sort' is an integer that represents the sorting type.
 You can use the search constants present in SearchParam to define this:
 
-    * [0]: FEATURED - Sort by featured 
-    * [1]: POPULARITY - Sort by popularity 
-    * [2]: LAST_UPDATE - Sort by last updated
-    * [3]: NAME - Sort by name 
-    * [4]: AUTHOR - Sort by author 
-    * [5]: TOTAL_DOWNLOADS - Sort by total downloads
+* [0]: FEATURED - Sort by featured 
+* [1]: POPULARITY - Sort by popularity 
+* [2]: LAST_UPDATE - Sort by last updated
+* [3]: NAME - Sort by name 
+* [4]: AUTHOR - Sort by author 
+* [5]: TOTAL_DOWNLOADS - Sort by total downloads
 
 Check out this example of sorting by popularity:
 
@@ -352,6 +428,137 @@ You can get the file description like so:
 This will return a CurseDescription object,
 much like the 'addon_description' method.
 
+Callbacks
+=========
+
+Usually, users will call the entry point methods,
+and react to the objects the get returned.
+This is great for most use cases.
+However, if you want to go for a more 'reactive' model,
+you can bind callbacks to events which will be called 
+upon after each handle request.
+
+A 'callback' is a callable that does something with the data returned by the handler.
+It should have at least one argument, which will be the object returned by the handler.
+Any other arguments are optional.
+
+Here is an example callback that prints the given data to the terminal:
+
+.. code-block:: python 
+
+    def dummy_callback(data):
+
+        # Just print the data:
+
+        print(data)
+
+In this case, the callback is a simple function.
+Now, let's bind this function to the HC under the 'FILE' event:
+
+.. code-block:: python 
+
+    hands.bind_callback(hands.FILE, dummy_callback)
+
+Remember the event constants defined earlier?
+You can use those again here to define the event the callback should be bound to!
+After we receive the data from the handler associated with the FILE event,
+the HC will automatically call this function, and pass the returned value to the callback.
+
+Consider this next example:
+
+.. code-block:: python 
+
+    inst = hands.addon_file(ADDON_ID, FILE_ID)
+
+This method, as stated earlier, will return a CurseFile instance.
+The 'ADDON_ID' is the ID of the addon, and the 'FILE_ID' is the ID of the file.
+This method will return a CurseFile object as usual, 
+but before it does it will call the 'dummy_callback' method,
+and pass along the CurseFile object.
+You can see how this can be useful!
+
+The user can bind as many callbacks to an event as they see fit.
+They will be called in the order they have been added.
+For example, if the user was to attach a method named 'cool_method' to the FILE event,
+then 'dummy_method' will be called first, and 'cool_method' will be called second.
+
+You can also specify arguments that will be passed to the callback once it is ran.
+Keep in mind that the first argument should ALWAYS be the data returned by the handler!
+Let's see an example of this in action:
+
+.. code-block:: python
+
+    def multi_arg(data, arg1, arg2, arg3=None):
+
+        # We take many arguments!
+
+        print("Data: {}, arg1: {}, arg2: {}, arg3: {}".format(data, arg1, arg2, arg3))
+
+    # Attach the callback:
+
+    hands.bind_callback(hands.FILE, multi_arg, 1, 2, arg3=3)
+
+As you can see, any extra arguments specified in the 'bind_callback()' method will be saved and passed along to the callback.
+In this case, the arguments provided are integers, but they can be anything. 
+When the FILE event is invoked, then the callback will be ran and the output will be this:
+
+.. code-block::
+
+    Data: [HANDLER DATA], arg1: 1, arg2: 2, arg3: 3
+
+Where HANDLER_DATA is whatever the handler returned.
+Again, we save and pass all arguments and keyword arguments to the callback upon runtime!
+
+Finally, callbacks can be added using decorators.
+Here is an example of this in action:
+
+.. code-block:: python
+
+    @hands.bind_callback(hands.GAME)
+    def callback(data):
+        
+        print("We have been ran!")
+
+In this example, the function 'callback()' 
+is automatically registered to the HC by using the 'bind_callback()'
+as a decorator.
+As stated earlier, any other arguments will be saved and passed 
+to the callback at runtime.
+
+Removing callbacks are very easy to do.
+You can simply use the 'clear_callback()' method:
+
+.. code-block:: python 
+
+    hands.clear_callback(ID)
+
+Where ID is the event ID to remove callbacks from.
+For example, if you provide the FILE event ID,
+then all callbacks associated with the FILE event will be removed.
+This method returns an integer representing the number of callbacks removed.
+
+If you want to remove a specific callback,
+then you can use the 'call' parameter:
+
+.. code-block:: python
+
+    hands.clear_callback(ID, call=CALL)
+
+Where 'call' is the instance of the callback to remove.
+The 'clear_callback()' method will only return callbacks that 
+match the 'call' parameter.
+This is great if you have multiple callbacks associated 
+with a certain event, 
+and only want to remove a certain callback.
+
+For example, let's remove the 'dummy_callback()'
+function that is associated with the FILE event:
+
+.. code-block:: python 
+
+    hands.clear_callback(hands.FILE, call=dummy_callback)
+
+Again, this ensures that only the 'dummy_callback()' function will be removed.
 
 Conclusion
 ==========
@@ -359,9 +566,8 @@ Conclusion
 That concludes the tutorial on basic
 HC features!
 
-Be sure to check the other tutorials for 
-info on other components, especially the
-CurseInstance tutorial!
-
 If you want some insight into advanced HC features,
 such as handler loading, be sure to check out the Advanced Tutorial.
+
+In the next tutorial, 
+we will be going over CurseInstance objects.

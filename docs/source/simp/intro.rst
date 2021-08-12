@@ -168,9 +168,23 @@ the end user will interact with them in a standardized way.
 Like the other components, we won't go into much detail
 here, just keep it's purpose in mind as you go though the tutorials.
 
+Wrappers
+--------
+
+Wrappers are similar to HandlerCollections,
+except they change or optimize one or all features
+to work well with a specific game.
+
+For example, wrappers would offer methods that ony return
+info relevant to a specific game.
+They may also have relevant ID's hardcoded into the wrapper,
+such as category ID's.
+
 Conclusion
 ==========
 
 You should now have a basic understanding
 of capy, and the components in use.
-You can now continue with the basic usage tutorial!
+
+In the next section of the tutorial,
+we will be going over HandlerCollection objects!

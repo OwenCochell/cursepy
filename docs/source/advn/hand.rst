@@ -54,10 +54,9 @@ which will cover in the next section.
 In the meantime, let's go over the attributes
 that 'BaseHandler' adds to the object that inherits it:
 
-    * hand_collection - Instance of the HC that loaded the handler 
-    * name - Name of the handler
-    * proto - Instance of the protocol object this handler uses 
-        (More on this later)
+* hand_collection - Instance of the HC that loaded the handler 
+* name - Name of the handler
+* proto - Instance of the protocol object this handler uses(More on this later)
 
 The handler name is important for identifying
 like minded handlers.
@@ -120,13 +119,57 @@ is printed to the terminal.
 When the handler is unloaded, then 'Handler is stopped'
 is printed to the terminal.
 
+It is also important for the handler to identify
+what event they are registered to.
+This is helpful for end users and the HC class,
+as it can use this info to determine what a handler does.
+By default, this value is -1,
+which is guaranteed by capy to NEVER be a valid event ID. 
+To specify what event this handler is tied to,
+you can use the ID parameter, as documented here:
+
+.. code-block:: python 
+
+    # Import the BaseHandler:
+
+    from capy.handlers.base import BaseHandler
+
+    # Create a simple handler:
+
+    class DummyHand(BaseHandler):
+        
+        ID = 1
+
+        def __init__(self):
+    
+            # Set our name:
+    
+            super().__init__(name='DummyHand')
+    
+In this example, the DummyHandler 
+is associated with the 'GAME' event.
+This means that the handler should have something to do 
+with getting game data.
+You can (and should!) use the HC constants to define this,
+which are documented [HERE].
+
+All upcoming examples will NOT utilise the ID parameter!
+Just keep in mind that specifying the handler ID is highly 
+recommended in production environments.
+
 Adding Functionality 
 ====================
 
 To add functionality to a handler,
-you can simply overload the 'handle()' method.
+you can simply overload the 'handle()' method
+(Not to be confused with the HC 'handle()' method).
 
 Simple as that.
+
+When the handler is loaded into a HC,
+and the event it is registered to is invoked,
+then the HC calls the 'handle()' method 
+of the handler associated with the event.
 
 Here is an example of printing 'Hello!'
 to the terminal every time the handler is called:
@@ -153,7 +196,7 @@ to the terminal every time the handler is called:
 
                 print("Hello!")
 
-The HC also passes all arguments to the 'handle' method.
+The HC also passes all arguments to the 'handle()' method.
 capy has a standard which determines the types of arguments
 each handler should receive, but lets ignore that for now.
 Let's say your DummyHandler will take two arguments, 
@@ -192,7 +235,11 @@ Again, we can't stress this enough,
 but handlers do not have to follow this rule!
 The standard is highly recommended if the developer can help it,
 but if there is a specific use case that goes against this standard,
-then developers should feel free to deviate at there own risk. 
+then developers should feel free to deviate at there own risk.
+The HC will return the object that is returned by the 'handle()' method.
+HC will also process any relevant objects(objects that inherit 'BaseCurseInstance')
+by attaching itself to the object,
+and attaching the default formatter to any CurseDescription objects.
 
 Using the 'handle()' method is fine for simple operations.
 However, if you want a recommended implementation
@@ -211,7 +258,7 @@ it will make sense to you later.
 
 The CHF lifecycle is as follows:
 
-Get Data -> Decode Data -> Format Data -> Post-Process Data -> Run Custom Code -> Return Data 
+Get Data -> Decode Data -> Format Data -> Post-Process Data -> Return Data 
 
 There are methods for each event in this chain.
 This chain should also help illustrate the importance of smart inheritance.
@@ -230,7 +277,7 @@ then any content in the CHF methods will not be ran
 (Unless you run them yourself)!
 
 proto_call
-__________
+----------
 
 The 'proto_call()' method is called when 
 info is needed from the protocol object associated 
@@ -275,7 +322,7 @@ After the bytes are returned,
 then they will be passed along for decoding.
 
 pre_process
-___________ 
+-----------
 
 The 'pre_process()' method is called when raw data from the 'proto_call()'
 method needs to be decoded.
@@ -324,8 +371,8 @@ here is an example of decoding the raw bytes using JSON:
 Now, we can see that the data is decoded via JSON,
 and the resulting dictionary is returned.
 
-format 
-______ 
+format
+------
 
 The next method in the chain is the 'format()' method.
 
@@ -388,7 +435,7 @@ But wait! We are not done yet!
 This formatted object will no be passed to the next ring of the chain.
 
 post_process
-____________
+------------
 
 The 'post_process()' method should finalize the returned
 formatted object.
@@ -465,30 +512,8 @@ so all object will have the time attached to them
 without having to explicitly specify it.
 We will go deep into this concept later, but keep this in mind!
 
-run 
-___ 
-
-The 'run()' method is called after the handler operation.
-It should accept one argument, which is the finalized object.
-
-The run method is not meant to do anything to the finalized object 
-(Although it most certainly can).
-It is designed for users to attach custom methods to handlers 
-that are called upon each handler operation.
-Essentially, the run method allows for the user to register callbacks.
-
-In most cases, the user makes a request and the handler returns a CurseInstance
-representing the info received.
-The user will then use that info to do something.
-If the user wants to utilise a callback based approach,
-their custom code is called upon each request,
-then they can use the run method for this purpose.
-
-Because of this, it is not recommended to implement this method,
-as it will probably be overwritten by something else!
-
 make_proto
-__________
+----------
 
 Method called when a protocol object is needed.
 
@@ -564,7 +589,7 @@ All they need to do is provide a valid protocol object,
 and know that their protocol object is present at the 'proto' attribute.
 
 Tieing it all together
-______________________ 
+----------------------
 
 You now have a handler using the CHF!
 Now, let's go over how using this framework can save some time.
@@ -657,8 +682,8 @@ Lets go over these in detail.
     handlers and the features they support,
     then have a look '[HERE]'
 
-NullHandler 
-___________ 
+NullHandler
+-----------
 
 This handler does, you guessed it, nothing!
 
@@ -672,7 +697,7 @@ even if it does nothing.
 This handler is great if you want to disable a certain feature.
 
 RaiseHandler
-____________ 
+------------
 
 This handler raises an exception upon each handle request.
 It raises a 'HandlerRaise' exception upon each call.
@@ -680,7 +705,7 @@ It raises a 'HandlerRaise' exception upon each call.
 This handler is great of you want to forcefully disable an option!
 
 URLHandler
-__________ 
+----------
 
 This handler acts as a parent class for handlers communicating via HTTP.
 
@@ -690,11 +715,11 @@ It also keeps track of the HTTP request of the last made request,
 and offers the ability to generate valid metadata for CurseInstances,
 which is a dictionary with the following values:
 
-    * headers - A tuple of (header, value) tuples
-    * version - HTTP protocol version 
-    * url - URL of the resource retrieved
-    * status - Status code returned by the server 
-    * reason - Reason phrase returned by the server.
+* headers - A tuple of (header, value) tuples
+* version - HTTP protocol version 
+* url - URL of the resource retrieved
+* status - Status code returned by the server 
+* reason - Reason phrase returned by the server.
 
 It takes over the 'proto_call()' method as well,
 and uses the 'build_url()' method to get a valid URL.
@@ -745,6 +770,7 @@ Conclusion
 
 You should now have a solid understanding of handlers
 and how they operate!
-
 If you are still unsure about the topics discussed,
 then be sure to check out the API reference!
+
+The next section will go over wrapper development.

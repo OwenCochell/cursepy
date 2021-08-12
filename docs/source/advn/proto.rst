@@ -138,9 +138,13 @@ attributes which can be used to keep track of statistics.
 These usually record the number of bytes sent and received,
 but in this case it keeps track of the number of times the data was fetched.
 
-Built in Handlers 
-=================
+Built in Protocol Objects 
+=========================
 
-Lets go over the built in handlers that are shipped with capy.
+Lets go over the built in protocol objects that are shipped with capy.
 They can make handler development much easier,
 so using them is recommended!
+
+URLProtocol
+-----------
+

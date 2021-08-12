@@ -15,6 +15,8 @@ If you want to get down and dirty with handler development, check out the [TUTOR
    :maxdepth: 2
    :caption: Contents:
 
+   simp/index
+   advn/index
 
 
 Indices and tables

@@ -46,7 +46,6 @@ class BaseHandler(object):
         * pre_process - Decodes data from the protocol before being send to the handler
         * format - Method called for formatting raw data from the protocol
         * post_process - Finalizes the formatted data(Adds metadata, raw data, ect.)
-        * run - Ran after all other functions, with the instance as the argument, great for user-defined code
         * handle - Invokes the handling process for this handler
 
     This allows handlers to control many aspects of their implementation.
@@ -166,30 +165,6 @@ class BaseHandler(object):
         :type data: Any
         :return: Finalized packet
         :rtype: Any
-        """
-
-        pass
-
-    def run(self, data: base.BaseCurseInstance):
-        """
-        Contains code to be ran after the packet is received and formatted.
-
-        This is useful if you want something to be ran each time certain data is handled.
-        This is an optional implementation,
-        as the handler collection will always return a CurseInstance representing the received data.
-        The final CurseInstance will be passed to this function.
-
-        This function can be added via inheritance of the relevant handler,
-        or this function can be overwritten on an already existing handler.
-        The HandlerCollection will offer methods to make this process easier!
-
-        IT IS NOT RECOMMENDED TO IMPLEMENT THIS FUNCTION!
-        There is a chance that it will be overwritten by the HandlerCollection. 
-        Setting cutsom callbacks is welcome and encouraged,
-        so any custom stuff in here might get lost!
-
-        :param data: Final CurseInstace representing the data we formatted
-        :type data: BaseCurseInstance
         """
 
         pass
@@ -530,6 +505,13 @@ class HandlerCollection(object):
     We define some arguments that should be defined,
     as well as what we expect the functions to return.
 
+    Users can optionally attach callbacks to certain events.
+    These callbacks should be a callable, which will be called after 
+    the handle event is complete.
+    Callbacks should accept at least one argument,
+    which is the data the handler is returned.
+    Any other arguments can be optionally provided.
+
     You can utilise wrappers to change what functions expect and return.
     Be aware, that default dataclasses will call the functions defined here
     with the given arguments!
@@ -563,6 +545,7 @@ class HandlerCollection(object):
         
         self.handlers = {}  # Dictionary of handler objects
         self.proto_map = {}  # Maps handler names to protocol objects
+        self.callbacks = {}  # List of callbacks to run
         self.formatter = NullFormatter()  # Default formatter to attach to CurseDesciprion
 
         # Create a good starting state:
@@ -602,8 +585,15 @@ class HandlerCollection(object):
 
         self.proto_map.clear()
 
-    def add_handler(self, hand: BaseHandler, id: Optional[int]=None):
+        # Remove the callbacks:
 
+        self.callbacks = {}
+
+        # Remove the default formatter:
+
+        self.formatter = NullFormatter()
+
+    def add_handler(self, hand: BaseHandler, id: Optional[int]=None):
         """
         Adds the given handler to the HandlerCollection.
 
@@ -754,7 +744,7 @@ class HandlerCollection(object):
             )
         )
 
-        In this example, we do nto assign a handler for the 2nd index
+        In this example, we do not assign a handler for the 2nd index
         in the first priority handler map, and instead assign a NullHandler in it's place.
         Because NullHandlers are ALWAYS a lower priority,
         the lower priorities will overrite them, even though they have been specified.
@@ -849,7 +839,7 @@ class HandlerCollection(object):
 
         return self.handlers[id]
 
-    def bind_callback(self, call: Callable, id: int) -> Callable:
+    def bind_callback(self, call: Callable, id: int, *args, **kwargs) -> Callable:
         """
         Binds a callback function to the handler
         at the given ID.
@@ -857,8 +847,20 @@ class HandlerCollection(object):
         We can either be called the conventional way,
         or we can be used as a decorator.
 
-        Your run function should take one parameter,
+        Your run function should take at least one parameter,
         which will be the CurseInstance associated with the handler.
+        Other arguments can optionally be provided.
+
+        We keep a reference of the callback
+        and arguments in this class as a dictionary.
+        You can alter this structure yourself,
+        but it is recommended to use the higher level methods for this.
+
+        Any extra arguments that are passed will be saved and passed 
+        to the callback at a later time.
+
+        Multiple callbacks can be registered to an event!
+        The order that they are added will be the order that they will be called.
 
         The callback will be called after the data is retrieved, decoded, and formatted!
 
@@ -868,17 +870,64 @@ class HandlerCollection(object):
         :type id: int
         """
 
-        # Get the handler in question:
+        # Setup the basic structure:
 
-        hand = self.get_handler(id)
+        if id not in self.callbacks.keys():
 
-        # Set the callback function:
+            # Set the value to a list:
 
-        hand.run = call
+            self.callbacks[id] = []
 
-        # Return the function:
+        # Add the callback and argument info to the structure:
+
+        self.callbacks[id].append((call, args, kwargs))
 
         return call
+
+    def clear_callback(self, id: int, call: Callable=None) -> int:
+        """
+        Clears the callback from the given event.
+
+        If a callback is not specified,
+        then ALL callbacks will be cleared.
+        If a callback is specified, 
+        then the callbacks that match the provided object will be deleted.
+
+        :param id: ID to clear
+        :type id: int
+        :param call: Callback to remove, optional
+        :type call: Callbale, None
+        :return: Number of callbacks removed.
+        :rtype: int
+        """
+
+        removed = 0
+
+        # Check if the ID is present:
+
+        if id not in self.callbacks.keys():
+
+            # Key is NOT present, return
+
+            return removed
+
+        # Iterate over callbacks at the ID:
+
+        for index, val in enumerate(self.callbacks[id]):
+
+            # Check if the callback matches:
+
+            if val[0] == call or val is None:
+
+                # Remove the callback:
+
+                self.callbacks[id].pop(index)
+                
+                removed += 1
+
+        # Return the number of items removed:
+
+        return removed
 
     def get_search(self) -> SearchParam:
         """
@@ -1250,3 +1299,19 @@ class HandlerCollection(object):
                 # Attach our formatter:
 
                 pack.attach_formatter(self.formatter)
+
+""" 
+{
+    2: (
+        (
+            call,
+            (arg1, arg2),
+            {arg3=3}
+        ),
+        (
+            call2,
+            (),
+            {}
+        )
+    )
+}"""

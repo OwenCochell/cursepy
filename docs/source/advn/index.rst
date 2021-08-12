@@ -1,8 +1,5 @@
-=================
-Advanced Tutorial
-=================
-
 Welcome to the advanced capy tutorial!
+======================================
 
 We will go over advanced capy concepts 
 such as handler development, writing wrappers,
@@ -23,3 +20,4 @@ should be an excellent way for you to do that.
 
     advn/into
     advn/hand
+    advn/proto
