@@ -42,7 +42,7 @@ objects floating around in memory.
 Now that we have a basic understanding of protocol
 objects, we can now go into designing a protocol object.
 
-Creating a Protocol Object 
+Creating a Protocol Object
 ==========================
 
 Creating protocol objects are actually quite simple.
@@ -148,3 +148,89 @@ so using them is recommended!
 URLProtocol
 -----------
 
+The URLProtocol class eases the process of communicating with remote 
+entities via HTTP.
+We use the urllib library under the hood.
+
+Creating the URLProtocol object is very simple:
+
+.. code-block:: python 
+
+    proto = URLProtocol(URL)
+
+Where 'URL' is the base URL of the entity we are communicating with.
+Specifying this is recommended, as it allows you to easily build URLs.
+The port is not specified, it is set automatically to port 80.
+
+You can get data like so:
+
+.. code-block:: python 
+
+    proto.get_data(URL, timeout=60, data=DATA)
+
+Where URL is the URL of the data to retrieve.
+By default, we will do a HTTP GET request,
+unless DATA is specified, in which case we will
+do a HTTP POST request with the given data.
+We return the retrieved bytes of the operation.
+
+If you want to get a HTTPResponse object instead of bytes,
+then you can use the 'low_get()' method.
+It uses the same arguments and has the same functionality,
+except that it returns a HTTPResponse object.
+
+URLProtocol provides an easy way to create URLs.
+For example, lets say you are making requests to 'www.content.com'.
+Lets also say that your calls will always be under the '/content/'
+sub page.
+You can build valid URLs like so:
+
+.. code-block:: python
+
+    # Create the protocol object:
+
+    proto = URLProtocol('www.content.com')
+
+    # Set the extra URL path:
+
+    proto.extra = '/content/'
+
+    # Build a valid URL:
+
+    new_url = proto.url_build('new')
+
+The 'new_url' will be 'www.content.com/content/new'.
+You can see how this can be useful.
+Instead of manually providing each URL,
+you can use 'build_url()' to generate your URLs for you.
+
+At the end of the day, the generated URL will look like this:
+
+.. code-block::
+
+    [HOSTNAME]/[EXTRA]/[PATH]
+
+URLProtocol also provides a way to easily get metadata.
+You can use the 'get_metadata()' method,
+which will return the metadata of the last made request in dictionary
+format:
+
+.. code-block::
+
+    {
+        headers: A list of (header, value) tuples
+        version: HTTP Protocol version used by server
+        url: URL of the resource retrieved
+        status: Status code returned by server
+        reason: Reason phrase returned by the server 
+    }
+
+Conclusion
+==========
+
+That concludes this tutorial on protocol development!
+
+You should now have a deeper understanding of protocol
+objects, and how they operate.
+
+The next section in this tutorial goes over advanced HandlerCollection concepts.

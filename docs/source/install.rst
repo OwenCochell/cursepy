@@ -1,3 +1,5 @@
+
+
 ============
 Installation
 ============
@@ -19,14 +21,14 @@ capy is NOT backwards compatible with python 2!
 To check what version of python you have installed,
 you can run the following command in your terminal to find out:
 
-.. code-block:: bash:
+.. code-block:: terminal
 
     $ python --version
 
 This will print the python version. If you run this command 
 on python 3.9, the output will look something like this:
 
-.. code-block:: bash:
+.. code-block:: bash
 
     Python 3.9.5
 
@@ -45,7 +47,7 @@ It is important to specify the python 3 version of pip, or else it will not work
 Windows
 -------
 
-Windows users can download a python installer `here <https://www.python.org/downloads/>`_.
+Windows users can download the `python installer <https://www.python.org/downloads/>`_.
 The installation is pretty straightforward, although we recommend adding python to your PATH environment
 variable, as it makes using python much easier.
 

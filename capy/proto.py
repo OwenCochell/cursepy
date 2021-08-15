@@ -9,7 +9,6 @@ from urllib.request import urlopen, Request
 from urllib.parse import urlencode
 from http.client import HTTPResponse
 from typing import Optional
-from email.utils import parsedate
 
 
 class BaseProtocol(object):

@@ -20,7 +20,7 @@ of basic understanding of capy and it's components.
     If you want an advanced tutorial on capy,
     where we go into the internals of capy
     and handler development, then check out the 
-    advanced tutorial.
+    :ref:`advanced tutorial <advanced-tutorial>`.
 
 What is CurseForge?
 ===================
@@ -156,10 +156,10 @@ handlers are the components that offer the functionality!
     and handler development, then check out the 
     Advanced Tutorial!
 
-HandlerCollection
------------------
+CurseClient
+-----------
 
-A 'HandlerCollection' is a class
+A 'CurseClient' is a class
 that manages handlers, and offers 
 entry points into them.
 This ensures that no matter the handler type,
@@ -187,4 +187,4 @@ You should now have a basic understanding
 of capy, and the components in use.
 
 In the next section of the tutorial,
-we will be going over HandlerCollection objects!
+we will be going over CurseClient objects!

@@ -5,9 +5,8 @@ General classes for representing curseforge information.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Optional, Tuple, Union
-from os.path import isdir, basename, join
-from urllib.parse import urlparse
+from typing import Any, Optional, Tuple
+from os.path import isdir, join
 
 from capy.classes.search import SearchParam
 from capy.formatters import BaseFormat, NullFormatter
@@ -140,11 +139,9 @@ class BaseDownloader(BaseWriter):
     """
     Parent class for all instances that download information.
 
-    We expect the download URL to be present at the 'download_url' parameter,
-    and we expect the protocol to be HTTP. 
+    We offer some helper methods for achieving this.
+    We expect the protocol to be HTTP.
     """
-
-    download_url: str = field(init=False)
 
     def low_download(self, url: str, path: str=None) -> bytes:
         """
@@ -621,7 +618,7 @@ class CurseAddon(BaseCurseInstance):
         * category_id - ID of the category this addon is in
         * is_featured - Boolean determining if this addon is featured
         * popularity_score - Float representing this addon's popularity score
-        (Most likely used for popularity ranking)
+            (Most likely used for popularity ranking)
         * popularity_rank - Int representing the game's popularity rank
         * game_name - Name of the game
     """

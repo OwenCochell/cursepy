@@ -1,86 +1,87 @@
-=================
-Collection Basics
-=================
+.. _collec_basic:
+
+==================
+CurseClient Basics
+==================
 
 Introduction
 ============
 
-This section contains documentation on how to use the 'HandlerCollection' class!
+This section contains documentation on how to use the 'CurseClient' class!
 This is a general guide that will show you how to do basic operations,
 and the types of calls you can make to get information from CurseForge.
 
-HandlerCollection
-=================
+CurseClient
+===========
 
-Now, what is a 'HandlerCollection', and why is it relevant?
+Now, what is a 'CurseClient', and why is it relevant?
 
-The HandlerCollection(Hereafter referred to as HC),
-is the class that manages handlers, and offers entry points into them.
-This allows you to call handlers in a standardized way,
-regardless of the handler type.
-It is best practice to use the HC entry points
-instead of calling handlers directly.
+The CurseClient(Hereafter referred to as CC),
+is the class that facilitates communication with CurseForge(CF).
+It does many things under the hood to make the communication with CF
+a very simple procedure.
 
-Some classes will inherit HandlerCollection to add extra functionality.
+Some classes will inherit CurseClient to add extra functionality.
 These components are called wrappers, and they are described in detail
 elsewhere in this documentation.
 Just know that most features defined here will be present in all
-HC instances.
+CC instances.
 
-HC is a critical component of capy, and will be used extensively!
+CC is a critical high level component of capy, and will be used extensively!
 
-Creating HandlerCollection
-==========================
+Creating a CurseClient
+======================
 
-Creating a HandlerCollection is simple procedure, and can be done like so:
+Creating a CC is simple procedure, and can be done like so:
 
 .. code-block:: python
 
-    # Import the HC:
+    # Import the CC:
 
-    from capy import HandlerCollection
+    from capy import CurseClient
 
-    # Create the HC:
+    # Create the CC:
 
-    hands = HandlerCollection()
+    client = HandlerCollection()
 
-This will create a HC with the default handlers loaded.
+This will create a CC with the default handlers loaded.
 If you do not want the default handlers to be loaded,
 then you can pass 'False' to the 'load_default' parameter, like so:
 
 .. code-block:: python
 
-    # Create a HC, but without default handlers:
+    # Create a CC, but without default handlers:
 
-    hands = HandlerCollection(load_default=False)
+    client = CurseClient(load_default=False)
 
 If no default handlers are loaded, 
 then every event will have a 'NullHandler'
 associated with it.
 
-We will touch on handler management later in this section,
-but first we will touch on how to get game information.
+We will not get into handler management in this tutorial, 
+but you can have a look at the :ref:`Advanced Tutorial <collec_advn>`
+for more info!
 
 .. note::
 
     In all following examples,
-    we assume that a HC is properly imported and instantiated
-    under the name 'hands'.
+    we assume that a CC is properly imported and instantiated
+    under the name 'client'.
 
 Important Things to Keep in Mind
 ================================
 
-As per the name, HC is a collection of handlers.
+CC uses a collection of handlers to add functionality.
 These handlers are associated with certain events.
 When an event is 'fired', then the handler associated with the event 
 is called.
 We derive all functionality from said handlers,
-meaning that HC is only as useful as the handlers that
+meaning that CC is only as useful as the handlers that
 are currently loaded!
 It is important to recognize that handlers
 are the components that do all the dirty work
 (Getting info, decoding it, formatting it).
-The only thing the HC does is organize
+The only thing the CC does is organize
 and call these handlers with the relevant information.
 
 With that being said, 
@@ -93,7 +94,7 @@ but it is strongly recommended that they do so!
 Keep in mind that the built in handlers follow these recommendations,
 so you should either be wary, or have a keen understanding on any third party handlers you load!
 
-To sum it all up: HC's manage handlers, but handlers provide the functionality!
+To sum it all up: CC manages handlers, but handlers provide the functionality!
 
 We will not be going into the dirty details
 about handler development and functionality.
@@ -101,13 +102,15 @@ We will be keeping the content at a surface level understanding only!
 If you want a more in-depth explanation of handler development, 
 you can go [HERE].
 
-HandlerCollection Constants
-===========================
+.. _collec-constants:
+
+CurseClient Constants
+=====================
 
 As stated earlier,
-HC objects organize handlers by attaching them to events.
+CC objects organize handlers by attaching them to events.
 These events can be identified using integers.
-HC contains constants that can be used to identify these events:
+CC contains constants that can be used to identify these events:
 
 * [0]: LIST_GAMES - Gets a list of all valid games
 * [1]: GAME - Get information on a specific game
@@ -126,7 +129,7 @@ with getting game info:
 
 .. code-block:: python 
 
-    print(hands.GAME)
+    print(client.GAME)
 
 These constants are automatically used when the entry level methods are called,
 so if you stick to those you should not have to worry about them.
@@ -134,10 +137,10 @@ However, if you want to use the lower-level 'handle()' method,
 or register callbacks, 
 then having an understanding of these constants will be very useful!
 
-HandlerCollection Methods
-=========================
+CurseClient Methods
+===================
 
-HC provides some entry points for getting information,
+CC provides some entry points for getting information,
 so developers have a standardized way of interacting with handlers.
 
 All methods will take a number of events to pass to the handler,
@@ -173,7 +176,7 @@ have a look at this example of the 'handle()' function in action:
 
 .. code-block:: python
 
-    inst = hands.handle(ID)
+    inst = client.handle(ID)
 
 This will invoke the handler at the given ID,
 and process and return the object the handler 
@@ -185,7 +188,7 @@ to the handler. Here is an example of this in action:
 
 .. code-block:: python 
 
-    inst = hands.handle(hands.ADDON, 1234)
+    inst = client.handle(client.ADDON, 1234)
 
 In this example, we call the handler that is associated with the addon event 
 and pass the integer '1234'.
@@ -202,7 +205,7 @@ you can use the 'game' method:
 
 .. code-block:: python
 
-    game = hands.game(GAME_ID)
+    game = client.game(GAME_ID)
 
 Where GAME_ID is the game ID.
 This method will return a CurseGame object
@@ -213,7 +216,7 @@ you can use the 'games' method:
 
 .. code-block:: python
 
-    games = hands.games()
+    games = client.games()
 
 'game' takes no parameters,
 and it returns a tuple of CurseGame objects
@@ -227,7 +230,7 @@ you can use the 'category' method:
 
 .. code-block:: python
 
-    cat = hands.category(CAT_ID)
+    cat = client.category(CAT_ID)
 
 Where CAT_ID is the category ID.
 We will return a CurseCategory object
@@ -240,7 +243,7 @@ you can use the 'sub_category' method:
 
 .. code-block:: python
 
-    sub_cats = hands.sub_category(CAT_ID)
+    sub_cats = client.sub_category(CAT_ID)
 
 If no sub-categories are found,
 then the returned tuple will be empty.
@@ -255,7 +258,7 @@ using the 'addon' method:
 
 .. code-block:: python
 
-    addon = hands.addon(ADDON_ID)
+    addon = client.addon(ADDON_ID)
 
 Where ADDON_ID is the ID of the addon to get.
 We will return a CurseAddon object 
@@ -268,7 +271,7 @@ method for this:
 
 .. code-block:: python
 
-    desc = hands.addon_description(ADDON_ID)
+    desc = client.addon_description(ADDON_ID)
 
 This will return a CurseDescription
 object representing the addon description.
@@ -277,7 +280,7 @@ You can also search for addons using the 'search' method:
 
 .. code-block:: python
 
-    result = hands.search(GAME_ID, CAT_ID, search=search_param)
+    result = client.search(GAME_ID, CAT_ID, search=search_param)
 
 Where GAME_ID is the ID of the game to search under,
 and CAT_ID is the category ID to search under.
@@ -290,7 +293,7 @@ method:
 
 .. code-block:: python
 
-    search = hands.get_search()
+    search = client.get_search()
 
 The 'SearchParam' objects contains the following values
 for fine-tuning the search operation:
@@ -327,7 +330,7 @@ Check out this example of sorting by popularity:
 
     # Get the search object:
 
-    search = hand.get_search()
+    search = client.get_search()
 
     # Set the sorting type:
 
@@ -346,7 +349,7 @@ Here is an example of getting the second page of search results:
 
     # Get the SearchParam:
 
-    search = hands.get_search()
+    search = client.get_search()
 
     # Set the page index to 1:
 
@@ -354,10 +357,10 @@ Here is an example of getting the second page of search results:
 
     # Get the results:
 
-    result = hands.search(GAME_ID, CAT_ID, search)
+    result = client.search(GAME_ID, CAT_ID, search)
 
 If you want to iterate over ALL content over all valid pages,
-HC has a method for that.
+CC has a method for that.
 You can use the 'iter_search' method to iterate over all 
 search results until we reach the end.
 We use the 'search' method to get each page of values,
@@ -371,15 +374,15 @@ and print each name:
 
     # Get the SearchParam:
 
-    search = hands.get_search()
+    search = client.get_search()
 
     # Set the filter to 'test':
 
-    search.filter = test
+    search.filter = 'test'
 
     # Iterate over ALL addons:
 
-    for addon in hands.iter_search(GAME_ID, ADDON_ID, search):
+    for addon in client.iter_search(GAME_ID, ADDON_ID, search):
 
         print(addon.name)
 
@@ -400,7 +403,7 @@ associated with an addon:
 
 .. code-block:: python
 
-    files = hands.addon_files(ADDON_ID)
+    files = client.addon_files(ADDON_ID)
 
 Where ADDON_ID is the ID of the addon to get files for.
 This function will return a tuple of CurseFile instances
@@ -411,7 +414,7 @@ you can use the 'addon_file' method:
 
 .. code-block:: python
 
-    file = hands.addon_files(ADDON_ID, FILE_ID)
+    file = client.addon_files(ADDON_ID, FILE_ID)
 
 Where FILE_ID is the ID of the file to get info for.
 This function will return a CurseFile
@@ -423,7 +426,7 @@ You can get the file description like so:
 
 .. code-block:: python
 
-    desc = hands.file_description(ADDON_ID, FILE_ID)
+    desc = client.file_description(ADDON_ID, FILE_ID)
 
 This will return a CurseDescription object,
 much like the 'addon_description' method.
@@ -453,22 +456,22 @@ Here is an example callback that prints the given data to the terminal:
         print(data)
 
 In this case, the callback is a simple function.
-Now, let's bind this function to the HC under the 'FILE' event:
+Now, let's bind this function to the CC under the 'FILE' event:
 
 .. code-block:: python 
 
-    hands.bind_callback(hands.FILE, dummy_callback)
+    client.bind_callback(client.FILE, dummy_callback)
 
 Remember the event constants defined earlier?
 You can use those again here to define the event the callback should be bound to!
 After we receive the data from the handler associated with the FILE event,
-the HC will automatically call this function, and pass the returned value to the callback.
+the CC will automatically call this function, and pass the returned value to the callback.
 
 Consider this next example:
 
 .. code-block:: python 
 
-    inst = hands.addon_file(ADDON_ID, FILE_ID)
+    inst = client.addon_file(ADDON_ID, FILE_ID)
 
 This method, as stated earlier, will return a CurseFile instance.
 The 'ADDON_ID' is the ID of the addon, and the 'FILE_ID' is the ID of the file.
@@ -496,7 +499,7 @@ Let's see an example of this in action:
 
     # Attach the callback:
 
-    hands.bind_callback(hands.FILE, multi_arg, 1, 2, arg3=3)
+    client.bind_callback(client.FILE, multi_arg, 1, 2, arg3=3)
 
 As you can see, any extra arguments specified in the 'bind_callback()' method will be saved and passed along to the callback.
 In this case, the arguments provided are integers, but they can be anything. 
@@ -514,23 +517,23 @@ Here is an example of this in action:
 
 .. code-block:: python
 
-    @hands.bind_callback(hands.GAME)
+    @client.bind_callback(client.GAME)
     def callback(data):
         
         print("We have been ran!")
 
 In this example, the function 'callback()' 
-is automatically registered to the HC by using the 'bind_callback()'
+is automatically registered to the CC by using the 'bind_callback()'
 as a decorator.
 As stated earlier, any other arguments will be saved and passed 
 to the callback at runtime.
 
-Removing callbacks are very easy to do.
+Removing callbacks is very easy to do.
 You can simply use the 'clear_callback()' method:
 
 .. code-block:: python 
 
-    hands.clear_callback(ID)
+    client.clear_callback(ID)
 
 Where ID is the event ID to remove callbacks from.
 For example, if you provide the FILE event ID,
@@ -542,7 +545,7 @@ then you can use the 'call' parameter:
 
 .. code-block:: python
 
-    hands.clear_callback(ID, call=CALL)
+    client.clear_callback(ID, call=CALL)
 
 Where 'call' is the instance of the callback to remove.
 The 'clear_callback()' method will only return callbacks that 
@@ -556,7 +559,7 @@ function that is associated with the FILE event:
 
 .. code-block:: python 
 
-    hands.clear_callback(hands.FILE, call=dummy_callback)
+    client.clear_callback(client.FILE, call=dummy_callback)
 
 Again, this ensures that only the 'dummy_callback()' function will be removed.
 
@@ -564,10 +567,10 @@ Conclusion
 ==========
 
 That concludes the tutorial on basic
-HC features!
+CC features!
 
-If you want some insight into advanced HC features,
-such as handler loading, be sure to check out the Advanced Tutorial.
+If you want some insight into advanced CC features,
+such as handler loading, be sure to check out the :ref:`Advanced Tutorial <collec_advn>`.
 
 In the next tutorial, 
 we will be going over CurseInstance objects.

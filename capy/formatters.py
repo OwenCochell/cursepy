@@ -18,9 +18,8 @@ class BaseFormat(object):
     BaseFormat - Base class all formatters must inherit!
 
     We define some useful functionality for all formatters to implement.
-
-    What method should we use to create more formatters?
-    Copy? Manually instantiate them? TODO: Figure this out!
+    A 'formatter' is something that changes HTML content into something else.
+    What the content gets converted to is up to the formatter!
     """
 
     def format(self, data: str) -> Any:

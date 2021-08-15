@@ -26,15 +26,21 @@ Please refrain from editing files that are sill being written!
 
 Ready for checking:
 
-collec_simp.rst
-into_stip.rst
+basic/collection.rst
+basic/into.rst
+basic/index.rst
+basic/curse_inst.rst
+advn/collection.rst 
+advn/hand.rst 
+advn/index.rst 
+advn/into.rst 
+advn/proto.rst
+index.rst 
+install.rst
 
 Being written:
 
-index.rst
-install.rst
-usage.rst
-curse_inst.rst
+basic/wrap.rst
 
 Completed:
 

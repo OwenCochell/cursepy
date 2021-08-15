@@ -35,11 +35,10 @@ class BaseHandler(object):
     """
     BaseHandler - Child class all handlers must inherit!
 
-    We define the framework of a handler,
-    how it will be invoked, what information is given to it,
-    and how it should integrate with other modules.
+    We offer some basic methods that a handler should inherit,
+    as well as define the cappy Handler Framework(CHF).
 
-    Essentially, a module can define a few things:
+    Essentially, the function makeup of the CHF is this:
 
         * make_proto - Should return a valid protocol object for this handler
         * proto_call - Call to the protocol of this handler, should return valid raw data
@@ -70,10 +69,10 @@ class BaseHandler(object):
     Handlers must be identified if they are to be used for handler processes!
 
     These handlers are designed to be customizable!
-    The framework of methods are designed to be a good default implementation,
+    The CHF is designed to be a good default implementation,
     that minimizes the amount of code developers have to write for handler development.
 
-    Don't like our implementation? No problem!
+    Don't like the CHF? No problem!
     Most of the functions defined here are not necessary for handlers to work!
     The only functions that NEED to be defined are 'handle' and 'make_proto'.
     This means you can define your own methods and frameworks by creating a custom 'handle' method,
@@ -520,11 +519,10 @@ class HandlerCollection(object):
     This allows developers to easily automate actions,
     and make interacting with certain games much easier.
 
-    By default, we load the built in recommended handlers.
-    Users can optionally overwrite these handlers with there own,
-    or they can clear the HandlerCollection and start from scratch.
-    Upon instanciating the HandlerCollection,
-    users and sub-classes can disable the auto-load of the recommended handlers.
+    By default, we call the 'load_default()' method upon instantiation.
+    Wrappers should probably overload that method!
+    If this is not something you want, you can pass False to the 'load_default'
+    parameter.
     """
 
     LIST_GAMES = 0  # Gets a list of all valid games
@@ -575,11 +573,11 @@ class HandlerCollection(object):
 
         # Create null handlers for each INST_ID:
 
-        for num in range(1,9):
+        for num in range(11):
 
             # Create the NullHandler for this ID:
 
-            self.add_handler(NullHandler(id=num))
+            self.add_handler(NullHandler(), id=num)
 
         # Remove the protocol objects:
 
@@ -702,25 +700,27 @@ class HandlerCollection(object):
 
         Here is an example of an iterable for loading handlers:
 
-        (
+        .. code-block::
+
             (
-                Hand1,
-                Hand1,
-                Hand1
-            ),
-            {
-                0: Hand2,
-                2: Hand2,
-                4: Hand2
-            }
-        )
+                (
+                    Hand1(),
+                    Hand1(),
+                    Hand1()
+                ),
+                {
+                    0: Hand2(),
+                    2: Hand2(),
+                    4: Hand2()
+                }
+            )
 
         In this example, the handler map will look like this:
 
-            * 0 - Hand1
-            * 1 - Hand1
-            * 2 - Hand1
-            * 4 - Hand2
+        * 0 - Hand1
+        * 1 - Hand1
+        * 2 - Hand1
+        * 4 - Hand2
 
         Notice, that even though Hand2 was assigned to ID's 0 and 2,
         it was not used, as Hand1 had a higher priority.
@@ -730,19 +730,21 @@ class HandlerCollection(object):
         Here is another example, and instead of utilizing
         dictionaries for skipped indexes, we simply use a NullHandler as a placeholder:
 
-        (
+        .. code-block::
+
             (
-                Hand1(),
-                Hand1(),
-                NullHandler(),
-                Hand1()
-            ),
-            (
-                Hand2(),
-                NullHandler(),
-                Hand2(),
+                (
+                    Hand1(),
+                    Hand1(),
+                    NullHandler(),
+                    Hand1()
+                ),
+                (
+                    Hand2(),
+                    NullHandler(),
+                    Hand2(),
+                )
             )
-        )
 
         In this example, we do not assign a handler for the 2nd index
         in the first priority handler map, and instead assign a NullHandler in it's place.
@@ -815,17 +817,15 @@ class HandlerCollection(object):
         This function should load a set of handlers that is relevant to the 
         operation of the HandlerCollection.
 
-        By default, we load the default_map contaning the build-in handlers.
-        However, if your HandlerCollection instance needs or wants something diffrent,
-        then overloading this class is the recommended way of doing it!
+        By default,
+        we raise a 'NotImplementedError'.
+        It is up to wrappers to implement this function!
 
         It is probably best if this function used the 'load_handlers()'
         method to do all the dirty work.
         """
 
-        # Just load default Handlers:
-
-        self.load_handlers(HandlerCollection.default_map)
+        raise NotImplementedError("Must be implemented in child class!")
 
     def get_handler(self, id: int) -> BaseHandler:
         """
@@ -1299,19 +1299,3 @@ class HandlerCollection(object):
                 # Attach our formatter:
 
                 pack.attach_formatter(self.formatter)
-
-""" 
-{
-    2: (
-        (
-            call,
-            (arg1, arg2),
-            {arg3=3}
-        ),
-        (
-            call2,
-            (),
-            {}
-        )
-    )
-}"""

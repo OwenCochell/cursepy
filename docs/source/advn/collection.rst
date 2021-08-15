@@ -1,3 +1,5 @@
+.. collec_advn:
+
 ===================================
 Advanced HandlerCollection Tutorial
 ===================================
@@ -29,6 +31,25 @@ With that being said, lets get started!
     For all upcoming examples,
     we assume that a HC is properly imported and 
     instantiated under the name 'hands'.
+
+What is a HandlerCollection?
+============================
+
+The 'HandlerCollection' class manages handlers
+and callbacks.
+If you read the basic tutorial,
+you will have a basic understanding of the "CurseClient' class,
+and you might recall that the functionality is very similar.
+As a matter of fact, the CurseClient actually inherits the HandlerCollection class!
+Even so, there are some differences between the two.
+
+The HandlerCollection is a low level component for managing handlers.
+All the CurseClient does is load the default capy handlers,
+as well as provide the entry point methods.
+For the sake of simplicity,
+it is recommended that you use CurseClient
+as the building block for wrapper development,
+unless you have a special reason not to. 
 
 Handler Management
 ==================
@@ -63,7 +84,7 @@ By default, the HC pulls the event ID out of the handler itself.
 This allows handlers to define what they do,
 so the developer does not have to.
 You can ready about how handlers identify themselves by checking out the 
-advanced handler tutorial [HERE].
+:ref:`advanced handler tutorial <hand_advn>`.
 
 The 'add_handler()' method provides a way to manually specify the event ID the handler
 should be associated with, regardless of what the handler states.
@@ -125,7 +146,7 @@ The first thing this method does is invoke the
 After this, we remove the handler from the handler structure
 and replaces it with a 'NullHandler'.
 
-Loading Multiple Handlers 
+Loading Multiple Handlers
 -------------------------
 
 HC provides a method for loading multiple handlers at a time,

@@ -40,11 +40,9 @@ HandlerCollection calls with the correct arguments to get the relevant data.
 
 .. note::
 
-    You should have already read the HandlerCollection tutorial.
+    You should have already read the :ref:`CurseClient tutorial <collec_basic>`.
     If you haven't, you should really check it out,
-    as HandlerCollections are very important classes!
-
-    Have a look at the tutorial [HERE]
+    as CurseClient is a very important class!
 
 Why CurseInstances?
 -------------------
@@ -69,7 +67,7 @@ This makes the end user's life much easier,
 and allows for a more pythonic, class-based way
 of interacting with CF.
 
-CI's use the entry point methods of the HC that returned them.
+CI's use the entry point methods of the CC that returned them.
 This means that they expect the handlers at the given location 
 to accept the standard arguments,
 and return the standard objects.
@@ -124,6 +122,36 @@ More info can be found in the API reference for CIs.
     For all coming examples,
     assume that 'inst' is a valid CurseInstance
     of the type being described.
+
+Before we gte into CI types,
+we will first go over common features every CI has.
+
+Every CI should have attributes which store the raw data and metadata of the request.
+Raw data is the raw, unprocessed data from the protocol object.
+This is usually bytes that are encoded in some format.
+Raw data should really only be touched by people who need it!
+It is already decoded and put into a format that is accessible
+(The CI).
+Note that not all handlers attach this raw data,
+so be warned!
+
+Metadata is extra data provided by the protocol object.
+For example, the URLProtocol object provides status codes, request headers,
+reason strings, ect. about the HTTP connection.
+This data can be useful if you are interested in connection stats.
+Again, not all handlers attach this metadata, so be warned!
+
+Here is an example of printing both values:
+
+.. code-block::
+
+    # Print the raw data:
+
+    print(inst.raw)
+
+    # Print the meta data:
+
+    print(inst.meta)
 
 Extra Functionality
 -------------------

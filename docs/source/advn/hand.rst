@@ -1,3 +1,5 @@
+.. _hand_advn:
+
 ================
 Handler Tutorial
 ================
@@ -114,7 +116,7 @@ This can be defined by using the 'start()' and 'stop()' methods:
 
             print("Handler is stopped!")
 
-WHen this handler is loaded, then 'Handler is started!'
+When this handler is loaded, then 'Handler is started!'
 is printed to the terminal.
 When the handler is unloaded, then 'Handler is stopped'
 is printed to the terminal.
@@ -145,19 +147,18 @@ you can use the ID parameter, as documented here:
             # Set our name:
     
             super().__init__(name='DummyHand')
-    
+
 In this example, the DummyHandler 
 is associated with the 'GAME' event.
 This means that the handler should have something to do 
 with getting game data.
-You can (and should!) use the HC constants to define this,
-which are documented [HERE].
+You can (and should!) use the :ref:`HC constants <collec_constants>` to define this.
 
 All upcoming examples will NOT utilise the ID parameter!
 Just keep in mind that specifying the handler ID is highly 
 recommended in production environments.
 
-Adding Functionality 
+Adding Functionality
 ====================
 
 To add functionality to a handler,
@@ -209,13 +210,13 @@ one int and one string.
     from capy.handlers.base import BaseHandler
 
     # Create a simple handler:
-        
+
     class DummyHand(BaseHandler):
-        
+
         def __init__(self):
-    
+
             # Set our name:
-    
+
             super().__init__(name='DummyHand')
 
         def handle(arg1: int, arg2: str):
@@ -512,12 +513,27 @@ so all object will have the time attached to them
 without having to explicitly specify it.
 We will go deep into this concept later, but keep this in mind!
 
+It is recommended to attach raw data and metadata from the protocol object 
+to the CurseInstance using this method!
+Most users will expect this data to be present,
+so it is a good idea to provide it!
+
+Here is an example of attaching this data to a CurseInstance:
+
+.. code-block:: python
+
+    inst.raw = RAW_DATA
+    inst.meta = META_DATA
+
+Where 'RAW_DATA' is the raw data to add,
+and 'META_DATA' is the metadata to add.
+
 make_proto
 ----------
 
 Method called when a protocol object is needed.
 
-This method should usually return a instantiated
+This method should normally return a instantiated
 protocol object.
 The HC ensures that the same protocol object is used for like-minded 
 handlers.
@@ -773,4 +789,4 @@ and how they operate!
 If you are still unsure about the topics discussed,
 then be sure to check out the API reference!
 
-The next section will go over wrapper development.
+The next section will go over protocol development.

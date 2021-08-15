@@ -25,16 +25,16 @@ This means that any entry point into CF can be removed,
 or have certain functionality removed, at any given point.
 This is what we like to call an 'unreliable API'.
 
-Usually, API's are well documented, and are guaranteed
+Usually, APIs are well documented, and are guaranteed
 (For the most part)
 to remain mostly in the same configuration.
 In other words, they are well understood by the developer,
 and can be accessed in the same way forever.
 This is what we like to call a reliable API.
 
-For reliable API's, writing code to interact with
+For reliable APIs, writing code to interact with
 them is usually very simple.
-Unreliable API's on the other hand,
+Unreliable APIs on the other hand,
 can be difficult to work with,
 as nothing is guaranteed.
 
@@ -151,6 +151,20 @@ for writing handlers.
 
 We will not go into the details about CHF,
 as we will cover it later.
+
+HandlerCollection
+-----------------
+
+The HandlerCollection class is a low-level class that 
+manages handlers and callbacks.
+It provides easy to use methods for loading 
+and unloading these components.
+
+You may remember from the basic usage tutorial,
+we covered a classes called 'CurseClient'.
+'CurseClient' actually inherits the 'HandlerCollection' class!
+The only thing 'CurseClient' does is auto-load the default capy handlers,
+and provides entry points into said handlers.
 
 Conclusion
 ==========

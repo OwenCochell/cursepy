@@ -13,10 +13,6 @@ from capy.handlers.base import URLHandler
 from capy.classes import base
 
 
-# Map the classes to ID's:
-
-
-
 class BaseSVCHandler(URLHandler):
     """
     BaseSVCHandler - Base handler all classes must inherit!
@@ -603,6 +599,9 @@ class SVCFileDescription(BaseSVCHandler):
         """
 
         return base.CurseDescription(data)
+
+
+# Set the handler map:
 
 svc_map = (SVCListGame(),
     SVCGame(),
