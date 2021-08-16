@@ -185,6 +185,3 @@ Conclusion
 
 You should now have a basic understanding
 of capy, and the components in use.
-
-In the next section of the tutorial,
-we will be going over CurseClient objects!

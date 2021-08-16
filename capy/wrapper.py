@@ -299,7 +299,6 @@ class CurseClient(HandlerCollection):
         return self.handle(10, addon_id, file_id)
 
 
-
 class MinecraftWrapper(CurseClient):
     """
     MinecraftWrap - Wrapper for working with Minecraft data!

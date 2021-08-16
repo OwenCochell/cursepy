@@ -232,5 +232,3 @@ That concludes this tutorial on protocol development!
 
 You should now have a deeper understanding of protocol
 objects, and how they operate.
-
-The next section in this tutorial goes over advanced HandlerCollection concepts.

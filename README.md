@@ -10,7 +10,7 @@ We will be complete with docs soon.
 
 # Introduction
 
-Curseforge Api PYthon(or capy for short) allows you to interact with CurseForge
+CurseForge Api Python(or capy for short) allows you to interact with CurseForge
 addons and files in a simply, easy to use way.
 
 Our goal is to be modular and heavily customizable for developers who
@@ -25,13 +25,13 @@ said files.
 # Example
 
 ```python
-from capy import HandlerCollection  # Import the HandlerCollection
+from capy import CurseClient  # Import the CurseClient
 
 GAME_ID = 432  # ID of the game you want to fetch, in this case Minecraft
 
-# Create the HandlerCollection:
+# Create the CurseClient:
 
-curse = HandlerCollection()
+curse = CurseClient()
 
 # Get the game info:
 

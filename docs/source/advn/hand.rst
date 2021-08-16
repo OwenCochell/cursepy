@@ -788,5 +788,3 @@ You should now have a solid understanding of handlers
 and how they operate!
 If you are still unsure about the topics discussed,
 then be sure to check out the API reference!
-
-The next section will go over protocol development.

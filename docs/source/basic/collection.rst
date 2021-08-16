@@ -571,6 +571,3 @@ CC features!
 
 If you want some insight into advanced CC features,
 such as handler loading, be sure to check out the :ref:`Advanced Tutorial <collec_advn>`.
-
-In the next tutorial, 
-we will be going over CurseInstance objects.

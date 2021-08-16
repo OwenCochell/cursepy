@@ -512,7 +512,3 @@ Conclusion
 That concludes this tutorial on CurseInstance objects!
 If you have any other questions about the intricacies
 of CurseInstances, then you should check out the API Reference!
-
-In the next section,
-we will go over wrappers,
-and how to use them.
