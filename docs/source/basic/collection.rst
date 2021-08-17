@@ -16,7 +16,7 @@ CurseClient
 
 Now, what is a 'CurseClient', and why is it relevant?
 
-The CurseClient(Hereafter referred to as CC),
+The CurseClient (Hereafter referred to as CC),
 is the class that facilitates communication with CurseForge(CF).
 It does many things under the hood to make the communication with CF
 a very simple procedure.
@@ -32,7 +32,7 @@ CC is a critical high level component of capy, and will be used extensively!
 Creating a CurseClient
 ======================
 
-Creating a CC is simple procedure, and can be done like so:
+Creating a CC is simple procedure, and can be done like this:
 
 .. code-block:: python
 
@@ -80,7 +80,7 @@ meaning that CC is only as useful as the handlers that
 are currently loaded!
 It is important to recognize that handlers
 are the components that do all the dirty work
-(Getting info, decoding it, formatting it).
+(Getting info, decoding it, and formatting it).
 The only thing the CC does is organize
 and call these handlers with the relevant information.
 
@@ -132,7 +132,7 @@ with getting game info:
     print(client.GAME)
 
 These constants are automatically used when the entry level methods are called,
-so if you stick to those you should not have to worry about them.
+so if you stick to those you shouldn't have to worry about them.
 However, if you want to use the lower-level 'handle()' method,
 or register callbacks, 
 then having an understanding of these constants will be very useful!
@@ -169,7 +169,7 @@ With that being said, you should only call this method if you want low-level
 access to the loaded handlers.
 You should instead use the higher-level entry functions,
 as they automatically provide the necessary arguments to the 'handle()'
-function for you(among other things).
+function for you (among other things).
 
 Just because you might not use this method does not mean that you shouldn't understand it!
 have a look at this example of the 'handle()' function in action:
@@ -180,7 +180,7 @@ have a look at this example of the 'handle()' function in action:
 
 This will invoke the handler at the given ID,
 and process and return the object the handler 
-gives us(Usually a CurseInstance).
+gives us (Usually a CurseInstance).
 Remember the event constants we listed earlier?
 You can use those for the 'ID' parameter.
 We also pass along all other arguments besides the ID 
@@ -286,7 +286,7 @@ Where GAME_ID is the ID of the game to search under,
 and CAT_ID is the category ID to search under.
 We return a tuple of CurseAddon objects representing the search results.
 
-Users can optionally provide search object
+Users can optionally provide a search object
 to fine tune to search operation. 
 You can get a search object using the 'get_search'
 method:
@@ -336,7 +336,7 @@ Check out this example of sorting by popularity:
 
     search.sort = search.POPULARITY 
 
-'index' and 'pageSize' are used due to search
+'index' and 'pageSize' are used since search
 results are usually limited to 'pages'
 to save some bandwidth.
 
@@ -435,8 +435,8 @@ Callbacks
 =========
 
 Usually, users will call the entry point methods,
-and react to the objects the get returned.
-This is great for most use cases.
+and react to the objects that get returned.
+This is great for most user cases.
 However, if you want to go for a more 'reactive' model,
 you can bind callbacks to events which will be called 
 upon after each handle request.
