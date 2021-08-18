@@ -17,15 +17,15 @@ sys.path.insert(0, os.path.abspath('../..'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'capy'
+project = 'cursepy'
 copyright = '2021, Owen Cochell'
 author = 'Owen Cochell'
 
 # The full version, including alpha/beta/rc tags
 
-import capy
+import cursepy
 
-release = capy.__version__
+release = cursepy.__version__
 
 # -- General configuration ---------------------------------------------------
 
@@ -60,13 +60,13 @@ master_doc = 'index'
 
 html_theme_options = {'description': 'Tools for interacting with CurseForge',
                       'github_user': 'Owen-Cochell',
-                      'github_repo': 'capy',
+                      'github_repo': 'cursepy',
                       'github_button': True,
                       'github_type': 'star',
                       'extra_nav_links': {
-                          'Github Page': 'https://github.com/Owen-Cochell/capy',
-                          'PyPi Page': 'https://pypi.org/project/capy/',
-                          'Issue Tracker': 'https://github.com/Owen-Cochell/capy/issues'
+                          'Github Page': 'https://github.com/Owen-Cochell/cursepy',
+                          'PyPi Page': 'https://pypi.org/project/cursepy/',
+                          'Issue Tracker': 'https://github.com/Owen-Cochell/cursepy/issues'
                       }}
 
 # Add any paths that contain custom static files (such as style sheets) here,

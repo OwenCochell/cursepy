@@ -5,20 +5,20 @@ Usage Introduction
 Introduction
 ============
 
-Welcome to the usage tutorial for capy!
+Welcome to the usage tutorial for cursepy!
 
 In this document, we outline some terminology
-and concepts that will offer some insight into not only capy,
+and concepts that will offer some insight into not only cursepy,
 but CurseForge itself!
 
 We will keep the concepts at the surface level only, 
 as this tutorial is meant to give you an understanding
-of basic understanding of capy and it's components.
+of basic understanding of cursepy and it's components.
 
 .. note::
 
-    If you want an advanced tutorial on capy,
-    where we go into the internals of capy
+    If you want an advanced tutorial on cursepy,
+    where we go into the internals of cursepy
     and handler development, then check out the 
     :ref:`advanced tutorial <advanced-tutorial>`.
 
@@ -50,17 +50,17 @@ You can find this client `here <https://download.curseforge.com/>`_.
 Suffice it to say, CF plays a huge role in addon distribution,
 and the addon catalog and supported games grow bigger each day!
 
-The Role of capy
-================
+The Role of cursepy
+===================
 
-capy aims to provide a modular, easy to use interface
+cursepy aims to provide a modular, easy to use interface
 for communicating with CF.
 
 We offer the ability to download addon info,
 get addon files, and other misc. operations 
 like getting supported games and categories.
 
-We do this by offering intuitive calls to capy components, 
+We do this by offering intuitive calls to cursepy components, 
 allowing you to get the info you need without being too complicated.
 
 Before we get into the swing of things, 
@@ -91,15 +91,15 @@ and most catagories have parent catagories.
 The only catagories that don't are 'root catagories'.
 Keep this hierarchy in mind!
 
-capy allows you to work with components 
+cursepy allows you to work with components 
 in each layer of the hierarchy.
 You will understand how to do this in a later tutorial,
 but for now keep this hierarchy in mind! 
 
-capy Terms
-==========
+cursepy Terms
+=============
 
-capy has a few concepts that might be better understood with some explanation.
+cursepy has a few concepts that might be better understood with some explanation.
 We only touch on these concepts, we will go into much greater detail later in this tutorial.
 Don't worry about completely understanding these for now,
 just keep these concepts in mind. 
@@ -184,4 +184,4 @@ Conclusion
 ==========
 
 You should now have a basic understanding
-of capy, and the components in use.
+of cursepy, and the components in use.

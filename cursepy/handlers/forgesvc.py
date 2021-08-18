@@ -5,12 +5,11 @@ ForgeSVC - Handlers for getting info via ForgeSVC.net
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
 from typing import Any, Tuple
 
-from capy.classes.search import SearchParam, url_convert
-from capy.handlers.base import URLHandler
-from capy.classes import base
+from cursepy.classes.search import SearchParam, url_convert
+from cursepy.handlers.base import URLHandler
+from cursepy.classes import base
 
 
 class BaseSVCHandler(URLHandler):
@@ -25,7 +24,7 @@ class BaseSVCHandler(URLHandler):
 
         super().__init__('ForgeSVC', 'https://addons-ecs.forgesvc.net', extra='/api/v2/', path='')
 
-        self.raw: dict  # Raw data before formatting and post-processing
+        self.raw: Any  # Raw data before formatting and post-processing
 
     def pre_process(self, data: bytes) -> dict:
         """
@@ -342,8 +341,8 @@ class SVCAddon(BaseSVCHandler):
         # Create the instance:
 
         return base.CurseAddon(data['name'], data['slug'], data['summary'], data['websiteUrl'],
-                               data['primaryLanguage'], data['dateCreated'], data['dateModified'], data['dateRelease'],
-                               data['id'], data['downloadCount'], data['gameId'], data['isAvailable'], data['isExperimental'],
+                               data['primaryLanguage'], data['dateCreated'], data['dateModified'], data['dateReleased'],
+                               data['id'], data['downloadCount'], data['gameId'], data['isAvailable'], data['isExperiemental'],
                                tuple(authors), tuple(attach), data['primaryCategoryId'], data['isFeatured'], data['popularityScore'],
                                data['gamePopularityRank'], data['gameName'])
 
@@ -363,7 +362,7 @@ class SVCSearch(BaseSVCHandler):
 
         # Create and return the URL:
 
-        return self.proto.url_build(url_convert(search, url='search?gameId={}&sectionId={}&'.format(game_id, section_id)))
+        return self.proto.url_build(url_convert(search, url='addon/search?gameId={}&sectionId={}&'.format(game_id, section_id)))
 
     def format(self, data: dict) -> Tuple[base.CurseAddon, ...]:
         """
@@ -407,7 +406,7 @@ class SVCAddonDescription(BaseSVCHandler):
         :rtype: str
         """
         
-        return self.proto.url_build('addon/{}/description')
+        return self.proto.url_build('addon/{}/description'.format(addon_id))
 
     def pre_process(self, data: bytes) -> str:
         """
@@ -420,7 +419,11 @@ class SVCAddonDescription(BaseSVCHandler):
         :rtype: str
         """
 
-        return str(data)
+        # Set the raw data:
+
+        self.raw = data
+
+        return data.decode()
 
     @staticmethod
     def format(data: str) -> base.CurseDescription:
@@ -467,7 +470,7 @@ class SVCAddonFiles(BaseSVCHandler):
 
         # Extract the addon ID from the URL:
 
-        id = int(self.url.split('/')[1])
+        id = int(self.url.split('/')[6])
 
         # Iterate over the files:
 
@@ -517,7 +520,7 @@ class SVCFile(BaseSVCHandler):
 
         # Get the addon ID:
 
-        id = int(self.url.split('/')[1])
+        id = int(self.url.split('/')[6])
 
         # Call the low-level format method:
 
@@ -573,7 +576,7 @@ class SVCFileDescription(BaseSVCHandler):
         :rtype: str
         """
 
-        return self.proto.url_build('addon/{}/file/{}/description'.format(addon_id, file_id))
+        return self.proto.url_build('addon/{}/file/{}/changelog'.format(addon_id, file_id))
 
     def pre_process(self, data: bytes) -> str:
         """
@@ -586,7 +589,9 @@ class SVCFileDescription(BaseSVCHandler):
         :rtype: str
         """
 
-        return str(data)
+        self.raw = data
+
+        return data.decode()
 
     def format(self, data: str) -> base.CurseDescription:
         """

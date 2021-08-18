@@ -1,10 +1,10 @@
 """
-capy init file.    
+cursepy init file.    
 """
 
 # Import the necessary components:
 
-from capy.wrapper import CurseClient
+from cursepy.wrapper import CurseClient
 
 
 # Define some metadata here:

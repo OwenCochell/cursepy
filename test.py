@@ -1,65 +1,144 @@
 """
-Dummy testing file for capy.
+Testing each and every feature cursepy has to offer!
 
-We are here for testing the two operations,
-as well as doing a simple test to see which one is faster.
+Should really be unit tests...
 """
 
 import time
 import pprint
 import timeit
 
-from capy.backend import ForgeSVCBackend
-from capy.wrapper import SVCWrap
+from cursepy import CurseClient
+from cursepy.formatters import StripHTML
+from cursepy.classes.search import SearchParam
 
 
-def conv():
-    
-    # Test the conventional, class based method:
-
-    #print("Testing class based backend ...")
-
-    back = ForgeSVCBackend()
-
-    back_games = back.games()
-
-    #print("Game data:")
-    #pprint.pprint(back_games)
+GAME_ID = 432
+CATEGORY = 6
+ADDON = 60089
+FILE = 2671937
 
 
-def hand():
+# Simple callbacks for testing
 
-    # Test the new, handler based method:
+def call(data):
+    print("In callback!")
 
-    #print("Testing handler based backend ...")
+def call2(data, thing, thing1='blah'):
+    print("In callback 2!")
+    print(thing)
+    print(thing1)
 
-    hand = SVCWrap()
+# Create CurseClient with default handlers loaded:
 
-    hand_games = hand.games()
+client = CurseClient()
 
-    print("Game data:")
-    pprint.pprint(hand_games)
+def test_call():
 
+    # Get the games:
 
-# Run the functions:
+    print("Getting games:")
 
-print("Testing hand based backend ...")
+    games = client.games()
 
-hand_time = timeit.timeit(hand, number=3)
-print("Average hand time: {}".format(hand_time))
+    # Get a game:
 
+    print("Getting game:")
 
-print("Testing class-based backend ...")
+    game = client.game(GAME_ID)
 
-conv_time = timeit.timeit(conv, number=3)
-print("Average conv time: {}".format(conv_time))
+    # Get catagories
 
+    print("Getting categories:")
 
-if hand_time < conv_time:
+    cats = client.catagories()
 
-    print("Hand time faster by : {} secs!".format(conv_time - hand_time))
+    # get category:
 
-else:
+    print("Get category")
 
-    print("Conv time faster by : {} secs!".format(hand_time - conv_time))
+    cat = client.category(CATEGORY)
+
+    # Get sub-category:
+
+    print("Sub-category:")
+
+    sub = client.sub_category(CATEGORY)
+
+    # Get the adddon:
+
+    print("Getting addon:")
+
+    addon = client.addon(ADDON)
+
+    # Get the description:
+
+    print("Get addon description:")
+
+    addon_desc = client.addon_description(ADDON)
+
+    # Get addon files:
+
+    print("Addon files:")
+
+    addon_files = client.addon_files(ADDON)
+
+    # Get a file:
+
+    print("Addon file:")
+
+    addon_file = client.addon_file(ADDON, FILE)
+
+    # File description:
+
+    print("File description:")
+
+    file_desc = client.file_description(ADDON, FILE)
+
+    # Search
+
+    print("Search")
+
+    searched = client.search(GAME_ID, CATEGORY)
+
+def iter_search():
+
+    for addon in client.iter_search(GAME_ID, CATEGORY, SearchParam(filter='JEI', pageSize=5)):
+
+        # Print the name:
+
+        print(addon.name)
+        inp = input("Wait")
+
+def formatter():
+
+    format = StripHTML()
+
+    # Set the default formatter:
+
+    client.default_formatter(format)
+
+    # Make a call
+
+    print(client.file_description(ADDON, FILE).format())
+
+def callback():
+
+    # Register the callback:
+
+    client.bind_callback(call, 3)
+
+    client.bind_callback(call2, 3, 'test', thing1='thing1')
+
+    client.category(CATEGORY)
+
+    # Remove the callback:
+
+    client.clear_callback(3, call)
+
+    client.category(CATEGORY)
+
+    client.clear_callback(3)
+
+    client.category(CATEGORY)
 

@@ -3,7 +3,7 @@
 --== [ Documentation Readme: ] ==--
 
 This readme contains some important info 
-for writing and correcting capy docs!
+for writing and correcting cursepy docs!
 
 --== [ Goals: ] ==--
 
@@ -61,7 +61,7 @@ https://git-scm.com/docs/gittutorial
 
 --== [ Doc Writing Introduction: ] ==--
 
-The capy docs are separated into 'pages',
+The cursepy docs are separated into 'pages',
 much like a website. Each page
 contains info on a certain topic.
 This is to ensure the documentation

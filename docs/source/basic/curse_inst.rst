@@ -20,7 +20,6 @@ What is a CurseInstance?
 
 A 'CurseInstance' is a class that represents 
 CurseForge(CF) information.
-
 For example, 
 the CurseAddon class contains info such as
 the addon name, slug, id, release date, ect.
@@ -36,7 +35,7 @@ You can access the name of the addon like so:
 
 CIs also offer convince methods for interacting with said data.
 These convenience methods automatically make the necessary 
-HandlerCollection calls with the correct arguments to get the relevant data.
+CurseClient calls with the correct arguments to get the relevant data.
 
 .. note::
 
@@ -48,19 +47,19 @@ Why CurseInstances?
 -------------------
 
 CurseInstances are in place to normalize CF data.
-They ensure that no matter what the capy configuration is,
+They ensure that no matter what the cursepy configuration is,
 your program will always interact with the same classes.
 If this were not the case, 
-then the end user using capy would have to 
+then the end user using cursepy would have to 
 determine what format the raw data being is in,
 and how to decode it.
-Because capy is modular, this data can be literally anything!
+Because cursepy is modular, this data can be literally anything!
 So having a standardized way to get this data is very important.
 
 CIs also provide all addon info in a convent way.
 Most users do not want to manually parse request data!
 
-Finally, CI's convenience methods make using capy much easier.
+Finally, CI's convenience methods make using cursepy much easier.
 As stated earlier, these methods take the steps to automatically 
 get extra info.
 This makes the end user's life much easier,
@@ -301,7 +300,7 @@ Here is an example of a custom formatter that appends 'Super Slick!' to the end 
 
     # Import BaseFormat:
 
-    from capy.formatters import BaseFormat
+    from cursepy.formatters import BaseFormat
         
     class SuperFormatter(BaseFormat):
 

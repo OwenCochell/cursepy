@@ -1,5 +1,5 @@
 """
-capy wrapper classes.
+cursepy wrapper classes.
 
 These classes are designed to work with specific games,
 and make getting information about them much easier.
@@ -8,10 +8,10 @@ The class you probably want to work with is the CurseClient.
 
 from typing import Tuple
 
-from capy.handlers.base import HandlerCollection
-from capy.classes import base
-from capy.classes.search import SearchParam
-from capy.handlers.maps import DEFAULT_MAP
+from cursepy.handlers.base import HandlerCollection
+from cursepy.classes import base
+from cursepy.classes.search import SearchParam
+from cursepy.handlers.maps import DEFAULT_MAP
 
 
 class CurseClient(HandlerCollection):
@@ -32,7 +32,7 @@ class CurseClient(HandlerCollection):
 
     def load_default(self):
         """
-        We simply load the capy default handler map.
+        We simply load the cursepy default handler map.
         """
         
         self.load_handlers(DEFAULT_MAP)

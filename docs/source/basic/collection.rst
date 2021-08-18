@@ -27,7 +27,7 @@ elsewhere in this documentation.
 Just know that most features defined here will be present in all
 CC instances.
 
-CC is a critical high level component of capy, and will be used extensively!
+CC is a critical high level component of cursepy, and will be used extensively!
 
 Creating a CurseClient
 ======================
@@ -38,7 +38,7 @@ Creating a CC is simple procedure, and can be done like so:
 
     # Import the CC:
 
-    from capy import CurseClient
+    from cursepy import CurseClient
 
     # Create the CC:
 

@@ -1,9 +1,9 @@
 """
-CAPY excpetions and errors
+cursepy excpetions and errors
 """
 
 
-class CapyBaseException(BaseException):
+class CurseBaseException(BaseException):
 
     """
     CFABaseException - Base exception all CFA excaptions will inherit!
@@ -15,7 +15,7 @@ class CapyBaseException(BaseException):
     pass
 
 
-class ProtocolMismatch(CapyBaseException):
+class ProtocolMismatch(CurseBaseException):
     """
     Exception raised when a protocol mismatch has occurred.
 
@@ -27,7 +27,7 @@ class ProtocolMismatch(CapyBaseException):
     pass
 
 
-class HandlerRaise(CapyBaseException):
+class HandlerRaise(CurseBaseException):
     """
     Exception raised when the 'RaiseHandler' is called.
 

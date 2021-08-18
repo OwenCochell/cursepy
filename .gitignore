@@ -27,6 +27,12 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Build files:
+
+build/
+dist/
+cursepy.egg-info/
+
 # Sphinx buid files
 
 docs/build/

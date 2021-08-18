@@ -26,12 +26,12 @@ then an exception will be raised!
 This is the one and only restriction
 to handlers.
 The reason why this is the case is because
-capy must guarantee that a 'handel()' method 
+cursepy must guarantee that a 'handel()' method 
 is present on the object to load
 (You will find out why this is later).
 It is also important for the HandlerCollection(HC),
 as it will assign some values in the object,
-and capy does not want weird errors to occur.
+and cursepy does not want weird errors to occur.
 
 Here is an example of making a simple handler 
 that does nothing:
@@ -40,7 +40,7 @@ that does nothing:
 
     # Import the BaseHandler:
 
-    from capy.handlers.base import BaseHandler
+    from cursepy.handlers.base import BaseHandler
 
     # Create a simple handler:
 
@@ -71,7 +71,7 @@ of BaseHandler like so:
 
     # Import the BaseHandler:
 
-    from capy.handlers.base import BaseHandler
+    from cursepy.handlers.base import BaseHandler
 
     # Create a simple handler:
     
@@ -92,7 +92,7 @@ This can be defined by using the 'start()' and 'stop()' methods:
 
     # Import the BaseHandler:
 
-    from capy.handlers.base import BaseHandler
+    from cursepy.handlers.base import BaseHandler
 
     # Create a simple handler:
     
@@ -126,7 +126,7 @@ what event they are registered to.
 This is helpful for end users and the HC class,
 as it can use this info to determine what a handler does.
 By default, this value is -1,
-which is guaranteed by capy to NEVER be a valid event ID. 
+which is guaranteed by cursepy to NEVER be a valid event ID. 
 To specify what event this handler is tied to,
 you can use the ID parameter, as documented here:
 
@@ -134,7 +134,7 @@ you can use the ID parameter, as documented here:
 
     # Import the BaseHandler:
 
-    from capy.handlers.base import BaseHandler
+    from cursepy.handlers.base import BaseHandler
 
     # Create a simple handler:
 
@@ -152,7 +152,7 @@ In this example, the DummyHandler
 is associated with the 'GAME' event.
 This means that the handler should have something to do 
 with getting game data.
-You can (and should!) use the :ref:`HC constants <collec_constants>` to define this.
+You can (and should!) use the :ref:`HC constants <collec-constants>` to define this.
 
 All upcoming examples will NOT utilise the ID parameter!
 Just keep in mind that specifying the handler ID is highly 
@@ -179,7 +179,7 @@ to the terminal every time the handler is called:
 
         # Import the BaseHandler:
 
-        from capy.handlers.base import BaseHandler
+        from cursepy.handlers.base import BaseHandler
 
         # Create a simple handler:
         
@@ -198,7 +198,7 @@ to the terminal every time the handler is called:
                 print("Hello!")
 
 The HC also passes all arguments to the 'handle()' method.
-capy has a standard which determines the types of arguments
+cursepy has a standard which determines the types of arguments
 each handler should receive, but lets ignore that for now.
 Let's say your DummyHandler will take two arguments, 
 one int and one string.
@@ -207,7 +207,7 @@ one int and one string.
 
     # Import the BaseHandler:
 
-    from capy.handlers.base import BaseHandler
+    from cursepy.handlers.base import BaseHandler
 
     # Create a simple handler:
 
@@ -245,12 +245,12 @@ and attaching the default formatter to any CurseDescription objects.
 Using the 'handle()' method is fine for simple operations.
 However, if you want a recommended implementation
 that should reduce the amount of code you will have to write,
-with smart inheritance, then you should use the capy handler framework.
+with smart inheritance, then you should use the cursepy handler framework.
 
-capy Handler Framework 
-======================
+cursepy Handler Framework 
+=========================
 
-The capy Handler Framework(CHF) is an implementation
+The cursepy Handler Framework(CHF) is an implementation
 for handlers that aims to minimize the amount of code written in the long run.
 Using inheritance, each method can be utilized,
 thus leaving only the necessary methods to be written.
@@ -300,7 +300,7 @@ Here is an example of this in action:
 
     # Import the BaseHandler:
 
-    from capy.handlers.base import BaseHandler
+    from cursepy.handlers.base import BaseHandler
 
     # Create a simple handler:
     
@@ -341,7 +341,7 @@ here is an example of decoding the raw bytes using JSON:
 
     # Import the BaseHandler:
 
-    from capy.handlers.base import BaseHandler
+    from cursepy.handlers.base import BaseHandler
 
     # Import JSON:
 
@@ -391,11 +391,11 @@ Here is the previous example with that addition:
 
     # Import the BaseHandler:
 
-    from capy.handlers.base import BaseHandler
+    from cursepy.handlers.base import BaseHandler
 
     # Import CurseAuthor:
 
-    from capy.classes.base import CurseAuthor
+    from cursepy.classes.base import CurseAuthor
 
     # Import JSON:
 
@@ -453,11 +453,11 @@ the formatted object:
 
     # Import the BaseHandler:
 
-    from capy.handlers.base import BaseHandler
+    from cursepy.handlers.base import BaseHandler
 
     # Import CurseAuthor:
 
-    from capy.classes.base import CurseAuthor
+    from cursepy.classes.base import CurseAuthor
 
     # Import JSON:
 
@@ -547,11 +547,11 @@ Here is an example of this method:
 
     # Import the BaseHandler:
 
-    from capy.handlers.base import BaseHandler
+    from cursepy.handlers.base import BaseHandler
 
     # Import CurseAuthor:
 
-    from capy.classes.base import CurseAuthor
+    from cursepy.classes.base import CurseAuthor
 
     # Import JSON:
 
@@ -617,11 +617,11 @@ class, like so:
 
     # Import the BaseHandler:
 
-    from capy.handlers.base import BaseHandler
+    from cursepy.handlers.base import BaseHandler
 
     # Import CurseAuthor:
 
-    from capy.classes.base import CurseAuthor
+    from cursepy.classes.base import CurseAuthor
 
     # Import JSON:
 
@@ -687,7 +687,7 @@ as again, the only parts that are specified are those that are unique.
 Built in Handlers 
 =================
 
-capy has a few built in handlers
+cursepy has a few built in handlers
 for development purposes.
 
 Lets go over these in detail.
@@ -773,7 +773,7 @@ These can all be defined using the URLHandlers init method:
 
     # Import URLHandler:
 
-    from capy.handlers.base import URLHandler
+    from cursepy.handlers.base import URLHandler
 
     # Create the handler:
 

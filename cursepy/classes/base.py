@@ -8,9 +8,9 @@ from dataclasses import dataclass, field
 from typing import Any, Optional, Tuple
 from os.path import isdir, join
 
-from capy.classes.search import SearchParam
-from capy.formatters import BaseFormat, NullFormatter
-from capy.proto import URLProtocol
+from cursepy.classes.search import SearchParam
+from cursepy.formatters import BaseFormat, NullFormatter
+from cursepy.proto import URLProtocol
 
 
 @dataclass
@@ -45,8 +45,8 @@ class BaseCurseInstance(object):
         * hands - HandlerCollection instance
     """
 
-    raw: Any = field(init=False, repr=False)  # RAW packet data
-    meta: Any = field(init=False, repr=False)  # Metadata on this packet
+    raw: Any = field(init=False, repr=False, default=None)  # RAW packet data
+    meta: Any = field(init=False, repr=False, default=None)  # Metadata on this packet
     hands: 'HandlerCollection' = field(init=False, repr=False, compare=False)  # Handler Collection instance
 
 

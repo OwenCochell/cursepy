@@ -12,10 +12,10 @@ protocol objects, and how to use them effectively.
 
 Like the other advanced tutorials in this series,
 the content covered in this document are not necessary 
-for basic capy usage!
+for basic cursepy usage!
 You should only have to care bout this stuff if you are 
 looking to get into handler development,
-or wish to gain a deeper understanding of capy's internals.
+or wish to gain a deeper understanding of cursepy's internals.
 
 With that being said, let's get started!
 
@@ -59,7 +59,7 @@ Lets create a simple DummyProtocol object to demonstrate:
 
     # Import the BaseProtocol
 
-    from capy.protocol import BaseProtocol
+    from cursepy.protocol import BaseProtocol
 
     # Create the class:
 
@@ -78,7 +78,7 @@ This protocol object is not very interesting, so lets add some functionality:
 
     # Import the BaseProtocol
 
-    from capy.protocol import BaseProtocol
+    from cursepy.protocol import BaseProtocol
 
     # Create the class:
 
@@ -111,7 +111,7 @@ For this final example, we will implement some advanced features into the protoc
 
     # Import the BaseProtocol
 
-    from capy.protocol import BaseProtocol
+    from cursepy.protocol import BaseProtocol
 
     # Create the class:
 
@@ -141,7 +141,7 @@ but in this case it keeps track of the number of times the data was fetched.
 Built in Protocol Objects 
 =========================
 
-Lets go over the built in protocol objects that are shipped with capy.
+Lets go over the built in protocol objects that are shipped with cursepy.
 They can make handler development much easier,
 so using them is recommended!
 

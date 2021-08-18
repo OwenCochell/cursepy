@@ -1,5 +1,3 @@
-
-
 ============
 Installation
 ============
@@ -7,21 +5,23 @@ Installation
 Introduction
 ============
 
-This section of the documentation shows how to install capy.
-We will cover the steps you will need to take to get capy up and running.
+This section of the documentation shows how to install cursepy.
+We will cover the steps you will need to take to get cursepy up and running.
 
 Python
 ======
 
-capy requires python to be installed before it can be used. We will
+cursepy requires python to be installed before it can be used. We will
 walk through the steps of achieving this for each major platform.
-It is recommended to use python version 3.8 or above.
-capy is NOT backwards compatible with python 2!
+It is recommended to use python version 3.7 or above!
+Using a lower version can and will lead to performance issues, 
+as the typing module is very slow in previous versions!
+cursepy is NOT backwards compatible with python 2!
 
 To check what version of python you have installed,
 you can run the following command in your terminal to find out:
 
-.. code-block:: terminal
+.. code-block:: bash
 
     $ python --version
 
@@ -31,6 +31,13 @@ on python 3.9, the output will look something like this:
 .. code-block:: bash
 
     Python 3.9.5
+
+If the above command does not return python 7.x or above,
+then you may have to manually specify the python version like so:
+
+.. code-block:: bash
+
+    $ python3 --version 
 
 Linux
 -----
@@ -59,11 +66,11 @@ You can find installation instructions `here <https://docs.python-guide.org/star
 Installation via pip
 ====================
 
-You can install capy using pip like so:
+You can install cursepy using pip like so:
 
 .. code-block:: bash
 
-    $ pip install capy
+    $ pip install cursepy
 
 To learn more about PIP and installing third party modules in general, check out the
 `Tutorial on installing packages <https://packaging.python.org/tutorials/installing-packages/>`_.
@@ -75,22 +82,22 @@ You can acquire the source code from github like so:
 
 .. code-block:: bash
 
-    git clone https://github.com/Owen-Cochell/capy
+    git clone https://github.com/Owen-Cochell/cursepy
 
 This will download the repository to your computer via git.
 You can then reference the package from your application,
-or install it using pip
+or install it using pip:
 
 .. code-block:: bash
 
-    $ cd capy  # Navigate to the installed directory
+    $ cd cursepy  # Navigate to the installed directory
     $ pip install .
 
 You can also get the tarball from github, which you can download like so:
 
 .. code-block:: bash
 
-    $ curl -ol https://github.com/Owen-Cochell/capy/tarball/master
+    $ curl -ol https://github.com/Owen-Cochell/cursepy/tarball/master
 
 Updating
 ========
@@ -99,6 +106,6 @@ If you installed using pip, you can preform an update like so:
 
 .. code-block:: bash
 
-    $ pip install capy --upgrade
+    $ pip install cursepy --upgrade
 
-This will update capy if necessary.
+This will update cursepy if necessary.

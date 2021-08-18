@@ -17,13 +17,13 @@ which will accept raw data from the service we are talking to.
 There will be other components that the handler can overide if necessary.
 """
 
-from capy.formatters import BaseFormat, NullFormatter
-from typing import Any, Callable, Optional, Tuple
+from typing import Any, Callable, Optional
 
-from capy.classes import base
-from capy.proto import BaseProtocol, URLProtocol
-from capy.errors import ProtocolMismatch, HandlerRaise
-from capy.classes.search import SearchParam
+from cursepy.classes import base
+from cursepy.proto import BaseProtocol, URLProtocol
+from cursepy.errors import ProtocolMismatch, HandlerRaise
+from cursepy.classes.search import SearchParam
+from cursepy.formatters import BaseFormat, NullFormatter
 
 
 # Define the default handler map, should be set in the init file:
@@ -373,13 +373,9 @@ class URLHandler(BaseHandler):
         :rtype: bytes
         """
 
-        # Generate the URL:
-
-        url = self.build_url(*args)
-
         # Get and return the data:
 
-        return self.proto.get_data(url)
+        return self.proto.get_data(self.url)
 
     def build_url(self, *args) -> str:
         """
@@ -917,7 +913,7 @@ class HandlerCollection(object):
 
             # Check if the callback matches:
 
-            if val[0] == call or val is None:
+            if val[0] == call or call is None:
 
                 # Remove the callback:
 
@@ -1009,274 +1005,21 @@ class HandlerCollection(object):
 
         else:
 
-            # Check if we are working with a valid handler:
+            # Check if we are working with a valid instance:
 
             self._format_object(inst)
+
+        # Run all callbacks associated with the event:
+
+        for call in self.callbacks[id]:
+
+            # Run the callback:
+
+            call[0](inst, *call[1], **call[2])
 
         # Return the instance:
 
         return inst
-
-    def games(self) -> Tuple[base.CurseGame]:
-        """
-        Returns a tuple of all games supported on curseforge.
-
-        This call can be somewhat intensive,
-        so it's a good idea to not call it often.
-        Make a note of the relevant game's information!
-
-        :raises NotImplementedError: Must be overridden in child class!
-        :return: Tuple of CurseGame instances
-        :rtype: Tuple[base.CurseGame]
-        """
-
-        return self.handle(0)
-
-    def game(self, id: int) -> base.CurseGame:
-        """
-        Returns information on a specific game.
-
-        You will need to provide the game ID.
-        Game information will be returned in a CurseGame instance.
-
-        :param id: ID of the game to get
-        :type id: int
-        :raises NotImplementedError: Must be overridden in child class!
-        :return: CurseGame instance representing the game
-        :rtype: base.CurseGame
-        """
-
-        return self.handle(1, id)
-
-    def catagories(self) -> Tuple[base.CurseCategory, ...]:
-        """
-        Gets ALL valid categories on CurseForge.
-
-        This call can get expensive, so call in moderation!
-
-        :return: Tuple of CurseCategory instances
-        :rtype: Tuple[base.CurseCategory, ...]
-        """
-
-        return self.handle(2)
-
-    def category(self, category_id: int) -> base.CurseCategory:
-        """
-        Returns information on a category for a specific game.
-
-        You will need to provide a category ID.
-
-        :param game_id: ID of the game
-        :type game_id: int
-        :param category_id: ID of the category
-        :type category_id: int
-        :raises NotImplementedError: Must be overridden in child class!
-        :return: CurseCategory instance representing the category
-        :rtype: base.CurseCategory
-        """
-
-        return self.handle(3, category_id)
-
-    def sub_category(self, category_id: int) -> Tuple[base.CurseCategory, ...]:
-        """
-        Gets the sub-categories of the given category.
-
-        We return a tuple of CurseCategory instances
-        representing the sub-categories
-
-        :param category_id: ID of category to get sub-catagories for
-        :type category_id: int
-        :return: Tuple of CurseCategories representing the sub-categories
-        :rtype: Tuple[base.CurseCategory, ...]
-        """
-
-        return self.handle(4, category_id)
-
-    def iter_search(self, game_id: int, category_id: int, search: SearchParam=None) -> base.CurseAddon:
-        """
-        Iterates over all results from the search operation.
-
-        We automatically bump the SearchParam by one after
-        each call. We will keep yielding until
-        we receive a tuple that has a length of zero,
-        which at that point we will raise a 'StopIteration' exception.
-
-        Because we only bump the index value,
-        we will start on the index that was provided by the
-        SearchParam object. For example,
-        if the index starts at one, then we will return
-        each addon from that page on.
-
-        We use the 'search' method under the hood.
-
-        This method is best used in for loops/situations
-        where iterators are used!
-        Because we are a generator,
-        calling this method on it's own is not recommended!
-        If you want a list of values,
-        use the 'list()' method on us.
-
-        :param game_id: Game ID to search under
-        :type game_id: int
-        :param category_id: Category ID to search under
-        :type cat_id: int
-        :param search: Search Parameter to use
-        :type search: SearchParam
-        :return: Each CurseAddon that returned during the search operation.
-        :rtype: base.CurseAddon
-        :raises: StopIteration: When we have run out of search content
-        """
-
-        # Check if we should generate a SearchParam:
-
-        if search is None:
-
-            # None provided, let's create one:
-
-            search = self.get_search()
-
-        while True:
-
-            # Get the current page of results:
-
-            results = self.search(game_id, category_id, search)
-
-            # Check to see if the page is empty:
-
-            if not results:
-
-                # No results! Raise 'StopIteration'!
-
-                raise StopIteration()
-
-            # Iterate over the result:
-
-            for item in results:
-
-                # Yield the result:
-
-                yield item
-
-            # Bump the index and continue:
-
-            search.index =+ 1
-
-    def addon(self, addon_id: int) -> base.CurseAddon:
-        """
-        Gets information on a specific addon.
-
-        You will need to provide an addon ID,
-        which can be found by searching a game category.
-
-        :param addon_id: Addon ID
-        :type addon_id: int
-        :raises NotImplementedError: Must be overridden in child class
-        :return: CurseCategory instance representing the addon
-        :rtype: base.CurseAddon
-        """
-
-        return self.handle(5, addon_id)
-
-    def search(self, game_id: int, category_id: int, search: SearchParam=None) -> Tuple[base.CurseAddon, ...]:
-        """
-        Searches the given game and category for addons.
-
-        The game_id and category_id parameters are required for searching,
-        but the search parameter can optionally be provided to fine-tune to search.
-
-        Each implementation has diffrent search backends,
-        so it is important to pass the correct search instance!
-
-        The wrappers will implement search checking,
-        to ensure only the correct search parameters are used. 
-
-        :param game_id: ID of the game to search under
-        :type game_id: int
-        :param category_id: Category to search under
-        :type category_id: int
-        :param search: Search options to fine tune the search, optional
-        :type search: Any
-        :return: Tuple of addons that matched the search parameters
-        :rtype: Tuple[base.CurseAddon, ...]
-        :raises: TypeError: If the search object fails the search check
-        """ 
-
-        # Check if we should generate a dummy SearchParam:
-
-        if search is None:
-
-            # Create dummy search param:
-
-            search = SearchParam()
-
-        return self.handle(6, game_id, category_id, search)
-
-    def addon_description(self, addon_id: int) -> base.CurseDescription:
-        """
-        Gets the description of a specific addon.
-
-        You will need to provide an addon ID,
-        which can be found by searching a game category.
-
-        :param addon_id: Addon ID
-        :type addon_id: int
-        :raises NotImplementedError: Must be overridden in child class!
-        :return: CurseDescription instance representing the addon's description
-        :rtype: base.CurseDescription
-        """
-
-        return self.handle(7, addon_id)
-
-    def addon_files(self, addon_id: int) -> Tuple[base.CurseFile]:
-        """
-        Gets a list of files associated with the addon.
-
-        You will need to provide an addon ID,
-        which can be found by searching a game category.
-
-        :param addon_id: Addon ID
-        :type addon_id: int
-        :raises NotImplementedError: Must be overridden in child class!
-        :return: Tuple of CurseFile instances representing the addon's files
-        :rtype: Tuple[base.CurseFile]
-        """
-
-        return self.handle(8, addon_id)
-
-    def addon_file(self, addon_id: int, file_id:int) -> base.CurseFile:
-        """
-        Gets information on a specific file associated with an addon.
-
-        You will need to provide an addon ID,
-        as well as a file ID, which can be found by getting a list of all files
-
-        :param addon_id: Addon ID
-        :type addon_id: int
-        :param file_id: File ID
-        :type file_id: int
-        :raises NotImplementedError: Must be overridden in child class!
-        :return: CurseFile instance representing the addon file
-        :rtype: base.CurseFile
-        """
-
-        return self.handle(9, addon_id, file_id)
-
-    def file_description(self, addon_id: int, file_id: int) -> base.CurseDescription:
-        """
-        Gets a description of an addon file.
-
-        You will need to provide a addon ID and a file ID.
-        We return a CurseDesciprion object representing the description.
-
-        :param addon_id: Addon ID
-        :type addon_id: int
-        :param file_id: File ID
-        :type file_id: int
-        :return: CurseDescription representing the description
-        :rtype: base.CurseDescription
-        """
-
-        return self.handle(10, addon_id, file_id)
 
     def _format_object(self, pack):
         """

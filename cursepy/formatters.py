@@ -80,7 +80,7 @@ class StripHTML(BaseFormat):
         :rtype: str
         """
 
-        return re.sub(StripHTML.PATTERN, '', data)
+        return str(re.sub(StripHTML.PATTERN, '', data))
  
 
 class BSFormatter(BaseFormat):

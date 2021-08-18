@@ -1,8 +1,8 @@
-.. collec_advn:
+.. _collec_advn:
 
-===================================
-Advanced HandlerCollection Tutorial
-===================================
+==========================
+HandlerCollection Tutorial
+==========================
 
 Introduction 
 ============
@@ -16,13 +16,13 @@ Everything from loading handlers, to the internal structure
 of info will be covered here.
 
 The topics covered in this document are not necessary 
-for using capy!
+for using cursepy!
 This info is only for advanced users who wish 
-to gain a deeper understanding of capy and it's internals 
+to gain a deeper understanding of cursepy and it's internals 
 for there own uses.
 
 If you want a surface-level tutorial on HC objects,
-take a look at the basic usage tutorial [HERE]!
+take a look at the :ref:`basic usage tutorial <basic-tutorial>`.
 
 With that being said, lets get started!
 
@@ -44,7 +44,7 @@ As a matter of fact, the CurseClient actually inherits the HandlerCollection cla
 Even so, there are some differences between the two.
 
 The HandlerCollection is a low level component for managing handlers.
-All the CurseClient does is load the default capy handlers,
+All the CurseClient does is load the default cursepy handlers,
 as well as provide the entry point methods.
 For the sake of simplicity,
 it is recommended that you use CurseClient
@@ -184,14 +184,14 @@ Consider this example:
 If this handler map was passed to the 'load_handlers()' method,
 then the handlers will be bound to these events:
 
-0. Hand1 
-1. Hand2
-2. Hand3
+1. Hand1 
+2. Hand2
+3. Hand3
 
 In other words, 'Hand1' will be bound to the 'LIST_GAMES' event,
 'Hand2' will be bound to the 'GAME' event,
 and 'Hand3' will be bound to the 'LIST_CATEGORY' event.
-capy uses the index of the handler to determine the event ID it should be bound to.
+cursepy uses the index of the handler to determine the event ID it should be bound to.
 For example, the index of 'Hand1' is zero, which means it will be bound to the event ID of zero
 (The 'LIST_GAMES' event).
 If the provided object is a dictatory,
@@ -302,8 +302,8 @@ HandlerCollection Structures
 In this section,
 we will go over the internal data structures
 HC uses to organize and store components.
-Knowing this info is not necessary at all for using capy!
-However, if you want to get into capy development,
+Knowing this info is not necessary at all for using cursepy!
+However, if you want to get into cursepy development,
 or simply wish to have a deeper understanding,
 then this section could be useful for you.
 
@@ -479,7 +479,7 @@ You should now have a deep understand of HC objects
 and all their advanced features!
 
 This concludes the advanced tutorial 
-for advanced capy usage.
+for advanced cursepy usage.
 
-If you still want more info on capy and it's components, 
+If you still want more info on cursepy and it's components, 
 you should check out the API reference.
