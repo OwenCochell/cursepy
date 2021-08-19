@@ -78,9 +78,11 @@ class TCPProtocol(BaseProtocol):
 
         while len(bytes) < length:
 
+            to_read = length - len(byts)
+
             # Read as many bytes as we can:
 
-            last = self.sock.recv(length - len(bytes))
+            last = self.sock.recv(4096 if to_read > 4096 else to_read)
 
             byts = byts + last
 
@@ -114,7 +116,8 @@ class UDPProtocol(BaseProtocol):
     UDPProtocol - Protocol object for data exchange via UDP sockets.
 
     We offer convenience methods for working with UDP sockets.
-    Like TPCProtocol, we keep metadata that keeps track of data transferred.
+    Like TPCProtocol, we keep metadata that keeps track of data transferred,
+    as well as the address of the last exchange.
     """
 
     def __init__(self, host: str, port, timeout: int):
@@ -122,7 +125,7 @@ class UDPProtocol(BaseProtocol):
         super().__init__(host, port, timeout=timeout)
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.last = {'bytes': 0}
+        self.last = {'bytes': 0,'addr':  None}
 
         self.sock.settimeout(self.timeout)
 
@@ -136,15 +139,16 @@ class UDPProtocol(BaseProtocol):
 
         # Get the data:
 
-        byts = self.sock.recvfrom(1024)
+        resp = self.sock.recvfrom(1024)
 
         # Set the metadata:
 
-        self.last['bytes'] = len(byts)
+        self.last['bytes'] = len(resp[0])
+        self.last['addr'] = resp[1]
 
         # Return it:
 
-        return byts
+        return resp[0]
 
     def write(self, byts: bytes):
         """
@@ -161,6 +165,8 @@ class UDPProtocol(BaseProtocol):
         # Set the metadata:
 
         self.last['bytes'] = len(byts)
+        self.last['addr'] = (self.host, self.port)
+
 
 class URLProtocol(BaseProtocol):
 

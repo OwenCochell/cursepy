@@ -1,17 +1,17 @@
 =================
-Protocol Tutorial 
+Protocol Tutorial
 =================
 
-Introduction 
+Introduction
 ============
 
 Welcome to the Protocol tutorial!
 
-This document will go over the finer details on 
+This document will go over the finer details on
 protocol objects, and how to use them effectively.
 
 Like the other advanced tutorials in this series,
-the content covered in this document are not necessary 
+the content covered in this document are not necessary
 for basic cursepy usage!
 You should only have to care bout this stuff if you are 
 looking to get into handler development,
@@ -288,15 +288,17 @@ To receive data you can use the 'read()' method:
 You can use the 'make_meta()' method to
 generate valid metadata.
 The metadata is very simple,
-and is a dictionary with a single value:
+and is as dictionary of two values:
 
 .. code-block::
 
     {
-        'bytes': BYTES
+        'bytes': BYTES,
+        'addr': (HOST, PORT)
     }
 
-Where 'BYTES' is the number of bytes transferred.
+Where 'BYTES' is the number of bytes transferred,
+and HOST/PORT is the host and port of the remote connection, respectfully.
 
 Conclusion
 ==========

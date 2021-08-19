@@ -26,11 +26,6 @@ from cursepy.classes.search import SearchParam
 from cursepy.formatters import BaseFormat, NullFormatter
 
 
-# Define the default handler map, should be set in the init file:
-
-default_map = None
-
-
 class BaseHandler(object):
     """
     BaseHandler - Child class all handlers must inherit!

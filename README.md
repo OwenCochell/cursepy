@@ -3,17 +3,14 @@ A modular API for interacting with [CurseForge](https://curseforge.com).
 
 [![Documentation Status](https://readthedocs.org/projects/cursepy/badge/?version=latest)](https://cursepy.readthedocs.io/en/latest/?badge=latest)
 
-# Disclaimer
-
-cursepy is a work in progress!
-
-Use this library at your own risk!
-We will be complete with docs soon.
+The documentation for cursepy is still a work in progress!
+The core content will remain the same,
+but expect minor corrections and rephrasing.
 
 # Introduction
 
 cursepy allows you to interact with CurseForge
-addons and files in a simply, easy to use way.
+addons and files in a simple, easy to use way.
 We offer easy to use entry points into certain CurseForge APIs and backbends.
 
 Our goal is to be modular and heavily customizable for developers who
@@ -47,7 +44,49 @@ print(game.name)
 
 # Features
 
-Here, we will give brief examples of cursepy features.
+Here, we will give brief descriptions of cursepy features.
+
+## Ease of Use
+
+using cursepy is very simple!
+Simply import the CurseClient class:
+
+```python
+from cursepy import CurseClient
+
+# Create the client:
+
+client = CurseClient()
+
+# Get a tuple of all games:
+
+games = client.games()
+```
+
+The CurseClient offers easy to use methods for getting info from CurseForge.
+CurseClient also allows for callbacks to be bound to events, 
+meaning when an event is fired,
+your custom callback will also be called.
+Here is an example of this in action:
+
+```python
+# Define a custom callback:
+
+def callback(data)
+    # Print the data we have:
+
+    print(data)
+
+# Bind the callback to the ADDON event:
+
+client.bind_callback(callback, client.ADDON)
+```
+
+When the ADDON event is triggered, then this callback will be called,
+and the data we received by the handler will be passed along to the callback.
+
+If you want a closer look at working with CurseClient,
+you should check out the [CurseClient Documentation](https://cursepy.readthedocs.io/en/latest/basic/collection.html).
 
 ## Modular Design
 
@@ -55,6 +94,24 @@ Each operation is managed by a component called a 'handler'.
 Handlers are simply classes that get information and process it.
 This information can be from any location,
 and it can be retrieved in many different ways.
+Here is an example of a simple handler thats pulls HTTP data from somewhere and returns it:
+
+```python
+from urllib.request import urlopen
+
+# Import the BaseHandler:
+
+from cursepy.handlers.base import BaseHandler
+
+
+class HTTPGet(BaseHandler):
+
+    def handle(self):
+
+        # Get and return HTTP data:
+
+        return urlopen('somedomain.com/some/path')
+```
 
 The only limit is your imagination!
 
@@ -62,7 +119,10 @@ Our modular method allows for functionality to be swapped and
 mixed around, allowing for automated and easier customization
 compared to sub-classing.
 
-Have a look at the documentation on handler development [here](https://cursepy.readthedocs.io/en/latest/advn/hand.html)!
+cursepy has extensive documentation on handler development,
+which contains best practice recommendations, docs on the cusepy Handler Framework(CHF),
+and tutorials on how to use the development handlers built into cursepy.
+Have a look at the [Handler Development Tutorial](https://cursepy.readthedocs.io/en/latest/advn/hand.html)!
 
 ## Curse Instances
 
@@ -82,7 +142,7 @@ They are dataclasses, which makes retrieving and working
 with information very easy.
 
 Curse Instances have plenty of other nifty features for 
-easing your development, so be sure to check out their [documentation](https://cursepy.readthedocs.io/en/latest/basic/curse_inst.html)!
+easing your development, so be sure to check out the [CurseInstance Tutorial](https://cursepy.readthedocs.io/en/latest/basic/curse_inst.html)!
 
 ## Wrappers
 
@@ -94,7 +154,7 @@ For example, the 'MinecraftWrapper' eases the process of getting
 information on Minecraft projects and addons.
 We hope to implement more wrappers for more games at a later date.
 
-Again, have a look at our [documentation](https://cursepy.readthedocs.io/en/latest/basic/wrap.html) for more info!
+Have a look at the [Wrapper Tutorial](https://cursepy.readthedocs.io/en/latest/basic/wrap.html) for more info!
 
 # Installation
 
@@ -115,6 +175,24 @@ I'm sure you know this already, but the documentation can be found here:
 [https://cursepy.readthedocs.io/en/latest/index.html](https://cursepy.readthedocs.io/en/latest/index.html)
 
 Be sure to check out the [cursepy PyPi page](https://pypi.org/project/cursepy/) for more information
+
+The documentation is built using [sphinx](https://www.sphinx-doc.org/en/master/index.html).
+Building the docs yourself is very simple.
+You can start by installing sphinx:
+
+```
+pip install sphinx
+```
+
+Now, navigate to the 'docs' directory in your favorite terminal.
+Next, you can issue the 'make' command to build the docs:
+
+```
+make html
+```
+
+This will build the docs into HTML,
+and will be placed into build directory.
 
 # Contributing
 
