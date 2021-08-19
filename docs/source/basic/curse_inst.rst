@@ -1,3 +1,5 @@
+.. _curse_inst:
+
 =======================
 Curse Instance Tutorial
 =======================
@@ -399,7 +401,7 @@ over each addon.
 
 .. note::
     If you need a primer on searching,
-    check out the Basic Tutorial[HERE]
+    check out the :ref:`CurseClient Tutorial <search>`.
 
 CurseAddon 
 ----------

@@ -5,6 +5,8 @@ We offer components that can be used to get curseforge information from somewher
 in this case HTTP get requests.
 """
 
+import socket
+
 from urllib.request import urlopen, Request
 from urllib.parse import urlencode
 from http.client import HTTPResponse
@@ -38,6 +40,128 @@ class BaseProtocol(object):
         self.total_received = 0  # Total bytes received in our lifetime
 
 
+class TCPProtocol(BaseProtocol):
+    """
+    TCPProtocol - Protocol object for data exchange via TCP sockets.
+
+    We offer convince methods for working with TCP sockets.
+    We also provide methods for generating valid metadata,
+    which will provide the number of bytes transmitted/received,
+    as well as the remote entity we are communicating with.
+    """
+
+    def __init__(self, host: str, port: int, timeout: int=60):
+
+        super().__init__(host, port, timeout=timeout)
+
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.last = {'bytes': 0}
+
+        self.sock.settimeout(self.timeout)
+        self.sock.connect((self.host, self.port))
+
+    def read(self, length: int) -> bytes:
+        """
+        Reads content from the TCP socket.
+        We make sure to check the received data length
+        to ensure that we read everything that we expect.
+
+        :param length: Number of bytes to read
+        :type length: int
+        :return: Retrieved bytes 
+        :rtype: bytes
+        """
+
+        byts = b''
+
+        # Continuosly loop:
+
+        while len(bytes) < length:
+
+            # Read as many bytes as we can:
+
+            last = self.sock.recv(length - len(bytes))
+
+            byts = byts + last
+
+        # Update the metadata:
+
+        self.last['bytes'] = len(byts)
+
+        # Return the bytes:
+
+        return byts
+
+    def write(self, byts: bytes):
+        """
+        Writes data over the TCP socket.
+
+        :param byts: Bytes to write
+        :type byts: bytes
+        """
+
+        # Send the bytes:
+
+        self.sock.sendall(byts)
+
+        # Update our metadata:
+
+        self.last['bytes'] = len(byts)
+
+
+class UDPProtocol(BaseProtocol):
+    """
+    UDPProtocol - Protocol object for data exchange via UDP sockets.
+
+    We offer convenience methods for working with UDP sockets.
+    Like TPCProtocol, we keep metadata that keeps track of data transferred.
+    """
+
+    def __init__(self, host: str, port, timeout: int):
+
+        super().__init__(host, port, timeout=timeout)
+
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.last = {'bytes': 0}
+
+        self.sock.settimeout(self.timeout)
+
+    def read(self) -> bytes:
+        """
+        Reads content over the UPD socket.
+
+        :return: Bytes read
+        :rtype: bytes
+        """
+
+        # Get the data:
+
+        byts = self.sock.recvfrom(1024)
+
+        # Set the metadata:
+
+        self.last['bytes'] = len(byts)
+
+        # Return it:
+
+        return byts
+
+    def write(self, byts: bytes):
+        """
+        Writes data over the UPD socket.
+
+        :param byts: Bytes to write
+        :type byts: bytes
+        """
+
+        # Send the data:
+
+        self.sock.sendto(byts, (self.host, self.port))
+
+        # Set the metadata:
+
+        self.last['bytes'] = len(byts)
+
 class URLProtocol(BaseProtocol):
 
     """
@@ -54,7 +178,7 @@ class URLProtocol(BaseProtocol):
     We raise the usual urllib exceptions if issues arise.
     """
 
-    def __init__(self, host:str, timeout: int=60) -> None:
+    def __init__(self, host: str, timeout: int=60) -> None:
 
         super().__init__(host, 80, timeout=timeout)
 

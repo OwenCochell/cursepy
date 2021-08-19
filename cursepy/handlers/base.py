@@ -1009,13 +1009,17 @@ class HandlerCollection(object):
 
             self._format_object(inst)
 
-        # Run all callbacks associated with the event:
+        # Check if there is a valid event:
 
-        for call in self.callbacks[id]:
+        if id in self.callbacks.keys():
 
-            # Run the callback:
+            # Run all callbacks associated with the event:
 
-            call[0](inst, *call[1], **call[2])
+            for call in self.callbacks[id]:
+
+                # Run the callback:
+
+                call[0](inst, *call[1], **call[2])
 
         # Return the instance:
 

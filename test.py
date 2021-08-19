@@ -141,4 +141,3 @@ def callback():
     client.clear_callback(3)
 
     client.category(CATEGORY)
-

@@ -30,3 +30,4 @@ the :ref:`Basic Usage Tutorial<basic-tutorial>`.
     hand
     proto
     collection
+    builtin_hand

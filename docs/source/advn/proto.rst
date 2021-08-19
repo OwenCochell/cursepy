@@ -145,6 +145,8 @@ Lets go over the built in protocol objects that are shipped with cursepy.
 They can make handler development much easier,
 so using them is recommended!
 
+.. _url-proto:
+
 URLProtocol
 -----------
 
@@ -210,6 +212,8 @@ At the end of the day, the generated URL will look like this:
 
     [HOSTNAME]/[EXTRA]/[PATH]
 
+.. _url-meta:
+
 URLProtocol also provides a way to easily get metadata.
 You can use the 'get_metadata()' method,
 which will return the metadata of the last made request in dictionary
@@ -224,6 +228,75 @@ format:
         status: Status code returned by server
         reason: Reason phrase returned by the server 
     }
+
+TCPProtocol
+-----------
+
+The TCPProtocol makes exchanging data via TCP sockets very simple.
+This is a very low-level component that will probably only be used 
+in the development of higher-level protocol objects. 
+
+To send data, you can use the 'write()' method:
+
+.. code-block:: python
+
+    proto.write(CONTENT)
+
+Where 'CONTENT' is the content to write.
+To receive data you can use the 'read()' method:
+
+.. code-block:: python 
+
+    proto.read(NUM)
+
+Where 'NUM' is the number of bytes to read.
+TCPProtocol takes special measures to ensure that the 
+the we read the number of bytes asked.
+You can use the 'make_meta()' method to
+generate valid metadata.
+The metadata is very simple,
+and is a dictionary with a single value:
+
+.. code-block::
+
+    {
+        'bytes': BYTES
+    }
+
+Where 'BYTES' is the number of bytes transferred.
+
+UDPProtocol
+-----------
+
+The UDPProtocol makes exchanging data via UDP socket very simple.
+Like TCPProtocol, this is a low-level component that will probably
+be used in the development of higher-level protocol objects.
+
+To send data, you can use the 'write()' method:
+
+.. code-block:: python
+
+    proto.write(CONTENT)
+
+Where 'CONTENT' is the content to write.
+To receive data you can use the 'read()' method:
+
+.. code-block:: python 
+
+    proto.read()
+
+You can use the 'make_meta()' method to
+generate valid metadata.
+The metadata is very simple,
+and is a dictionary with a single value:
+
+.. code-block::
+
+    {
+        'bytes': BYTES
+    }
+
+Where 'BYTES' is the number of bytes transferred.
 
 Conclusion
 ==========

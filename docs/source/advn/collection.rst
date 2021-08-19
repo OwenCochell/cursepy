@@ -57,6 +57,11 @@ Handler Management
 HC contains a few methods for loading and unloading handlers.
 In this section, we will go over those methods in detail.
 
+.. note::
+
+    If you want a look at the built in handlers,
+    you should check out the :ref:`Builtin Handler List<hand-built>`.
+
 Getting Handlers
 ----------------
 

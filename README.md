@@ -129,7 +129,7 @@ I also accept comments and feedback at my email address listed under my GitHub a
 
 # Changelog
 
-You can have a look at the changelog [here]().
+You can have a look at the changelog [here](https://cursepy.readthedocs.io/en/latest/changelog.html).
 
 # Special Thanks
 

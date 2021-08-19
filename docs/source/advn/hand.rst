@@ -8,9 +8,8 @@ Introduction
 ============
 
 Welcome to the handler tutorial!
-
 This tutorial should give you an
-advanced look at handler development!
+advanced look at handler development.
 
 Creating a Handler
 ==================
@@ -689,14 +688,7 @@ Built in Handlers
 
 cursepy has a few built in handlers
 for development purposes.
-
 Lets go over these in detail.
-
-.. note::
-
-    If you want a list of all functional 
-    handlers and the features they support,
-    then have a look '[HERE]'
 
 NullHandler
 -----------
@@ -719,6 +711,8 @@ This handler raises an exception upon each handle request.
 It raises a 'HandlerRaise' exception upon each call.
 
 This handler is great of you want to forcefully disable an option!
+
+.. _url-hand:
 
 URLHandler
 ----------

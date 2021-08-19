@@ -100,7 +100,7 @@ We will not be going into the dirty details
 about handler development and functionality.
 We will be keeping the content at a surface level understanding only!
 If you want a more in-depth explanation of handler development, 
-you can go [HERE].
+you should check out the :ref:`handler tutorial <hand_advn>`.
 
 .. _collec-constants:
 
@@ -148,7 +148,7 @@ and will return a CurseInstance representing the retrieved info.
 We will go over all the types of information you can get.
 
 .. note::
-    You can read all about CurseInstances [HERE].
+    You can read the :ref:`CurseInstance Tutorial <curse_inst>` for an in-depth look at these objects.
     For now, just know that CurseInstances
     are classes that represent CurseForge information.
 
@@ -275,6 +275,8 @@ method for this:
 
 This will return a CurseDescription
 object representing the addon description.
+
+.. _search:
 
 You can also search for addons using the 'search' method:
 
