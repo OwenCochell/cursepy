@@ -42,7 +42,7 @@ Creating a CC is simple procedure, and can be done like this:
 
     # Create the CC:
 
-    client = HandlerCollection()
+    client = CurseClient()
 
 This will create a CC with the default handlers loaded.
 If you do not want the default handlers to be loaded,
