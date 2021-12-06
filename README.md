@@ -7,20 +7,20 @@ The documentation for cursepy is still a work in progress!
 The core content will remain the same,
 but expect minor corrections and rephrasing.
 
-# Introduction this is sally 
+# Introduction  
 
-cursepy allows you to interact with CurseForge
-addons and files in a simple, easy to use way.
-We offer easy to use entry points into certain CurseForge APIs and backbends.
+cursepy allows you to interact with CurseForge,
+which allows you to add, addons and files in a simple, easy to use format.
+We offer easy entry points into certain CurseForge APIs and backbends.
 
 Our goal is to be modular and heavily customizable for developers who
-have very specific use cases, while also being simple and intuitive
+have very specific wants and needs, while also being simple and intuitive
 for developers who want something that 'just works'.
 
 We support getting information on all games,
 addons, categories, files, and so much more!
 We also offer easy to use methods for downloading 
-said files.
+files.
 
 # Example
 
@@ -44,7 +44,7 @@ print(game.name)
 
 # Features
 
-Here, we will give brief descriptions of cursepy features.
+Here, we will give brief descriptions of cursepy features:
 
 ## Ease of Use
 
@@ -63,10 +63,10 @@ client = CurseClient()
 games = client.games()
 ```
 
-The CurseClient offers easy to use methods for getting info from CurseForge.
+The CurseClient offers simple to use navigational methods for obtaining necessary information from CurseForge.
 CurseClient also allows for callbacks to be bound to events, 
 meaning when an event is fired,
-your custom callback will also be called.
+your custom callback will also be cued.
 Here is an example of this in action:
 
 ```python
@@ -92,7 +92,7 @@ you should check out the [CurseClient Documentation](https://cursepy.readthedocs
 
 Each operation is managed by a component called a 'handler'.
 Handlers are simply classes that get information and process it.
-This information can be from any location,
+This information can be from any location
 and it can be retrieved in many different ways.
 Here is an example of a simple handler thats pulls HTTP data from somewhere and returns it:
 
@@ -120,8 +120,7 @@ mixed around, allowing for automated and easier customization
 compared to sub-classing.
 
 cursepy has extensive documentation on handler development,
-which contains best practice recommendations, docs on the cusepy Handler Framework(CHF),
-and tutorials on how to use the development handlers built into cursepy.
+which contains best practice recommendations. Docs on the cusepy Handler Framework(CHF)/tutorials on how to use the development handlers are already built into cursepy.
 Have a look at the [Handler Development Tutorial](https://cursepy.readthedocs.io/en/latest/advn/hand.html)!
 
 ## Curse Instances
@@ -135,10 +134,10 @@ Not ideal!
 
 cursepy offers curse instances that normalize data,
 and offer a container for data to be kept in.
-This ensures that no matter what,
+This ensures that no matter what
 the developer will be working with data in the same way,
 regardless of how or where we got the data from.
-They are dataclasses, which makes retrieving and working 
+They're dataclasses, which makes retrieving and working 
 with information very easy.
 
 Curse Instances have plenty of other nifty features for 
@@ -148,7 +147,7 @@ easing your development, so be sure to check out the [CurseInstance Tutorial](ht
 
 Wrappers ease the process of interacting with certain games and projects on CurseForge.
 They do this by keeping track of relevant information, such as game and category ID's,
-so you as the developer do not have to.
+so you, as the developer, do not have to.
 
 For example, the 'MinecraftWrapper' eases the process of getting 
 information on Minecraft projects and addons.
@@ -170,7 +169,7 @@ check out the installation section in our [documentation](https://cursepy.readth
 As stated many times before, we have an extensive documentation. It contains tutorials, the API reference,
 and best practice recommendations.
 
-I'm sure you know this already, but the documentation can be found here:
+If you don't know this already, the documentation can be found here:
 
 [https://cursepy.readthedocs.io/en/latest/index.html](https://cursepy.readthedocs.io/en/latest/index.html)
 
@@ -196,9 +195,9 @@ and will be placed into build directory.
 
 # Contributing
 
-Pull requests are welcome and encouraged :) ! If you want to see a feature in cursepy,
-or have a fix for a bug you came across, then a PR will be the fastest way to 
-to get you change included in cursepy.
+Pull requests are welcome and encouraged! If you want to see a feature in cursepy
+or have a fix for a bug you came across, then a PR will be the fastest way for you 
+to get the change (included in cursepy).
 
 If you wish to simply report a bug, then you should open an issue,
 and I will get back to you as soon as I can.
@@ -213,8 +212,10 @@ You can have a look at the changelog [here](https://cursepy.readthedocs.io/en/la
 
 Sir Quinn - Documentation work
 
+Sally Miller - Proof reading
+
 # Conclusion
 
 cursepy offers a pythonic, intuitive way to interact with CurseForge projects!
-We offer high levels of customizability,
+We offer high levels of customizability
 while at the same time being easy to use. 

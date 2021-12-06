@@ -63,14 +63,14 @@ https://git-scm.com/docs/gittutorial
 
 The cursepy docs are separated into 'pages',
 much like a website. Each page
-contains info on a certain topic.
+contains information on a certain topic.
 This is to ensure the documentation
 remains maintainable,
 as putting everything in one file
 would make maintainability difficult.
 
 The docs are built using a service called Sphinx 
-that will render the content, and link them together.
+that will render the content and link them together.
 You can read more about sphinx here:
 
 https://www.sphinx-doc.org/en/master/
@@ -83,7 +83,7 @@ docs/source/
 
 Any file with an extension with '.rst' are
 docs files that should be checked!
-Have a list at the top of this file 
+I Have a list at the top of this file 
 for doc status.
 You can ignore 'conf.py'.
 
@@ -91,7 +91,7 @@ You can ignore 'conf.py'.
 
 Content in these pages are written in a
 markup language called ReStructuredText.
-RT should look like normal text,
+ReconstructedText (RT) should look like normal text,
 but with some minor syntax changes.
 
 For example, here is text rendered as a header:
@@ -101,7 +101,7 @@ Header
 
 Normal text 
 
-The 'Header' text will be rendered in large and bold, acting a header.
+The 'Header' text will be rendered in large and bold, acting as a header.
 Any text with '=' below it will act as a header.
 Any text with '-' beneath it will act as a sub-header.
 
@@ -147,7 +147,7 @@ https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
 --== [ Manually Building Docs: ] ==--
 
 Your IDE should automatically build the docs for 
-you in the preview pane.
+you in the preview page.
 If you want to build the docs yourself, 
 then follow these steps:
 
