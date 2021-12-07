@@ -71,7 +71,7 @@ new handlers can quickly be written in to fix it.
 
 cursepy offers standardized methods for interacting with these handlers,
 ensuring that no matter what the handler does,
-it will always be cued in the same way.
+it will always be called in the same way.
 cursepy also provides standardized classes for returning CF
 information, in turn guarantees that no matter what the handler
 is doing it will always return the same class.
