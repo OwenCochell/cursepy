@@ -551,7 +551,7 @@ class SVCFile(BaseSVCHandler):
 
             # Add the dependency ID's:
 
-            final.append(depen('addonId'))
+            final.append(depen['addonId'])
 
         return base.CurseFile(data['id'], addon_id, data['displayName'], data['fileName'], data['fileDate'], 
         data['downloadUrl'], data['fileLength'], tuple(data['gameVersion']), tuple(final))
