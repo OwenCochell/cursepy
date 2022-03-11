@@ -105,7 +105,7 @@ such as creating custom handlers.
 
 This philosophy means that for people 
 who want to use cursepy for interacting with CF and nothing more
-(which is 99% of people).
+(which is 99% of people),
 Cursepy will be simple and easy to use.
 Handlers will be auto-loaded and high-level methods
 will do and act as they are supposed to.

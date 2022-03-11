@@ -300,7 +300,7 @@ method:
 The 'SearchParam' objects contains the following values
 for fine-tuning the search operation:
 
-* filter - Value to search for 
+* searchFilter - Value to search for 
 * index - Page index to search under
 * pageSize - Number of items to display per page
 * gameVersion - Game version to search under
@@ -311,7 +311,7 @@ ____________________________
 
 Most of these values are self-explanatory.
 
-'filter' is the actual search term to search for.
+'searchFilter' is the actual search term to search for.
 
 'gameVersion' is the game version to search under.
 This varies from game to game, and should be a string.
@@ -380,7 +380,7 @@ and print each name:
 
     # Set the filter to 'test':
 
-    search.filter = 'test'
+    search.searchFilter = 'test'
 
     # Iterate over ALL addons:
 

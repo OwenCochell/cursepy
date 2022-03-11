@@ -33,7 +33,7 @@ class SearchParam:
     all search parameters in only one call.
     """
 
-    filter: Optional[str] = field(default=None) # Term to search for
+    searchFilter: Optional[str] = field(default=None) # Term to search for
     index: Optional[int] = field(default=None)  # Page of search results to view
     pageSize: Optional[int] = field(default=None)  # Number of items to display per page
     gameVersion: Optional[int] = field(default=None)  # Game version to use

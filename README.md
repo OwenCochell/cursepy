@@ -7,11 +7,11 @@ The documentation for cursepy is still a work in progress!
 The core content will remain the same,
 but expect minor corrections and rephrasing.
 
-# Introduction  
+# Introduction
 
 cursepy allows you to interact with CurseForge,
 which allows you to add, addons and files in a simple, easy to use format.
-We offer easy entry points into certain CurseForge APIs and backbends.
+We offer easy entry points into certain CurseForge APIs and backends.
 
 Our goal is to be modular and heavily customizable for developers who
 have very specific wants and needs, while also being simple and intuitive

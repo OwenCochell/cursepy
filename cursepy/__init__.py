@@ -9,5 +9,5 @@ from cursepy.wrapper import CurseClient
 
 # Define some metadata here:
 
-__version__ = '1.1.2'
+__version__ = '1.1.3'
 __author__ = 'Owen Cochell'

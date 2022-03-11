@@ -503,7 +503,7 @@ the formatted object:
 Now, the object has the time attached to it.
 You may be thinking, why not attach the time during the format
 operation?
-You defiantly can! There is nothing stopping you.
+You definitely can! There is nothing stopping you.
 But adding that instruction to every handler you plan to write
 is redundant, and leads to unnecessary code.
 If you make a master class for you handlers,
