@@ -16,7 +16,7 @@ have read about the HandlerCollection,
 and it's entry points.
 You should have noticed some talk about CurseInstances,
 which will be covered in great detail in this document.
-*
+
 What is a CurseInstance?
 ========================
 
@@ -502,7 +502,8 @@ You can also get dependencies by using the 'get_dependencies()' method:
 
     deps = inst.get_dependencies()
 
-You can also pass 'required=True' to get only required dependencies.
+You can also pass 'required=True' to get only required dependencies,
+and 'optional=True' to get only optional dependencies.
 
 You can also get the 'get_addon()' method to retrieve a CurseAddon 
 object representing the addon this file is attached to.
