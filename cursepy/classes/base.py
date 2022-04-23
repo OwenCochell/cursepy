@@ -480,7 +480,7 @@ class CurseFile(BaseDownloader):
         * download_url - Download URL of the file
         * length - Length in bytes of the file
         * version - Version of the game needed to work with this file
-        * dependencies - List dependency addons ID's
+        * dependencies - List of CurseDependency objects
     """
 
     id: int
@@ -491,7 +491,7 @@ class CurseFile(BaseDownloader):
     download_url: str
     length: int
     version: Tuple[str, ...]
-    dependencies: Tuple[int, ...]
+    dependencies: Tuple[CurseDependency, ...]
 
     INST_ID = 6
 
@@ -510,24 +510,40 @@ class CurseFile(BaseDownloader):
 
         return self.hands.file_description(self.addon_id, self.id)
 
-    def get_dependencies(self) -> Tuple[CurseAddon, ...]:
+    def get_dependencies(self, required = False, optional = False) -> Tuple[CurseDependency, ...]:
         """
-        Returns a tuple of all CurseAddons
-        that are the dependencies of this file.
+        Returns a tuple of CurseDependency objects
+        that this addon file requires.
 
-        :return: Tuple of CurseAddons
-        :rtype: Tuple[CurseAddon]
+        We have the option to return only required or optional dependencies.
+        You can use the parameters 'required' and 'optional' to determine
+        which dependencies to return.
+
+        :param required: Boolean determining if we should return only required dependencies
+        :type required: bool, optional
+        :param optional: Boolean determining if we should return only optional dependencies
+        :type optional: bool, optional
+        :return: Tuple of CurseDependency objects
+        :rtype: Tuple[CurseDependency, ...]
         """
 
-        # Iterate over the dependency IDs:
+        # Iterate over the dependencies:
 
         final = []
 
-        for depen_id in self.dependencies:
+        for depen in self.dependencies:
+
+            if required and not depen.required:
+
+                continue
+
+            if optional and depen.required:
+
+                continue
 
             # Get and create the CurseAddon instances:
 
-            final.append(self.hands.addon(depen_id))
+            final.append(depen)
 
         # Return the final tuple:
 
@@ -579,6 +595,70 @@ class CurseFile(BaseDownloader):
         # Do the download operation:
 
         return self.low_download(self.download_url, path=temp_path)
+
+
+@dataclass
+class CurseDependency(BaseCurseInstance):
+    
+    """
+    CurseDependency - Represents a dependency of an addon.
+    
+    A dependency is an addon file that is wanted or required by another addon.
+    This class represents these dependencies.
+    
+    We contain useful metadata on each dependency,
+    such as the addon ID and file ID this addon is apart of.
+    We also offer methods to retrieve the addon and file.
+    
+    We contain the following parameters:
+    
+        * id - ID of the dependency
+        * addon_id - ID of the addon this dependency is apart of
+        * file_id - ID of the file this dependency is apart of
+        * type - Type of the dependency
+        * required - Whether or not this dependency is required
+    """
+
+    id: int
+    addon_id: int
+    file_id: str
+    type: str
+
+    REQUIRED = 3
+    OPTIONAL = 2
+
+    INST_ID = 8
+
+    @property
+    def required(self) -> bool:
+        """
+        Determines if this dependency is required.
+
+        :return: True is required, False if not
+        :rtype: bool
+        """
+
+        return self.type == self.REQUIRED
+
+    def addon(self) -> CurseAddon:
+        """
+        Gets the CurseAddon this dependency is apart of.
+
+        :return: CurseAddon this dependency is apart of
+        :rtype: CurseAddon
+        """
+
+        return self.hands.addon(self.addon_id)
+
+    def file(self) -> CurseFile:
+        """
+        Gets the CurseFile this dependency is apart of.
+
+        :return: CurseFile this dependency is apart of
+        :rtype: CurseFile
+        """
+
+        return self.hands.file(self.addon_id, self.file_id)
 
 
 @dataclass

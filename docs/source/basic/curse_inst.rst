@@ -16,7 +16,7 @@ have read about the HandlerCollection,
 and it's entry points.
 You should have noticed some talk about CurseInstances,
 which will be covered in great detail in this document.
-
+*
 What is a CurseInstance?
 ========================
 
@@ -479,7 +479,7 @@ Represents a file on CF.
 * download_url - Download URL of the file 
 * length - Length in bytes of the file 
 * version - Version of the game needed to work this file 
-* dependencies - List of dependence IDs 
+* dependencies - Tuple of dependencies for this file 
 
 To get the changelog of the file,
 you can use the 'changelog' property:
@@ -494,11 +494,15 @@ CI's use the entry point methods of the HC that returned them.
 This means that the CurseDescription object will have the default formatter 
 attached to it.
 
-If you want all addon dependencies this file requires, you can use the 
-'get_dependencies()' method, which will return a tuple of CurseAddon 
-objects representing the dependencies.
-If there are no dependencies,
-then the returned tuple will be empty.
+If you want all dependencies for this file,
+then you can find them under the 'dependencies' parameter.
+You can also get dependencies by using the 'get_dependencies()' method:
+
+.. code-block:: python
+
+    deps = inst.get_dependencies()
+
+You can also pass 'required=True' to get only required dependencies.
 
 You can also get the 'get_addon()' method to retrieve a CurseAddon 
 object representing the addon this file is attached to.
@@ -506,6 +510,23 @@ object representing the addon this file is attached to.
 The CurseFile class also has download functionality.
 You can use the 'download()' method to download this 
 file.
+
+CurseDependency
+---------------
+
+Represents a file dependency on CF.
+
+* id - ID of the dependency
+* addon_id - ID of the addon this dependency is apart of
+* file_id - ID of the file this dependency is apart of
+* type - Type of the dependency, an int determining if the dependency is required or optional
+* required - Boolean determining if the dependency is required
+
+To determine if the dependency is required, you can use the 'required' parameter.
+You can also compare the type of the dependency with the 'REQUIRED' and 'OPTIONAL' constants.
+
+To get the addon and addon file this dependency is a member of,
+you can use the 'addon()' and 'file()' methods.
 
 Conclusion 
 ==========

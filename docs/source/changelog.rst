@@ -2,6 +2,16 @@
 Changelog
 =========
 
+1.2.0
+=====
+
+Featured Added
+--------------
+
+* We now keep track of dependency info in the new CurseDependency class
+* Users can retrieve the file ID as well as the addon ID of the dependency
+* Users can retrieve optional and/or required dependencies
+
 1.1.3
 =====
 
