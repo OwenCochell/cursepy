@@ -102,13 +102,13 @@ cursepy Terms
 cursepy has a few concepts that might be better understood with some explanation.
 We only touch on these concepts, we will go into much greater detail later in this tutorial.
 Don't worry about completely understanding these for now,
-just keep these concepts in mind. 
+just keep these concepts in mind.
 
 CurseInstance
 -------------
 
 A 'CurseInstance' is a class that represents 
-CF information, and makes getting related info easier. 
+CF information, and makes getting related info easier.
 
 For example, there is a class called 'CurseAddon'
 which represents a game addon. The class

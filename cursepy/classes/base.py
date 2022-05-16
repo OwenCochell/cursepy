@@ -169,7 +169,7 @@ class BaseDownloader(BaseWriter):
 
         # Get the data:
 
-        data = url_proto.get_data('')
+        data = url_proto.get_data(url)
 
         # Determine if we should write to a file:
 
@@ -602,14 +602,20 @@ class CurseDependency(BaseCurseInstance):
     
     """
     CurseDependency - Represents a dependency of an addon.
-    
+
     A dependency is an addon file that is wanted or required by another addon.
     This class represents these dependencies.
-    
+
     We contain useful metadata on each dependency,
     such as the addon ID and file ID this addon is apart of.
     We also offer methods to retrieve the addon and file.
-    
+
+    In some cases, we will not have all the required dependency information
+    such as the dependency ID and file ID.
+    This can happen if you use the ForgeSVC handlers and get ALL addon files
+    instead of requesting a specific one.
+    If this dependency instance is limited, then 'id' and 'file_id' will be None.
+
     We contain the following parameters:
     
         * id - ID of the dependency
@@ -649,16 +655,6 @@ class CurseDependency(BaseCurseInstance):
         """
 
         return self.hands.addon(self.addon_id)
-
-    def file(self) -> CurseFile:
-        """
-        Gets the CurseFile this dependency is apart of.
-
-        :return: CurseFile this dependency is apart of
-        :rtype: CurseFile
-        """
-
-        return self.hands.file(self.addon_id, self.file_id)
 
 
 @dataclass

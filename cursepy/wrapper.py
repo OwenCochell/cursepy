@@ -167,7 +167,7 @@ class CurseClient(HandlerCollection):
 
                 # No results! Raise 'StopIteration'!
 
-                raise StopIteration()
+                break
 
             # Iterate over the result:
 
@@ -179,7 +179,7 @@ class CurseClient(HandlerCollection):
 
             # Bump the index and continue:
 
-            search.index =+ 1
+            search.bump_page()
 
     def addon(self, addon_id: int) -> base.CurseAddon:
         """
@@ -324,6 +324,7 @@ class MinecraftWrapper(CurseClient):
     MODPACKS = 4471
     MODS = 6
     WORLDS = 17
+    BUKKIT = 5
 
     def search_resource_packs(self, search: SearchParam=None) -> Tuple[base.CurseAddon, ...]:
         """
@@ -377,10 +378,25 @@ class MinecraftWrapper(CurseClient):
 
         :param search: SearchParam to use, defaults to None
         :type search: SearchParam, optional
-        :return: Tuple of CurseAddons, optional
+        :return: Tuple of CurseAddons
         :rtype: Tuple[base.CurseAddon, ...]
         """
 
         # Search the worlds:
 
         return self.search(MinecraftWrapper.GAME_ID, MinecraftWrapper.WORLDS, search)
+
+    def search_plugins(self, search: SearchParam=None) -> Tuple[base.CurseAddon]:
+        """
+        Searches the Plugins category for addons.
+        Again, we use the SearchParam for the search operation.
+
+        :param search: SearchParam to use, defaults to None
+        :type search: SearchParam, optional
+        :return: Tuple of CurseAddons
+        :rtype: Tuple[base.CurseAddon]
+        """
+        
+        # Search the plugins:
+        
+        return self.search(MinecraftWrapper.GAME_ID, MinecraftWrapper.BUKKIT, search)

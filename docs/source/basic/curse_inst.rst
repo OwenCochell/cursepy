@@ -58,7 +58,7 @@ and how to decode it.
 Because cursepy is modular, this data can be literally anything!
 So having a standardized way to get this data is very important.
 
-CIs also provide all addon info in a convent way.
+CIs also provide all addon info in a convenient way.
 Most users do not want to manually parse request data!
 
 Finally, CI's convenience methods make using cursepy much easier.
@@ -124,7 +124,7 @@ More info can be found in the API reference for CIs.
     assume that 'inst' is a valid CurseInstance
     of the type being described.
 
-Before we gte into CI types,
+Before we get into CI types,
 we will first go over common features every CI has.
 
 Every CI should have attributes which store the raw data and metadata of the request.
@@ -303,7 +303,7 @@ Here is an example of a custom formatter that appends 'Super Slick!' to the end 
     # Import BaseFormat:
 
     from cursepy.formatters import BaseFormat
-        
+
     class SuperFormatter(BaseFormat):
 
         def format(self, data: str) -> str:
@@ -369,7 +369,7 @@ and provides methods for getting sub and parent catagories.
 * icon - Icon of the category(CurseAttachment)
 * date - Date this category was created
 
-If you read the into tutorial
+If you read the intro tutorial
 (You did read the into tutorial right?),
 then you will know that catagories can have
 parent and sub-catagories.
@@ -528,6 +528,12 @@ You can also compare the type of the dependency with the 'REQUIRED' and 'OPTIONA
 
 To get the addon and addon file this dependency is a member of,
 you can use the 'addon()' and 'file()' methods.
+
+Sometimes, the CurseDependency will have limited information.
+This can happen when you use the ForgeSVC handlers and get all addon files.
+In this case, the CurseDependency will have limited information,
+where the 'id' and 'file_id' will be None.
+This is a limitation of the ForgeSVC backend, not cursepy.
 
 Conclusion 
 ==========

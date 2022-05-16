@@ -480,7 +480,7 @@ class SVCAddonFiles(BaseSVCHandler):
 
             # Convert the file:
 
-            final.append(SVCFile.low_format(file, id))
+            final.append(SVCFile.low_format(file, id, limited=True))
 
         # Return the data:
 
@@ -527,13 +527,17 @@ class SVCFile(BaseSVCHandler):
         return self.low_format(data, id)
 
     @staticmethod
-    def low_format(data: dict, addon_id: int) -> base.CurseFile:
+    def low_format(data: dict, addon_id: int, limited=False) -> base.CurseFile:
         """
         Low-level format method.
 
         We are static to allow other classes to use us to format data.
         The actual 'format()' method will extract the addon ID from the URL
         and pass it along to us.
+        
+        In some cases, we are not given full dependence info,
+        for example when all files for a given addon is requested.
+        You can use the 'limited' parameter to prevent a key error.
 
         :param data: Data to be formatted
         :type data: dict
@@ -548,6 +552,12 @@ class SVCFile(BaseSVCHandler):
         final = []
 
         for depen in data['dependencies']:
+
+            if limited:
+
+                final.append(base.CurseDependency(None, depen['addonId'], None, depen['type']))
+
+                continue
 
             # Add the dependency ID's:
 

@@ -40,6 +40,7 @@ We have the following constants:
 * MODPACKS - ID of the modpack category(4471)
 * MODS - ID of the mods category(6)
 * WORLDS - ID of the worlds category(17)
+* BUKKIT - ID of the bukkit category(5)
 
 You can use these constants in the entry point methods.
 MinecraftWrapper also provides some methods to make searching easier.
@@ -64,6 +65,11 @@ search_worlds
 -------------
 
 Searches the worlds category for addons.
+
+search_plugins
+--------------
+
+Searches the Bukkit plugins category for addons.
 
 Conclusion
 ==========

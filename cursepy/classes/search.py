@@ -18,7 +18,7 @@ class SearchParam:
     We define the following values:
 
         * filter - Term to search for(i.e, 'Inventory Mods')
-        * index - Page index of results to view
+        * index - Addon index to start on
         * pageSize - Number of items to display per page
         * gameVersion - Game version to search under
         * sort - Sorting method to use
@@ -34,8 +34,8 @@ class SearchParam:
     """
 
     searchFilter: Optional[str] = field(default=None) # Term to search for
-    index: Optional[int] = field(default=None)  # Page of search results to view
-    pageSize: Optional[int] = field(default=None)  # Number of items to display per page
+    index: Optional[int] = field(default=0)  # Index of addon to start on
+    pageSize: Optional[int] = field(default=20)  # Number of items to display per page
     gameVersion: Optional[int] = field(default=None)  # Game version to use
     sort: Optional[int] = field(default=None) # Sort method to use
 
@@ -59,6 +59,50 @@ class SearchParam:
 
         return asdict(self)
 
+    def set_page(self, num: int):
+        """
+        Changes the page we are on.
+        
+        We change the index to reach the next page, 
+        we use this equation to determine this:
+        
+        index = num * pageSize
+        
+        This will set the index to the given page.
+        For example, if we set the page number to two,
+        have a page size of five, and an index of three,
+        then the resulting index after the operation will be 10.
+
+        :param page: Page number to set the index to
+        :type page: int
+        """
+        
+        self.index = num * self.pageSize
+        
+    def bump_page(self, num: int=1):
+        """
+        Bumps the page up or down.
+        
+        We add the page change to the current index using this equation:
+        
+        index += num * pageSize
+        
+        This will change the page in relation with the current index.
+        For example, if you bump the page up twice, have a page size of five
+        and an index of three, the resulting index after the operation will be 13.
+
+        You can supply a negative number to bump the page downward.
+        If the index ends up below zero, then we will set the index to zero.
+
+        :param num: Number of pages to bump
+        :type num: int
+        """
+        
+        self.index += num * self.pageSize
+        
+        if self.index < 0:
+            
+            self.index = 0
 
 def url_convert(search: SearchParam, url: str='') -> str:
     """

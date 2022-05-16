@@ -341,9 +341,23 @@ Check out this example of sorting by popularity:
 'index' and 'pageSize' are used since search
 results are usually limited to 'pages'
 to save some bandwidth.
+'pageSize' is the size of each page.
+For example, if your page size is five, then you will get five results
+with each search operation.
 
-'index' is the page to retrieve,
-and 'pageSize' is the size of each page.
+'index' is NOT the page number.
+Instead, it is the addon to start the search operation at.
+For example, if you have index set at three, you will NOT be at page three.
+instead, the search operation will start at the fourth addon.
+
+If you wish to traverse pages, you can use the 'set_page()' and 'bump_page()' methods.
+The 'set_page()' method sets the index to the given page.
+The 'bump_page()' method adds the pages to the index.
+
+For example, lets say you have a search parameter with an index of three,
+and a page size of five.
+If you set the page to three, then the index will be set to 15.
+If you bump the page three times, then the index will be set to 18.
 
 Here is an example of getting the second page of search results:
 
@@ -353,9 +367,9 @@ Here is an example of getting the second page of search results:
 
     search = client.get_search()
 
-    # Set the page index to 1:
+    # Set the index to page 2:
 
-    search.index = 1
+    search.set_page(2)
 
     # Get the results:
 
@@ -388,9 +402,9 @@ and print each name:
 
         print(addon.name)
 
-'iter_search' only bumps the index after each call,
-so you can start at a page by setting the 'index'
-value on the SearchParam before passing it along.
+'iter_search' calls 'bump_page()' after each call,
+so you can start at a certain index
+on the SearchParam before passing it along.
 The 'iter_search' does not alter any other parameters,
 so your search preferences will be saved.
 
