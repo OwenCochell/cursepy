@@ -8,13 +8,12 @@ in this case HTTP get requests.
 import socket
 
 from urllib.request import urlopen, Request
-from urllib.parse import urlencode
+from urllib.parse import urlencode, quote, urlsplit, urlunsplit
 from http.client import HTTPResponse
 from typing import Optional
 
 
 class BaseProtocol(object):
-
     """
     Base protocol implementation - All child protocols must inherit this class!
 
@@ -169,7 +168,6 @@ class UDPProtocol(BaseProtocol):
 
 
 class URLProtocol(BaseProtocol):
-
     """
     URLProtocol - Gets information via HTTP.
 
@@ -327,6 +325,8 @@ class URLProtocol(BaseProtocol):
 
         We point the request at the given url,
         add content headers, and add the given data.
+        We also do necessary quoting on the url path,
+        so our urls are valid.
 
         :param url: URL of the request
         :type url: str
@@ -352,6 +352,10 @@ class URLProtocol(BaseProtocol):
 
             heads = {}
 
-        # Make and return the request:
+        # Make and return the request, do some quoting on the path only:
 
-        return Request(url, data=encoded_data, headers={**self.headers, **heads})
+        split = urlsplit(url)
+
+        split = split._replace(path=quote(split.path))
+
+        return Request(urlunsplit(split), data=encoded_data, headers={**self.headers, **heads})

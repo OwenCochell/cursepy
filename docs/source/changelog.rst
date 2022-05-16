@@ -2,6 +2,14 @@
 Changelog
 =========
 
+1.3.1
+=====
+
+Bug Fixes
+---------
+
+* We now properly quote the path section of any URLs given to the URLProtocol
+
 1.3.0
 ======
 

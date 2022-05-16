@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 # -- Project information -----------------------------------------------------
 
 project = 'cursepy'
-copyright = '2021, Owen Cochell'
+copyright = '2022, Owen Cochell'
 author = 'Owen Cochell'
 
 # The full version, including alpha/beta/rc tags
