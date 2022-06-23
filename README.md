@@ -3,6 +3,8 @@ A modular API for interacting with [CurseForge](https://curseforge.com).
 
 [![Documentation Status](https://readthedocs.org/projects/cursepy/badge/?version=latest)](https://cursepy.readthedocs.io/en/latest/?badge=latest)
 
+This project is in work progress but because of the complicated Curse API deprecation, this might be finished longer than expected!
+
 The documentation for cursepy is still a work in progress!
 The core content will remain the same,
 but expect minor corrections and rephrasing.
