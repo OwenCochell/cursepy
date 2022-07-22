@@ -110,7 +110,7 @@ class BaseWriter(BaseCurseInstance):
 
         # Write the content:
 
-        return file.write(str(data))
+        return file.write(data)
 
     def write(self, path: str, append: bool=False) -> int:
         """
@@ -439,18 +439,7 @@ class CurseAttachment(BaseDownloader):
 
             # Check if we are working with a directory:
 
-            if isdir(name):
-
-                # Get the name of the file:
-
-                return self.url.split('/')[-1]
-
-            else:
-
-                # Just use the name provided:
-
-                return name
-
+            return self.url.split('/')[-1] if isdir(name) else name
         # Otherwise, return the None:
 
         return None
@@ -580,18 +569,7 @@ class CurseFile(BaseDownloader):
 
             # Check if we are working with a directory:
 
-            if isdir(path):
-
-                # Join the paths:
-
-                temp_path = join(path, self.file_name)
-
-            else:
-
-                # Just set the target to what was given:
-
-                temp_path = path
-
+            temp_path = join(path, self.file_name) if isdir(path) else path
         # Do the download operation:
 
         return self.low_download(self.download_url, path=temp_path)
@@ -968,13 +946,7 @@ class CurseGame(BaseCurseInstance):
 
         # Get all categories for this game:
 
-        final = []
-
-        for cat_id in self.cat_ids:
-
-            # Retrieve category info for this ID:
-
-            final.append(self.hands.category(cat_id))
+        final = [self.hands.category(cat_id) for cat_id in self.cat_ids]
 
         # Return the final tuple:
 

@@ -275,7 +275,10 @@ class BaseHandler(object):
 
             # Invalid handler, let's do someting!
 
-            raise ProtocolMismatch("Protocol is of type: '{}', must be of type: '{}'!".format(type(temp_proto), type(target)))
+            raise ProtocolMismatch(
+                f"Protocol is of type: '{type(temp_proto)}', must be of type: '{type(target)}'!"
+            )
+
 
         # Not present, let's make our own:
 
@@ -531,7 +534,7 @@ class HandlerCollection(object):
     DEFAULT_MAP: tuple = () # Default handler map
 
     def __init__(self, load_default=True):
-        
+
         self.handlers = {}  # Dictionary of handler objects
         self.proto_map = {}  # Maps handler names to protocol objects
         self.callbacks = {}  # List of callbacks to run

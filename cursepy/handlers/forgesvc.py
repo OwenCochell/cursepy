@@ -100,13 +100,7 @@ class SVCListGame(BaseSVCHandler):
         
         # Iterate over the games:
 
-        final = []
-
-        for game in data:
-
-            # Create the game and append it:
-
-            final.append(SVCGame.format(game))
+        final = [SVCGame.format(game) for game in data]
 
         # Return the final game:
 
@@ -135,7 +129,7 @@ class SVCGame(BaseSVCHandler):
         :rtype: str
         """
 
-        return self.proto.url_build('game/{}'.format(game_id))
+        return self.proto.url_build(f'game/{game_id}')
 
     @staticmethod
     def format(data: dict) -> base.CurseGame:
@@ -150,13 +144,7 @@ class SVCGame(BaseSVCHandler):
         
         # Create list of game categories:
 
-        final = []
-
-        for cat in data['categorySections']:
-
-            # Add the root ID's to the game:
-
-            final.append(cat['gameCategoryId'])
+        final = [cat['gameCategoryId'] for cat in data['categorySections']]
 
         # Create CurseGame:
 
@@ -192,13 +180,7 @@ class SVCListCategory(BaseSVCHandler):
 
         # Iterate over the catagories:
 
-        final = []
-
-        for cat in data:
-
-            # Create the category:
-
-            final.append(SVCCategory.format(cat))
+        final = [SVCCategory.format(cat) for cat in data]
 
         # Return the final tuple:
 
@@ -222,7 +204,7 @@ class SVCCategory(BaseSVCHandler):
         :rtype: str
         """
 
-        return self.proto.url_build('category/{}'.format(category_id))
+        return self.proto.url_build(f'category/{category_id}')
 
     @staticmethod
     def format(data: dict) -> base.CurseCategory:
@@ -257,7 +239,7 @@ class SVCSubCategory(BaseSVCHandler):
         :rtype: str
         """
 
-        return self.proto.url_build('category/section/{}'.format(category_id))
+        return self.proto.url_build(f'category/section/{category_id}')
 
     @staticmethod
     def format(data: dict) -> Tuple[base.CurseCategory, ...]:
@@ -272,13 +254,7 @@ class SVCSubCategory(BaseSVCHandler):
 
         # Iterate over the catagories:
 
-        final = []
-
-        for cat in data:
-
-            # Format the data:
-
-            final.append(SVCCategory.format(cat))
+        final = [SVCCategory.format(cat) for cat in data]
 
         # Return the final tuple:
 
@@ -302,7 +278,7 @@ class SVCAddon(BaseSVCHandler):
         :rtype: str
         """
 
-        return self.proto.url_build('addon/{}'.format(addon_id))
+        return self.proto.url_build(f'addon/{addon_id}')
 
     @staticmethod
     def format(data: dict) -> base.CurseAddon:
@@ -317,26 +293,27 @@ class SVCAddon(BaseSVCHandler):
         
         # Convert the authors:
 
-        authors = []
+        authors = [
+            base.CurseAuthor(auth['id'], auth['name'], auth['url'])
+            for auth in data['authors']
+        ]
 
-        # Iterate over the authors:
-
-        for auth in data['authors']:
-
-            # Create and add the author:
-
-            authors.append(base.CurseAuthor(auth['id'], auth['name'], auth['url']))
 
         # Convert the attachments:
 
-        attach = []
+        attach = [
+            base.CurseAttachment(
+                attachment['title'],
+                attachment['id'],
+                attachment['thumbnailUrl'],
+                attachment['url'],
+                attachment['isDefault'],
+                attachment['projectId'],
+                attachment['description'],
+            )
+            for attachment in data['attachments']
+        ]
 
-        for attachment in data['attachments']:
-
-            # Convert and add the attachment:
-
-            attach.append(base.CurseAttachment(attachment['title'], attachment['id'], attachment['thumbnailUrl'],
-            attachment['url'], attachment['isDefault'], attachment['projectId'], attachment['description']))
 
         # Create the instance:
 
@@ -362,7 +339,12 @@ class SVCSearch(BaseSVCHandler):
 
         # Create and return the URL:
 
-        return self.proto.url_build(url_convert(search, url='addon/search?gameId={}&sectionId={}&'.format(game_id, section_id)))
+        return self.proto.url_build(
+            url_convert(
+                search,
+                url=f'addon/search?gameId={game_id}&sectionId={section_id}&',
+            )
+        )
 
     def format(self, data: dict) -> Tuple[base.CurseAddon, ...]:
         """
@@ -376,13 +358,7 @@ class SVCSearch(BaseSVCHandler):
 
         # Iterate over the instances:
 
-        final = []
-
-        for addon in data:
-
-            # Create the instance:
-
-            final.append(SVCAddon.format(addon))
+        final = [SVCAddon.format(addon) for addon in data]
 
         # Return the final tuple:
 
@@ -406,7 +382,7 @@ class SVCAddonDescription(BaseSVCHandler):
         :rtype: str
         """
         
-        return self.proto.url_build('addon/{}/description'.format(addon_id))
+        return self.proto.url_build(f'addon/{addon_id}/description')
 
     def pre_process(self, data: bytes) -> str:
         """
@@ -456,7 +432,7 @@ class SVCAddonFiles(BaseSVCHandler):
         :rtype: str
         """
 
-        return self.proto.url_build('addon/{}/files'.format(addon_id))
+        return self.proto.url_build(f'addon/{addon_id}/files')
 
     def format(self, data: dict) -> Tuple[base.CurseFile, ...]:
         """
@@ -474,13 +450,7 @@ class SVCAddonFiles(BaseSVCHandler):
 
         # Iterate over the files:
 
-        final = []
-
-        for file in data:
-
-            # Convert the file:
-
-            final.append(SVCFile.low_format(file, id, limited=True))
+        final = [SVCFile.low_format(file, id, limited=True) for file in data]
 
         # Return the data:
 
@@ -506,7 +476,7 @@ class SVCFile(BaseSVCHandler):
         :rtype: str
         """
 
-        return self.proto.url_build('addon/{}/file/{}'.format(addon_id, file_id))
+        return self.proto.url_build(f'addon/{addon_id}/file/{file_id}')
 
     def format(self, data: dict) -> base.CurseFile:
         """
@@ -586,7 +556,7 @@ class SVCFileDescription(BaseSVCHandler):
         :rtype: str
         """
 
-        return self.proto.url_build('addon/{}/file/{}/changelog'.format(addon_id, file_id))
+        return self.proto.url_build(f'addon/{addon_id}/file/{file_id}/changelog')
 
     def pre_process(self, data: bytes) -> str:
         """

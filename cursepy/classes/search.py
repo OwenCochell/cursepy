@@ -99,10 +99,8 @@ class SearchParam:
         """
         
         self.index += num * self.pageSize
-        
-        if self.index < 0:
-            
-            self.index = 0
+
+        self.index = max(self.index, 0)
 
 def url_convert(search: SearchParam, url: str='') -> str:
     """
@@ -121,19 +119,7 @@ def url_convert(search: SearchParam, url: str='') -> str:
     # Get a dictionary of parameters:
 
     params = search.asdict()
-    final = {}
-
-    # Iterate over the parameters:
-
-    for key in params:
-
-        # Check to ensure value is not None:
-
-        if params[key] is not None:
-
-            # Add this to the final:
-
-            final[key] = params[key]
+    final = {key: params[key] for key in params if params[key] is not None}
 
     # Encode and return the values:
 
