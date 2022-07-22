@@ -171,12 +171,7 @@ class CurseClient(HandlerCollection):
 
             # Iterate over the result:
 
-            for item in results:
-
-                # Yield the result:
-
-                yield item
-
+            yield from results
             # Bump the index and continue:
 
             search.bump_page()
