@@ -30,7 +30,7 @@ class BaseProtocol(object):
     """
 
     def __init__(self, host:str, port, timeout:int=60) -> None:
-        
+
         self.timeout = timeout  # Timeout value for this object
         self.host = host # Hostname of the entity we are connected to
         self.port = port  # Port number of the entity we are connected to
@@ -81,7 +81,7 @@ class TCPProtocol(BaseProtocol):
 
             # Read as many bytes as we can:
 
-            last = self.sock.recv(4096 if to_read > 4096 else to_read)
+            last = self.sock.recv(min(to_read, 4096))
 
             byts = byts + last
 
@@ -223,13 +223,9 @@ class URLProtocol(BaseProtocol):
 
         self._create_meta(req)
 
-        # Get the raw content:
-
-        cont = req.read()
-
         # Finally, return the data:
 
-        return cont
+        return req.read()
 
     def low_get(self, url: str, timeout: Optional[int]=None, heads: Optional[dict]=None) -> HTTPResponse:
         """
@@ -257,7 +253,7 @@ class URLProtocol(BaseProtocol):
 
         # Get the HTTPResponse object:
 
-        self.last = urlopen(req, timeout=timeout if not None else self.timeout)
+        self.last = urlopen(req, timeout=self.timeout if None else timeout)
 
         # Return the object:
 
@@ -338,14 +334,7 @@ class URLProtocol(BaseProtocol):
         :rtype: Request
         """
 
-        # Check if we should encode the data:
-
-        encoded_data = None
-
-        if data is not None:
-
-            encoded_data = urlencode(data).encode()
-
+        encoded_data = urlencode(data).encode() if data is not None else None
         # Convert heads to empty dictionary if necessary: 
 
         if heads is None:
