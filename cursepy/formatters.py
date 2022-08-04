@@ -1,7 +1,7 @@
 """
 Formatters for use with CurseDescriptions.
 
-We offer methods for normalising and formatting descriptions,
+We offer methods for normalizing and formatting descriptions,
 which are in HTML.
 
 This can be as simple as striping HTML markups,

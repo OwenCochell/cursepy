@@ -171,10 +171,10 @@ class URLProtocol(BaseProtocol):
     """
     URLProtocol - Gets information via HTTP.
 
-    We seek to ease the process of retriving information via HTTP requests.
+    We seek to ease the process of retrieving information via HTTP requests.
     We not only facilitate the communication process,
     but we also provide other features such as user defined headers,
-    URL genration, and we implement the protocol caching system.
+    URL generation, and we implement the protocol caching system.
 
     The host will be used to automatically build URLs if used.
     If you want to provide URLs manually, you can use lower level methods to do so.
@@ -215,7 +215,7 @@ class URLProtocol(BaseProtocol):
         :rtype: str
         """
 
-        # Get the respone object:
+        # Get the response object:
 
         req = self.low_get(url, timeout=timeout)
 

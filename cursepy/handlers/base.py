@@ -3,7 +3,7 @@ This file contains base components for handler development.
 
 A 'handler' is something that 'handles' data from a specific source of a specific type.
 Essentially, when data comes from a specific source,
-the handler is the thing that gets and formatts that data into something that is easy to work with.
+the handler is the thing that gets and formats that data into something that is easy to work with.
 A handler may also fetch data from elsewhere to fill in the blanks.
 
 In this file, we outline some of the functionality of a handler,
@@ -14,7 +14,7 @@ the specific implementation is left ambiguous.
 
 By default, the HandlerCollection only works with the 'handle' method,
 which will accept raw data from the service we are talking to.
-There will be other components that the handler can overide if necessary.
+There will be other components that the handler can override if necessary.
 """
 
 from typing import Any, Callable, Optional
@@ -48,12 +48,12 @@ class BaseHandler(object):
     Everything from getting information to formatting can be customized. 
 
     Handlers are identified by instance types.
-    Instance types are simply an intiger that represents what this handler does.
+    Instance types are simply an integer that represents what this handler does.
 
     The handle method is the entry point for handlers.
     It will accept the arguments and information from the handler collection,
     and will work with them as necessary.
-    The default handle method will call all componets in order,
+    The default handle method will call all components in order,
     so it is a good idea to use 'super()' once you have configured your methods.
     You can configure the handle method to accept any arguments you like, 
     the HandlerCollection will pass all arguments that it receives to the 'handle' method,
@@ -98,7 +98,7 @@ class BaseHandler(object):
         Function called when this handler is removed from a HandlerCollection.
 
         Again, the user can put any relevant code here
-        that would be appropriate to run at stoptime.
+        that would be appropriate to run at stop time.
         """
 
         pass
@@ -108,8 +108,8 @@ class BaseHandler(object):
         Converts the given raw data into something,
         usually a CurseInstance.
 
-        In here, we format and organise the given data
-        into something that is usefull to the user.
+        In here, we format and organize the given data
+        into something that is useful to the user.
 
         This formatter can do other things if necessary,
         and they don't necessarily have to be within the scope of formatting!
@@ -490,7 +490,7 @@ class HandlerCollection(object):
     to share protocol objects between like-minded handlers.
 
     Only one handler can be registered to a given event!
-    These handlers can be of diffrent types and come from diffrent sources,
+    These handlers can be of different types and come from different sources,
     but only one can be registered to a given event!
 
     We define some entry points for calling handlers.
