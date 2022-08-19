@@ -189,8 +189,8 @@ class URLProtocol(BaseProtocol):
         self.headers = {'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}  # Request headers to use
         self.extra = '/'  # Extra information to add before the path when building URLs
         self.proto_id = 'URLProtocol'  # Protocol ID
-    
-        self.meta = {} # MetaData from the last request
+
+        self.meta = {}  # MetaData from the last request
 
     def get_data(self, url: str, timeout: Optional[int]=None, data: Optional[dict]=None) -> bytes:
         """
@@ -243,7 +243,7 @@ class URLProtocol(BaseProtocol):
         :param timeout: Timeout value, uses default value if None
         :type timeout: int, optional
         :param heads: Extra headers to include with our defaults
-        :return: HTTPResponse object contaning response from server
+        :return: HTTPResponse object containing response from server
         :rtype: HTTPResponse
         """
 

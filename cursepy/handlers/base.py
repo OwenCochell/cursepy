@@ -483,7 +483,7 @@ class HandlerCollection(object):
     and work with handlers.
 
     We normalize calling, adding, and removing handlers.
-    This allows for handler autoconfiguration,
+    This allows for handler auto configuration,
     and other time saving features.
 
     We also provide a collective space for handlers
@@ -505,7 +505,7 @@ class HandlerCollection(object):
     which is the data the handler is returned.
     Any other arguments can be optionally provided.
 
-    You can utilise wrappers to change what functions expect and return.
+    You can utilize wrappers to change what functions expect and return.
     Be aware, that default dataclasses will call the functions defined here
     with the given arguments!
 
@@ -530,7 +530,7 @@ class HandlerCollection(object):
     ADDON_LIST_FILE = 8  # Gets a tuple of all files associated with an addon
     ADDON_FILE = 9  # Get information on a specific file for an addon
     FILE_DESCRIPTION = 10  # Description of a file
-    
+
     DEFAULT_MAP: tuple = () # Default handler map
 
     def __init__(self, load_default=True):
@@ -538,7 +538,7 @@ class HandlerCollection(object):
         self.handlers = {}  # Dictionary of handler objects
         self.proto_map = {}  # Maps handler names to protocol objects
         self.callbacks = {}  # List of callbacks to run
-        self.formatter = NullFormatter()  # Default formatter to attach to CurseDesciprion
+        self.formatter = NullFormatter()  # Default formatter to attach to CurseDescription
 
         # Create a good starting state:
 

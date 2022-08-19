@@ -2,6 +2,34 @@
 Changelog
 =========
 
+2.0.0
+=====
+
+This update adds some major functionality!
+
+Features Added
+--------------
+
+* Added two new errors, 'HandlerNotImplemented' and 'HandlerNotSupported'
+* New class, BaseClient which defines the basic functionality for all wrappers (replaces old CurseClient)
+* For listing catagories, we now need a game ID, as we only get all catagories for a specific game
+* When listing files, a SearchParam can be provided to filter results
+* New values in SearchParam that allows for more advanced searching and sorting
+* Many curse instances have more parameters available
+* New curse instance, CurseHash, represents fille hashes
+* Added handlers for interacting with the official CurseForge API (Needs an API key!)
+* Added new wrapper, CurseClient (different from old CurseClient) that makes working with the official API easier
+
+Bug Fixes
+---------
+
+* Various formatting and spelling corrections
+
+Other Fixes
+-----------
+
+* Many additions and changes in the official documentation
+
 1.3.1
 =====
 

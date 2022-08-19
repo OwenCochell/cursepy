@@ -9,7 +9,7 @@ Introduction
 
 Welcome to the advanced tutorial for the HandlerCollection(HC) object!
 
-In this document, we will be going over 
+In this document, we will be going over
 some advanced concepts behind the HC
 that will help developers understand and work with HC classes.
 Everything from loading handlers, to the internal structure
@@ -124,7 +124,7 @@ then it removes the handler at the current event ID
     valid event ID's.
     When a HC is first created, it loads a 'NullHandler'
     object at each position.
-    
+
     This ensures that requests are always handled by something!
 
 After this, the handler is officially added to the HC handler structure.
@@ -189,9 +189,9 @@ Consider this example:
 If this handler map was passed to the 'load_handlers()' method,
 then the handlers will be bound to these events:
 
-1. Hand1 
-2. Hand2
-3. Hand3
+* [1]: Hand1 
+* [2]: Hand2
+* [3]: Hand3
 
 In other words, 'Hand1' will be bound to the 'LIST_GAMES' event,
 'Hand2' will be bound to the 'GAME' event,
@@ -213,9 +213,9 @@ For example, if this dictionary is provided:
 
 Then the handlers will be bound to these events:
 
-0. Hand0
-1. Hand2
-2. Hand3 
+* [0]: Hand0
+* [1]: Hand2
+* [2]: Hand3 
 
 The keys of dictionaries can technically be anything, 
 although it is recommended that they are integers
@@ -246,10 +246,10 @@ The order of these objects determine the order of the map,
 meaning that the lower the index, the higher it's priority.
 Using the above example, the handlers will be bound to these events:
 
-0. Hand1 
-1. Hand1 
-2. Hand1 
-3. Hand2
+* [0]: Hand1 
+* [1]: Hand1 
+* [2]: Hand1 
+* [3]: Hand2
 
 As you can see, the handlers in the first map are given priority
 over those in the second. 

@@ -54,4 +54,3 @@ Exceptions
 
 .. automodule:: cursepy.errors
     :members:
-
