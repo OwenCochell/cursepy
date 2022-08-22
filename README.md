@@ -21,8 +21,7 @@ for developers who want something that 'just works'.
 
 We support getting information on all games,
 addons, categories, files, and so much more!
-We also offer easy to use methods for downloading 
-files.
+We also offer easy to use methods for downloading files.
 
 # Example
 
@@ -33,7 +32,7 @@ GAME_ID = 432  # ID of the game you want to fetch, in this case Minecraft
 
 # Create the CurseClient:
 
-curse = CurseClient()
+curse = CurseClient(API_KEY)
 
 # Get the game info:
 
@@ -58,7 +57,7 @@ from cursepy import CurseClient
 
 # Create the client:
 
-client = CurseClient()
+client = CurseClient(API_KEY)
 
 # Get a tuple of all games:
 
@@ -66,7 +65,8 @@ games = client.games()
 ```
 
 The CurseClient offers simple to use navigational methods for obtaining necessary information from CurseForge.
-CurseClient also allows for callbacks to be bound to events, 
+Because CurseClient utilizes the official CurseForge API, we require an [API key](https://docs.curseforge.com/#what-is-curseforge-core) to use.
+CurseClient also allows for callbacks to be bound to events,
 meaning when an event is fired,
 your custom callback will also be cued.
 Here is an example of this in action:
@@ -122,7 +122,7 @@ mixed around, allowing for automated and easier customization
 compared to sub-classing.
 
 cursepy has extensive documentation on handler development,
-which contains best practice recommendations. Docs on the cusepy Handler Framework(CHF)/tutorials on how to use the development handlers are already built into cursepy.
+which contains best practice recommendations. Docs on the cursepy Handler Framework(CHF)/tutorials on how to use the development handlers are already built into cursepy.
 Have a look at the [Handler Development Tutorial](https://cursepy.readthedocs.io/en/latest/advn/hand.html)!
 
 ## Curse Instances
@@ -161,10 +161,12 @@ Have a look at the [Wrapper Tutorial](https://cursepy.readthedocs.io/en/latest/b
 
 You can install cursepy via pip:
 
-    $ pip install cursepy
+```bash
+pip install cursepy
+```
 
 For more information on installing cursepy,
-check out the installation section in our [documentation](https://cursepy.readthedocs.io/en/latest/install.html). 
+check out the installation section in our [documentation](https://cursepy.readthedocs.io/en/latest/install.html).
 
 # Documentation
 
@@ -181,14 +183,14 @@ The documentation is built using [sphinx](https://www.sphinx-doc.org/en/master/i
 Building the docs yourself is very simple.
 You can start by installing sphinx:
 
-```
+```bash
 pip install sphinx
 ```
 
 Now, navigate to the 'docs' directory in your favorite terminal.
 Next, you can issue the 'make' command to build the docs:
 
-```
+```bash
 make html
 ```
 
@@ -220,4 +222,4 @@ Sally Miller - Proof reading
 
 cursepy offers a pythonic, intuitive way to interact with CurseForge projects!
 We offer high levels of customizability
-while at the same time being easy to use. 
+while at the same time being easy to use.

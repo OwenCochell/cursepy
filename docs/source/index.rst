@@ -13,7 +13,7 @@ Here is an example of cursepy in action:
 
    # Create the CurseClient:
 
-   curse = CurseClient()
+   curse = CurseClient(API_KEY)
 
    ADDON_ID = 1234
 
@@ -25,7 +25,7 @@ Here is an example of cursepy in action:
 
    print(addon.name)
 
-This documentation houses the API reference, tutorials, and best practice recommendations. 
+This documentation houses the API reference, tutorials, and best practice recommendations.
 
 To get started, you should head over to the install page,
 where we go over how to install cursepy onto your machine.

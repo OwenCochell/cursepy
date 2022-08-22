@@ -162,6 +162,8 @@ that allows them to do extra things,
 such as write content to an external file,
 or download data from a remote source to a custom file.
 
+.. _curse_write:
+
 Writer
 ______
 
@@ -182,6 +184,8 @@ The CI determines what will be written to the external file.
 If a CI has this feature,
 then we will go over what exactly they write in this tutorial.
 
+.. _curse_download:
+
 Downloader
 __________
 
@@ -199,6 +203,8 @@ is a path like object giving the pathname of the file to be written to.
 Again, the CI determines what will be downloaded and written to the external file.
 If a CI has this feature, then we will go over exactly what they download and write.
 
+.. _curse_attach:
+
 CurseAttachment
 ---------------
 
@@ -213,7 +219,7 @@ Represents an attachment on CF.
 * addon_id - ID this addon is apart of 
 * description - Description of this attachment 
 
-CurseAttachments have the download feature,
+CurseAttachments have the :ref:`download feature<curse_download>`,
 which means that you can download this attachment using the 'download' method:
 
 .. code-block:: python 
@@ -234,6 +240,8 @@ then we will automatically use the default name
 as the file to write to.
 You can also download the thumbnail using the 'download_thumbnail' method,
 which operates in the same way.
+
+.. _curse_description:
 
 CurseDescription
 ----------------
@@ -319,7 +327,9 @@ Here is an example of a custom formatter that appends 'Super Slick!' to the end 
     desc.attach_formatter(SuperFormatter())
 
 CurseDescription objects can write content to an external file,
-as it has writing functionality. 
+as it has :ref:`writing functionality<curse_write>`. 
+
+.. _curse_author:
 
 CurseAuthor
 -----------
@@ -333,6 +343,8 @@ Represents an author on CF.
 CurseAuthor classes is not necessary for CF development,
 and only acts as extra info if you want it.
 
+.. _curse_game:
+
 CurseGame
 ---------
 
@@ -342,10 +354,35 @@ Represents a game on CF.
 * slug - Slug of the game 
 * id - ID of the game 
 * support_addons - Boolean determining if the game supports addons
-* cat_ids - List of root category ID's associated with the game
+* icon_url - URL to the game icon
+* tile_url - URL to the image used for the game tile
+* cover_url - URL to the image used for the game cover
+* status - Used for determining the game status, defined by constants!
+* api_status - Determining if this game is public or private
 
-The CurseGame instance does not have valid classes representing the root level catagories,
-only there ID's.
+Each game has a status, which is defined by the (you guessed it) 'status' parameter.
+You can use these constants to identify the status:
+
+* [1]: DRAFT - This game is a draft, not meant to be used
+* [2]: TEST - Game is in testing, not meant to be used
+* [3]: PENDING_REVIEW - Game is pending review, not meant to be used
+* [4]: REJECTED - Game has been rejected from the backend, definitely not meant to be used 
+* [5]: APPROVED - Game has been approved and is good to be used
+* [6]: LIVE - Game is live and (in theory) being used. This is the best game status!
+
+So, if you wanted to see if a given game is valid and live, then you can check the status:
+
+.. code-block:: python 
+
+    if game.status == CurseGame.LIVE:
+        print('Game is live!')
+
+The 'api_status' parameter is used to determine if the game is public or private.
+You can use these constants to identify the status:
+
+* [1]: PRIVATE - Game is private and not available for use
+* [2]: PUBLIC - Game is public and available for use
+
 If you want to retrieve the objects that represent the catagories,
 you can use the 'categories' method to retrieve category info like so:
 
@@ -353,7 +390,26 @@ you can use the 'categories' method to retrieve category info like so:
 
     cats = inst.catagories()
 
-This will return a tuple of CurseCatagories objects representing each root category.
+This will return a tuple of :ref:`CurseCategory<curse_category>` objects representing each root category.
+
+CurseGame also makes searching addons a breeze.
+You can use the 'search' method to search for addons:
+
+.. code-block:: python 
+
+    addons = inst.search(SEARCH)
+
+Where SEARCH is a search param.
+This method will automatically fill in the necessary game ID for you,
+and will return a tuple of :ref:`CurseAddon<curse_addon>` objects.
+CurseGame also as an 'iter_search()' method,
+which will traverse all pages of the search results.
+
+.. note::
+    If you need a primer on searching,
+    check out the :ref:`CurseClient Tutorial <search>`.
+
+.. _curse_category:
 
 CurseCategory
 -------------
@@ -361,15 +417,17 @@ CurseCategory
 Represents a CurseCategory,
 and provides methods for getting sub and parent catagories.
 
-* id - ID of the catagory
+* id - ID of the category
 * game_id - ID of the game the category is associated with 
 * name - Name of the category
 * root_id - ID of this objects root category(None if there is no root ID)
 * parent_id - ID of this objects parent category(None if there is no root ID)
-* icon - Icon of the category(CurseAttachment)
+* icon - Icon of the category(:ref:`CurseAttachment<curse_attach>`)
+* url - URL to the category page
 * date - Date this category was created
+* slug - Slug of the addon
 
-If you read the intro tutorial
+If you read the :ref:`intro tutorial<intro_tutorial>`
 (You did read the into tutorial right?),
 then you will know that catagories can have
 parent and sub-catagories.
@@ -390,44 +448,53 @@ None if there is no root category.
 representing the root category, returns
 None if there is no root category.
 
-CurseAddon also makes searching a breeze.
-We automatically provide the correct game and category ID's.
-Users can provide a 'SearchParameter' object for 
-fine-tuning the search operation.
+.. _curse_addon:
 
-You can use the 'search' method to get a list of valid addons.
-You can also use the 'iter_search' method to iterate 
-over each addon. 
-
-.. note::
-    If you need a primer on searching,
-    check out the :ref:`CurseClient Tutorial <search>`.
-
-CurseAddon 
+CurseAddon
 ----------
 
 Represents an addon on CurseForge.
 
 * name - Name of the addon 
 * slug - Slug of the addon 
-* summary - Summary of the addon(Not a full description, 
+* summary - Summary of the addon(Not a full description) 
 * url - URL of the addon page 
 * lang - Language of the addon
 * date_created - Date this addon was created 
 * date_modified - Date this addon was last modified 
 * date_release - Date the addons latest release 
-* ID - ID of this addon 
+* id - ID of this addon 
 * download_count - Number of times this addon has been downloaded
 * game_id - ID of the game this addon is in 
 * available - Boolean determining if the addon is available 
 * experimental - Boolean determining if the addon is experimental 
-* authors - Tuple of CurseAuthor instances for this addon
-* attachments - Tuple of CurseAttachments associated with the object 
-* category_id - ID of the category this addon is in 
+* authors - Tuple of :ref:`CurseAuthor<curse_author>` instances for this addon
+* attachments - Tuple of :ref:`CurseAttachments<curse_attach>` associated with the object 
+* category_id - ID of the category this addon is in
+* root_category - ID of the root category this addon is apart of
+* all_categories - Tuple of CurseCategory objects representing all the categories this addon is apart of
 * is_featured - Boolean determining if this addon is featured 
 * popularity_score - Float representing this popularity score(Most likely used for ranking)
-* popularity_rank - int representing the addon game's popularity 
-* game_name - Name of the game 
+* popularity_rank - int representing the addon game's popularity
+* allow_distribute - If this addon is allowed to be distributed
+* main_file_id - ID of the main file for this addon
+* status - Status of this addon, defined by constants!
+* wiki_url - URL to the addon wiki page
+* issues_url - URL to the addon issues page
+* source_url - URL to the addon source code
+
+To determine the status of the addon, you can use the constants:
+
+* [1]: NEW - This addon is new, no further progress has been made
+* [2]: CHANGED_REQUIRED - This addon needs to be changed in some way before it is approved
+* [3]: UNDER_SOFT_REVIEW - This addon is under soft review
+* [4]: APPROVED - This addon is approved and ready for use
+* [5]: REJECTED - This addon has been rejected from the backend, definitely not meant to be used
+* [6]: CHANGES_MADE - This addon has been changed since it's last review
+* [7]: INACTIVE - This addon is inactive and not being maintained
+* [8]: ABANDONED - This addon is abandoned and not being maintained
+* [9]: DELETED - This addon has been deleted
+* [10]: UNDER_REVIEW - This addon is under review
 
 CurseAddon objects do not keep the description info!
 A special call must be made to retrieve this.
@@ -445,16 +512,16 @@ You can get the files associated with this addon by using the 'file' method:
     file = inst.file(ID)
 
 Where ID is the ID of the file to retrieve.
-This method returns a CurseFile object representing the files
-(We will go over CurseFile objects later in this tutorial!).
+This method returns a :ref:`CurseFile<curse_file>` object representing the files
+(We will go over :ref:`CurseFile<curse_file>` objects later in this tutorial!).
 If you want a list of all files associated with the addon, 
 you can use the 'files()' method,
-which returns a tuple of CurseFile objects.
+which returns a tuple of :ref:`CurseFile<curse_file>` objects.
 
-You can retrieve the CurseGame object representing the game
-this addon is apart of using the 'game' method. You can also get a CurseCategory 
+You can retrieve the :ref:`CurseGame<curse_game>` object representing the game
+this addon is apart of using the 'game()' method. You can also get a :ref:`CurseCategory<curse_category>` 
 object representing the category this addon is apart of
-by using the 'category' method:
+by using the 'category()' method:
 
 .. code-block:: python 
 
@@ -466,51 +533,103 @@ by using the 'category' method:
 
     cat = inst.category()
 
+.. _curse_file:
+
 CurseFile 
 ---------
 
 Represents a file on CF.
 
-* id - ID of the file 
-* addon_id - ID of the addon this file is apart of 
-* display_name - Display name of the file 
+* id - ID of the file
+* addon_id - ID of the addon this file is apart of
+* display_name - Display name of the file
 * file_name - File name of the file
 * date - Date the file was uploaded
-* download_url - Download URL of the file 
-* length - Length in bytes of the file 
-* version - Version of the game needed to work this file 
-* dependencies - Tuple of dependencies for this file 
+* download_url - Download URL of the file
+* length - Length in bytes of the file
+* version - Version of the game needed to work this file
+* dependencies - Tuple of :ref:`CurseDependency<curse_dependency>` objects for this file
+* game_id - ID of the game this file is apart of
+* is_available - Boolean determining if the file is available
+* release_type - Release type of the file, defined by constants!
+* file_status - Status of the file, also defined by constants!
+* hashes - Tuple of :ref:`CurseHash<curse_hash>` objects representing file hashes
+* download_count - Number of times this file has been downloaded
+
+To determine the release type of the file, you can use the constants:
+
+* [1]: RELEASE - This file is a release
+* [2]: BETA - This is a beta file
+* [3]: ALPHA - This is an alpha file 
+
+To determine the file status, you can use the constants:
+
+* [1]: PROCESSING - This file is being processed and checked
+* [2]: CHANGES_REQUIRED - This file needs to be changed in some way before it is approved
+* [3]: UNDER_REVIEW - This file is under review
+* [4]: APPROVED - This file is approved and ready for use
+* [5]: REJECTED - This file has been rejected from the backend, definitely not meant to be used
+* [6]: MALWARE_DETECTED - This file has been detected as malware, you *really* should not use it!
+* [7]: DELETED - This file has been deleted
+* [8]: ARCHIVED - This file has been archived
+* [9]: TESTING - This file is being tested
+* [10]: RELEASED - This file is released and ready to be used
+* [11]: READY_FOR_REVIEW - This file is ready to be reviewed
+* [12]: DEPRECATED - This file has been marked as deprecated
+* [13]: BAKING - This file is being baked (?)
+* [14]: AWAITING_PUBLISHING - This file is awaiting publishing
+* [15]: FAILED_PUBLISHING - This file failed to publish
+
+To determine if a file is good to be used,
+you can use the 'good_file()' method:
+
+.. code-block:: python 
+    
+    if inst.good_file():
+        print "This file is good to use!"
+    else:
+        print "This file is not good to use!"
+
+This method simply checks if the file is available,
+if the file is released, and if the file status is RELEASED.
+Just because a file is not good does not mean it can't be used!
+On top of this, just because a file is good does not mean it will work properly.
+Our only understanding of the file is what the backend says it is.
+Production ready files could be poorly made,
+and non-production ready experimental files could also be valid.
 
 To get the changelog of the file,
 you can use the 'changelog' property:
 
 .. code-block:: python 
 
-    desc = inst.changelog 
+    desc = inst.changelog
 
-This will return a CurseCategory object representing the description.
+This will return a :ref:`CurseDescription<curse_description>` object representing the description.
 As stated earlier, 
 CI's use the entry point methods of the HC that returned them.
-This means that the CurseDescription object will have the default formatter 
+This means that the :ref:`CurseDescription<curse_description>` object will have the default formatter 
 attached to it.
 
-If you want all dependencies for this file,
+If you want all dependencies for a file,
 then you can find them under the 'dependencies' parameter.
-You can also get dependencies by using the 'get_dependencies()' method:
+You can also get certain dependencies by using the 'get_dependencies()' method:
 
 .. code-block:: python
 
-    deps = inst.get_dependencies()
+    deps = inst.get_dependencies(DEPEN_TYPE)
 
-You can also pass 'required=True' to get only required dependencies,
-and 'optional=True' to get only optional dependencies.
+Where DEPEN_TYPE is a dependency type,
+defined by the :ref:`CurseDependency<curse_dependency>` constants.
+This method will only return dependencies of the specified type.
 
-You can also get the 'get_addon()' method to retrieve a CurseAddon 
+You can also use the 'get_addon()' method to retrieve a :ref:`CurseAddon<curse_addon>` 
 object representing the addon this file is attached to.
 
-The CurseFile class also has download functionality.
-You can use the 'download()' method to download this 
-file.
+The CurseFile class also has :ref:`download functionality<curse_download>`.
+You can use the 'download()' method to download this file.
+
+.. _curse_dependency:
 
 CurseDependency
 ---------------
@@ -520,20 +639,43 @@ Represents a file dependency on CF.
 * id - ID of the dependency
 * addon_id - ID of the addon this dependency is apart of
 * file_id - ID of the file this dependency is apart of
-* type - Type of the dependency, an int determining if the dependency is required or optional
+* type - Type of the dependency, defined using constants!
 * required - Boolean determining if the dependency is required
 
+To determine the addon type, you can use the constants:
+
+* [1]: EMBEDDED_LIBRARY - This dependency is an embedded library
+* [2]: OPTIONAL - This dependency is optional
+* [3]: REQUIRED - This dependency is required
+* [4]: TOOL - This dependency is an optional tool
+* [5]: INCOMPATIBLE - This dependency is incompatible
+* [6]: INCLUDE - This dependency is an include file
+
 To determine if the dependency is required, you can use the 'required' parameter.
-You can also compare the type of the dependency with the 'REQUIRED' and 'OPTIONAL' constants.
+This parameter under the hood is a property which returns 'True' if the dependency is required.
+and 'False' if it is not.
 
-To get the addon and addon file this dependency is a member of,
-you can use the 'addon()' and 'file()' methods.
+To get the :ref:`CurseAddon<curse_addon>` and :ref:`CurseFile<curse_file>` objects this dependency is a member of,
+you can use the 'addon()' and 'file()' methods respectively.
 
-Sometimes, the CurseDependency will have limited information.
-This can happen when you use the ForgeSVC handlers and get all addon files.
-In this case, the CurseDependency will have limited information,
-where the 'id' and 'file_id' will be None.
-This is a limitation of the ForgeSVC backend, not cursepy.
+.. _curse_hash:
+
+CurseHash
+---------
+
+Represents a file hash on CF.
+
+* hash - Hash of the file
+* algorithm - Algorithm used to generate the hash, defined using constants!
+
+You can determine the algorithm by using these constants:
+
+* [1]: SHA1 - SHA1 algorithm
+* [2]: MD5 - MD5 algorithm
+
+These objects can be used to check the integrity of files,
+and determine if they are valid.
+Some backends may not provide hashes for certain files, or at all!
 
 Conclusion 
 ==========

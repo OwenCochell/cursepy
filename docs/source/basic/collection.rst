@@ -1,58 +1,58 @@
 .. _collec_basic:
 
 ==================
-CurseClient Basics
+BaseClient Basics
 ==================
 
 Introduction
 ============
 
-This section contains documentation on how to use the 'CurseClient' class!
+This section contains documentation on how to use the 'BaseClient' class!
 This is a general guide that will show you how to do basic operations,
 and the types of calls you can make to get information from CurseForge.
 
-CurseClient
+BaseClient
 ===========
 
-Now, what is a 'CurseClient', and why is it relevant?
+Now, what is a 'BaseClient', and why is it relevant?
 
-The CurseClient (Hereafter referred to as CC),
+The BaseClient (Hereafter referred to as BC),
 is the class that facilitates communication with CurseForge(CF).
 It does many things under the hood to make the communication with CF
 a very simple procedure.
 
-Some classes will inherit CurseClient to add extra functionality.
+Some classes will inherit BaseClient to add extra functionality.
 These components are called wrappers, and they are described in detail
 elsewhere in this documentation.
 Just know that most features defined here will be present in all
-CC instances.
+BC instances.
 
-CC is a critical high level component of cursepy, and will be used extensively!
+BC is a critical high level component of cursepy, and will be used extensively!
 
-Creating a CurseClient
+Creating a BaseClient
 ======================
 
-Creating a CC is simple procedure, and can be done like this:
+Creating a BC is simple procedure, and can be done like this:
 
 .. code-block:: python
 
-    # Import the CC:
+    # Import the BC:
 
-    from cursepy import CurseClient
+    from cursepy import BaseClient
 
-    # Create the CC:
+    # Create the BC:
 
-    client = CurseClient()
+    client = BaseClient()
 
-This will create a CC with the default handlers loaded.
+This will create a BC with the default handlers loaded.
 If you do not want the default handlers to be loaded,
 then you can pass 'False' to the 'load_default' parameter, like so:
 
 .. code-block:: python
 
-    # Create a CC, but without default handlers:
+    # Create a BC, but without default handlers:
 
-    client = CurseClient(load_default=False)
+    client = BaseClient(load_default=False)
 
 If no default handlers are loaded, 
 then every event will have a 'NullHandler'
@@ -65,23 +65,23 @@ for more info!
 .. note::
 
     In all following examples,
-    we assume that a CC is properly imported and instantiated
+    we assume that a BC is properly imported and instantiated
     under the name 'client'.
 
 Important Things to Keep in Mind
 ================================
 
-CC uses a collection of handlers to add functionality.
+BC uses a collection of handlers to add functionality.
 These handlers are associated with certain events.
 When an event is 'fired', then the handler associated with the event 
 is called.
 We derive all functionality from said handlers,
-meaning that CC is only as useful as the handlers that
+meaning that BC is only as useful as the handlers that
 are currently loaded!
 It is important to recognize that handlers
 are the components that do all the dirty work
 (Getting info, decoding it, and formatting it).
-The only thing the CC does is organize
+The only thing the BC does is organize
 and call these handlers with the relevant information.
 
 With that being said, 
@@ -94,7 +94,7 @@ but it is strongly recommended that they do so!
 Keep in mind that the built in handlers follow these recommendations,
 so you should either be wary, or have a keen understanding on any third party handlers you load!
 
-To sum it all up: CC manages handlers, but handlers provide the functionality!
+To sum it all up: BC manages handlers, but handlers provide the functionality!
 
 We will not be going into the dirty details
 about handler development and functionality.
@@ -104,13 +104,13 @@ you should check out the :ref:`handler tutorial <hand_advn>`.
 
 .. _collec-constants:
 
-CurseClient Constants
+BaseClient Constants
 =====================
 
 As stated earlier,
-CC objects organize handlers by attaching them to events.
+BC objects organize handlers by attaching them to events.
 These events can be identified using integers.
-CC contains constants that can be used to identify these events:
+BC contains constants that can be used to identify these events:
 
 * [0]: LIST_GAMES - Gets a list of all valid games
 * [1]: GAME - Get information on a specific game
@@ -137,10 +137,10 @@ However, if you want to use the lower-level 'handle()' method,
 or register callbacks, 
 then having an understanding of these constants will be very useful!
 
-CurseClient Methods
+BaseClient Methods
 ===================
 
-CC provides some entry points for getting information,
+BC provides some entry points for getting information,
 so developers have a standardized way of interacting with handlers.
 
 All methods will take a number of events to pass to the handler,
@@ -276,20 +276,19 @@ method for this:
 This will return a CurseDescription
 object representing the addon description.
 
-.. _search:
+.. _addon_search:
 
 You can also search for addons using the 'search' method:
 
 .. code-block:: python
 
-    result = client.search(GAME_ID, CAT_ID, search=search_param)
+    result = client.search(GAME_ID, search=search_param)
 
-Where GAME_ID is the ID of the game to search under,
-and CAT_ID is the category ID to search under.
+Where GAME_ID is the ID of the game to search under.
 We return a tuple of CurseAddon objects representing the search results.
 
 Users can optionally provide a search object
-to fine tune to search operation. 
+to fine tune the search operation.
 You can get a search object using the 'get_search'
 method:
 
@@ -300,11 +299,18 @@ method:
 The 'SearchParam' objects contains the following values
 for fine-tuning the search operation:
 
-* searchFilter - Value to search for 
+* gameId - Game ID to search under
+* rootCategoryId - Search by root category ID
+* categoryId - Search by category ID
+* gameVersion - Game version to search under
+* searchFilter - Value to search for
+* sortField - Filter results in a certain way (featured, popularity, total downloads, ect.), use constants for defining this!
+* sortOrder - Order the of the results (ascending or descending), use constants for defining this!
+* modLoaderType - Filter mods associated by modloader
+* gameVersionTypeId - Only show results tagged with a certain game version
+* slug - Filter by slug
 * index - Page index to search under
 * pageSize - Number of items to display per page
-* gameVersion - Game version to search under
-* sort - Sorting method to use
 
 Explaining Search Parameters
 ____________________________
@@ -315,16 +321,26 @@ Most of these values are self-explanatory.
 
 'gameVersion' is the game version to search under.
 This varies from game to game, and should be a string.
+'gameVersionTypeId' is the same as the 'gameVersion' parameter,
+but it takes a game version ID as an int instead of a string.
 
-'sort' is an integer that represents the sorting type.
+'rootCategoryId' and 'categoryId' are very similar fields, and are both related to category searching.
+The 'categoryId' is the ID of the category to search under.
+'rootCategoryId' is the root class to search under.
+Some backends will use both, others may only use one or the other.
+The official CurseForge API uses both values for example.
+
+'sortField' is an integer that represents the sorting type.
 You can use the search constants present in SearchParam to define this:
 
-* [0]: FEATURED - Sort by featured 
-* [1]: POPULARITY - Sort by popularity 
-* [2]: LAST_UPDATE - Sort by last updated
-* [3]: NAME - Sort by name 
-* [4]: AUTHOR - Sort by author 
-* [5]: TOTAL_DOWNLOADS - Sort by total downloads
+* [1]: FEATURED - Sort by featured 
+* [2]: POPULARITY - Sort by popularity 
+* [3]: LAST_UPDATE - Sort by last updated
+* [4]: NAME - Sort by name 
+* [5]: AUTHOR - Sort by author 
+* [6]: TOTAL_DOWNLOADS - Sort by total downloads
+* [7]: CATEGORY - Sort by category
+* [8]: GAME_VERSION - Sort by game version
 
 Check out this example of sorting by popularity:
 
@@ -337,6 +353,15 @@ Check out this example of sorting by popularity:
     # Set the sorting type:
 
     search.sort = search.POPULARITY 
+
+You can also change the order of the search by using the 'sortOrder'
+field of the 'SearchParam' object.
+You can use the search constants present in the SearchParam to define this:
+
+* [1]: ASCENDING - Sort in ascending order
+* [2]: DESCENDING - Sort in descending order
+
+'slug' allows you to sort items by their slug.
 
 'index' and 'pageSize' are used since search
 results are usually limited to 'pages'
@@ -375,8 +400,10 @@ Here is an example of getting the second page of search results:
 
     result = client.search(GAME_ID, CAT_ID, search)
 
+.. _iter_search:
+
 If you want to iterate over ALL content over all valid pages,
-CC has a method for that.
+BC has a method for that.
 You can use the 'iter_search' method to iterate over all 
 search results until we reach the end.
 We use the 'search' method to get each page of values,
@@ -419,11 +446,12 @@ associated with an addon:
 
 .. code-block:: python
 
-    files = client.addon_files(ADDON_ID)
+    files = client.addon_files(ADDON_ID, search)
 
 Where ADDON_ID is the ID of the addon to get files for.
 This function will return a tuple of CurseFile instances
 representing each file.
+You can also pass a SearchParam to the list to filter the results.
 
 To get info on a specific file,
 you can use the 'addon_file' method:
@@ -472,16 +500,16 @@ Here is an example callback that prints the given data to the terminal:
         print(data)
 
 In this case, the callback is a simple function.
-Now, let's bind this function to the CC under the 'FILE' event:
+Now, let's bind this function to the BC under the 'FILE' event:
 
 .. code-block:: python 
 
     client.bind_callback(client.FILE, dummy_callback)
 
-Remember the event constants defined earlier?
+Remember the :ref:`event constants<collec-constants>` defined earlier?
 You can use those again here to define the event the callback should be bound to!
 After we receive the data from the handler associated with the FILE event,
-the CC will automatically call this function, and pass the returned value to the callback.
+the BC will automatically call this function, and pass the returned value to the callback.
 
 Consider this next example:
 
@@ -535,11 +563,11 @@ Here is an example of this in action:
 
     @client.bind_callback(client.GAME)
     def callback(data):
-        
+
         print("We have been ran!")
 
 In this example, the function 'callback()' 
-is automatically registered to the CC by using the 'bind_callback()'
+is automatically registered to the BC by using the 'bind_callback()'
 as a decorator.
 As stated earlier, any other arguments will be saved and passed 
 to the callback at runtime.
@@ -583,7 +611,7 @@ Conclusion
 ==========
 
 That concludes the tutorial on basic
-CC features!
+BC features!
 
-If you want some insight into advanced CC features,
+If you want some insight into advanced BC features,
 such as handler loading, be sure to check out the :ref:`Advanced Tutorial <collec_advn>`.

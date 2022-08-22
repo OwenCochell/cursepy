@@ -171,10 +171,10 @@ class URLProtocol(BaseProtocol):
     """
     URLProtocol - Gets information via HTTP.
 
-    We seek to ease the process of retriving information via HTTP requests.
+    We seek to ease the process of retrieving information via HTTP requests.
     We not only facilitate the communication process,
     but we also provide other features such as user defined headers,
-    URL genration, and we implement the protocol caching system.
+    URL generation, and we implement the protocol caching system.
 
     The host will be used to automatically build URLs if used.
     If you want to provide URLs manually, you can use lower level methods to do so.
@@ -189,8 +189,8 @@ class URLProtocol(BaseProtocol):
         self.headers = {'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}  # Request headers to use
         self.extra = '/'  # Extra information to add before the path when building URLs
         self.proto_id = 'URLProtocol'  # Protocol ID
-    
-        self.meta = {} # MetaData from the last request
+
+        self.meta = {}  # MetaData from the last request
 
     def get_data(self, url: str, timeout: Optional[int]=None, data: Optional[dict]=None) -> bytes:
         """
@@ -215,7 +215,7 @@ class URLProtocol(BaseProtocol):
         :rtype: str
         """
 
-        # Get the respone object:
+        # Get the response object:
 
         req = self.low_get(url, timeout=timeout)
 
@@ -243,7 +243,7 @@ class URLProtocol(BaseProtocol):
         :param timeout: Timeout value, uses default value if None
         :type timeout: int, optional
         :param heads: Extra headers to include with our defaults
-        :return: HTTPResponse object contaning response from server
+        :return: HTTPResponse object containing response from server
         :rtype: HTTPResponse
         """
 

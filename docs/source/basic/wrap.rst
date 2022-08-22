@@ -18,16 +18,48 @@ wrappers might also load certain handlers that work well
 with the game.
 
 Just to put this in perspective,
-CurseClient is actually a wrapper!
+BaseClient is actually a wrapper!
 It loads the default handlers and offers entry 
 points into said handlers.
 
-ALL built in handlers inherit CurseClient,
+ALL built in wrappers inherit BaseClient,
 meaning that the entry point methods will always be available,
 regardless of the wrapper.
 Do keep in mind, that not all third party handlers
-will inherit CurseClient, meaning that some methods may be unavailable.
+will inherit BaseClient, meaning that some methods may be unavailable.
 Be sure that you know your handlers before you use them!
+
+.. _curse_client:
+
+CurseClient
+===========
+
+The CurseClient is a wrapper that is altered to work with the official CurseForge backend.
+
+To do this, we load the official :ref:`CurseForge handlers<curse_handlers>`.
+Because these handlers require an API key to work correctly,
+you will need to provide an API key when this wrapper is instantiated:
+
+.. code-block:: python
+
+    from cursepy.wrapper import CurseClient
+
+    client = CurseClient(API_KEY)
+
+Where API_KEY is the API key you `obtained from CurseForge <https://docs.curseforge.com/#what-is-curseforge-core>`_.
+
+CurseClient also requires a game ID when getting sub-catagories:
+
+.. code-block:: python
+
+    client.sub_category(GAME_ID, CAT_ID)
+
+Where GAME_ID is the game ID the category lies under,
+and CAT_ID is the category you wish to get sub-catagories for.
+
+Finally, because the :ref:`CurseForge handlers<curse_handlers>` do not support individual category lookup,
+you will be unable to use the 'category()' method.
+This is a limitation with the official CurseForge API.
 
 MinecraftWrapper
 ================
@@ -43,6 +75,22 @@ We have the following constants:
 * BUKKIT - ID of the bukkit category(5)
 
 You can use these constants in the entry point methods.
+This wrapper has the following methods:
+
+get_minecraft
+-------------
+
+Returns a :ref:`CurseGame<curse_game>` object for the game 'Minecraft'.
+This method takes no arguments.
+
+mine_sub_category
+-----------------
+
+Returns all sub-catagories (tuple of :ref:`CurseCategory<curse_category>` objects) for the given category ID.
+We automatically fill in the game ID for you,
+so this makes working with Minecraft sub-catagories identical to the BaseClient.
+We take one parameter, the category ID.
+
 MinecraftWrapper also provides some methods to make searching easier.
 Each method takes one parameter, a SearchParam object.
 

@@ -5,17 +5,23 @@ General classes for representing curseforge information.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Optional, Tuple
+from typing import Any, Optional, Tuple, TYPE_CHECKING
 from os.path import isdir, join
 
 from cursepy.classes.search import SearchParam
 from cursepy.formatters import BaseFormat, NullFormatter
 from cursepy.proto import URLProtocol
 
+if TYPE_CHECKING:
+
+    # Only import the HandlerCollection when type checking,
+    # resolves a circular dependency
+
+    from cursepy.handlers.base import HandlerCollection
+
 
 @dataclass
 class BaseCurseInstance(object):
- 
     """
     BaseCurseInstance - Class all child instances must inherit!
 
@@ -35,7 +41,7 @@ class BaseCurseInstance(object):
 
     Packets can also have the raw, unformatted data attached to them.
     This data is NOT standardized,
-    meaning that the raw data will most likely be diffrent across diffrent handlers.
+    meaning that the raw data will most likely be different across different handlers.
     Be aware, that handlers are under no obligation to attach raw data to the packet!
 
     We have the following parameters:
@@ -47,7 +53,7 @@ class BaseCurseInstance(object):
 
     raw: Any = field(init=False, repr=False, default=None)  # RAW packet data
     meta: Any = field(init=False, repr=False, default=None)  # Metadata on this packet
-    hands: 'HandlerCollection' = field(init=False, repr=False, compare=False)  # Handler Collection instance
+    hands: HandlerCollection = field(init=False, repr=False, compare=False)  # Handler Collection instance
 
 
 @dataclass
@@ -189,7 +195,7 @@ class BaseDownloader(BaseWriter):
 
         Child classes should implement this function!
         This allows them to fine-tune the download operation automatically,
-        and pass the necessary parmeters without the user having to specify them.
+        and pass the necessary parameters without the user having to specify them.
 
         Implementations should use the 'low_download' function for this operation.
 
@@ -233,9 +239,8 @@ class CurseAuthor(BaseCurseInstance):
 
 @dataclass
 class CurseDescription(BaseWriter):
-
     """
-    CurseDescription - Represents a decritpion of a addon.
+    CurseDescription - Represents a description of a addon.
 
     A 'description' is HTML code that the addon author can provide
     that describes something in detail.
@@ -247,7 +252,7 @@ class CurseDescription(BaseWriter):
     We offer the ability to attach custom 'formatters' to this object.
     A 'formatter' will convert the HTML code into something.
     The implementation of formatters is left ambiguous,
-    as users may have diffrent use cases.
+    as users may have different use cases.
     Check out the formatter documentation for more info.
 
     A formatter can be attached to us manually, 
@@ -403,7 +408,7 @@ class CurseAttachment(BaseDownloader):
         to save the thumbnail to a file.
 
         Like the download method,
-        we automaticallygenerate a name if the path is None,
+        we automatically generate a name if the path is None,
         or is just a directory.
 
         :param path: Path to save the file to, defaults to None
@@ -440,6 +445,7 @@ class CurseAttachment(BaseDownloader):
             # Check if we are working with a directory:
 
             return self.url.split('/')[-1] if isdir(name) else name
+
         # Otherwise, return the None:
 
         return None
@@ -447,7 +453,6 @@ class CurseAttachment(BaseDownloader):
 
 @dataclass
 class CurseFile(BaseDownloader):
-
     """
     CurseFile - Represents an addon file.
 
@@ -469,7 +474,34 @@ class CurseFile(BaseDownloader):
         * download_url - Download URL of the file
         * length - Length in bytes of the file
         * version - Version of the game needed to work with this file
-        * dependencies - List of CurseDependency objects
+        * dependencies - Tuple of CurseDependency objects
+        * game_id - ID of the game this file is apart of
+        * is_available - Boolean determining if this file is available for download
+        * release_type - Release type of this file (beta, alpha, release), use class constants for identifying this!
+        * file_status - Status of the file (approved, under review, deprecated, ect.), use the constants below for this!
+        * hashes - Tuple of CurseHashes representing file hashes
+        * download_count - Number of times this addon has been downloaded
+
+    We also contain the following constants:
+
+        * RELEASE - Used if the release type is 'release' (For for production use)
+        * BETA - Used if the release type is 'beta'
+        * ALPHA - Used if the release type is 'alpha'
+        * PROCESSING - Used for file status if the file is currently being processed
+        * CHANGES_REQUIRED - Used for file status if the file needs changes before approval
+        * UNDER_REVIEW - Used for file status if the file is currently under review
+        * APPROVED - Used for file status if the file is approved
+        * REJECTED - Used for file status if the file is rejected
+        * MALWARE_DETECTED - Used for file status if malware is detected in the uploaded file
+        * DELETED - Used for file status if the file has been deleted
+        * ARCHIVED - Used for the file status if the file has been archived
+        * TESTING - Used for the file status if the file is in the testing phase
+        * RELEASED - Used for the file status if the file is released, if this is the status, then the file is ready to be used!
+        * READY_FOR_REVIEW - Used for the file status if the file is ready for review
+        * DEPRECATED - Used for the file status if the file has been marked as deprecated
+        * BAKING - Used for the file status TODO: What does this mean?
+        * AWAITING_PUBLISHING - Used for file status if the file is awaiting publishing
+        * FAILED_PUBLISHING - Used for file status if the file has failed publishing 
     """
 
     id: int
@@ -481,6 +513,35 @@ class CurseFile(BaseDownloader):
     length: int
     version: Tuple[str, ...]
     dependencies: Tuple[CurseDependency, ...]
+
+    # Optional arguments:
+
+    game_id: int = -1
+    is_available: bool = True
+    release_type: int = -1
+    file_status: int = -1
+    hashes: Tuple[CurseHash, ...] = field(default_factory=lambda: [])
+    download_count: int = -1
+
+    RELEASE = 1
+    BETA = 2
+    ALPHA = 3
+
+    PROCESSING = 1
+    CHANGES_REQUIRED = 2
+    UNDER_REVIEW = 3
+    APPROVED = 4
+    REJECTED = 5
+    MALWARE_DETECTED = 6
+    DELETED = 7
+    ARCHIVED = 8
+    TESTING = 9
+    RELEASED = 10
+    READY_FOR_REVIEW = 11
+    DEPRECATED = 12
+    BAKING = 13
+    AWAITING_PUBLISHING = 14
+    FAILED_PUBLISHING = 15
 
     INST_ID = 6
 
@@ -499,19 +560,17 @@ class CurseFile(BaseDownloader):
 
         return self.hands.file_description(self.addon_id, self.id)
 
-    def get_dependencies(self, required = False, optional = False) -> Tuple[CurseDependency, ...]:
+    def get_dependencies(self, depen_type: int) -> Tuple[CurseDependency, ...]:
         """
         Returns a tuple of CurseDependency objects
         that this addon file requires.
 
-        We have the option to return only required or optional dependencies.
-        You can use the parameters 'required' and 'optional' to determine
-        which dependencies to return.
+        Users can specify a dependency type,
+        which will only return dependencies that match the given type.
+        You can use the dependency
 
-        :param required: Boolean determining if we should return only required dependencies
-        :type required: bool, optional
-        :param optional: Boolean determining if we should return only optional dependencies
-        :type optional: bool, optional
+        :param depen_type: Dependency type to return
+        :type depen_type: int
         :return: Tuple of CurseDependency objects
         :rtype: Tuple[CurseDependency, ...]
         """
@@ -522,17 +581,9 @@ class CurseFile(BaseDownloader):
 
         for depen in self.dependencies:
 
-            if required and not depen.required:
-
-                continue
-
-            if optional and depen.required:
-
-                continue
-
-            # Get and create the CurseAddon instances:
-
-            final.append(depen)
+            if depen.type == depen_type:
+                
+                final.append(depen)
 
         # Return the final tuple:
 
@@ -570,14 +621,33 @@ class CurseFile(BaseDownloader):
             # Check if we are working with a directory:
 
             temp_path = join(path, self.file_name) if isdir(path) else path
+
         # Do the download operation:
 
         return self.low_download(self.download_url, path=temp_path)
 
+    def good_file(self) -> bool:
+        """
+        This method determines if this file is valid and ready to be used.
+
+        We do this by checking the release type, file status, and if the file is available for download.
+        If this file is valid, then we return True.
+        
+        Just because a file is not good does not mean that it can't be used!
+        On top of this, just because a file is good does not mean it will work properly!
+        We only check if the file is downloadable and marked production ready.
+        Production ready files could be poorly made,
+        and non-production experimental files could also be valid.
+
+        :return: Boolean determining if this file is 'good'
+        :rtype: bool
+        """
+        
+        return self.is_available and self.release_type == CurseFile.RELEASE and self.file_status == CurseFile.RELEASED
+
 
 @dataclass
 class CurseDependency(BaseCurseInstance):
-    
     """
     CurseDependency - Represents a dependency of an addon.
 
@@ -601,6 +671,15 @@ class CurseDependency(BaseCurseInstance):
         * file_id - ID of the file this dependency is apart of
         * type - Type of the dependency
         * required - Whether or not this dependency is required
+
+    We also contain the following constants:
+
+        * INCLUDE - TODO: Document this
+        * INCOMPATIBLE - This dependency is incompatible
+        * TOOL - This dependency is an optional tool
+        * REQUIRED - This dependency is required
+        * OPTIONAL - This dependency is optional
+        * EMBEDDED_LIBRARY - This dependency is an embedded library
     """
 
     id: int
@@ -608,8 +687,12 @@ class CurseDependency(BaseCurseInstance):
     file_id: str
     type: str
 
+    INCLUDE = 6
+    INCOMPATIBLE = 5
+    TOOL = 4
     REQUIRED = 3
     OPTIONAL = 2
+    EMBEDDED_LIBRARY = 1
 
     INST_ID = 8
 
@@ -634,17 +717,26 @@ class CurseDependency(BaseCurseInstance):
 
         return self.hands.addon(self.addon_id)
 
+    def file(self) -> CurseFile:
+        """
+        Gets the CurseFile this dependency is apart of.
+
+        :return: CurseFile this dependency is apart of
+        :rtype: CurseFile
+        """
+
+        return self.hands.file(self,addon_id, self.file_id)
+
 
 @dataclass
 class CurseAddon(BaseCurseInstance):
-
     """
     CurseAddon - Represents a addon for a specific game.
 
     An 'addon' is something(mod, modpack, skin) that is added onto a game
     to change or add certain features and aspects.
 
-    The definition of a generic addon is purposefly left ambiguous,
+    The definition of a generic addon is purposely left ambiguous,
     as it can be anything from a resource pack in minecraft to a mod in Kerbal Space Program.
     If you want something a bit more helpful and specific to a game,
     then the game wrappers might be helpful!
@@ -666,15 +758,35 @@ class CurseAddon(BaseCurseInstance):
         * download_count - Number of downloads
         * game_id - ID of the game this addon is in
         * available - Boolean determining if the addon is available
-        * experimental - Boolean determining if the addon is expiremental
+        * experimental - Boolean determining if the addon is experimental
         * authors - Tuple of authors for this addon
         * attachments - Tuple of attachments attributed with this addon
-        * category_id - ID of the category this addon is in
+        * category_id - ID of the primary category this addon is apart of
+        * root_category - ID of the root category this addon is apart of
+        * all_categories - Tuple of all catagories this addon is affiliated with
         * is_featured - Boolean determining if this addon is featured
         * popularity_score - Float representing this addon's popularity score
             (Most likely used for popularity ranking)
         * popularity_rank - Int representing the game's popularity rank
-        * game_name - Name of the game
+        * allow_distribute - If addon is allowed for distribution
+        * main_file_id - ID of the main file for this addon
+        * status - Status of this addon (new, approved, under review, ect.), use the class constants for this!
+        * wiki_url - URL to the wiki of this mod, blank string if not specified
+        * issues_url - URL to the issues page of this mod, blank string if not specified
+        * source_url - URL to the source code of this mod, blank string if not specified
+        
+    We also contain the following constants for identifying the status:
+    
+        * NEW - Used if the addon is new, no further actions have been made
+        * CHANGES_REQUIRED - Used if the addon needs changes before approval
+        * UNDER_SOFT_REVIEW - Used if the addon is under soft review (elaborate?)
+        * APPROVED - Used if this addon is approved by the backend, good to be used
+        * REJECTED - Used if this addon is reject by the backend, not to be used
+        * CHANGES_MADE - used if changes have been made since the last review
+        * INACTIVE - Used if this addon is inactive
+        * ABANDONED - Used if this addon is abandoned
+        * DELETED - Used if this addon has been deleted
+        * UNDER_REVIEW - Used if this addon is under review
     """
 
     name: str
@@ -693,10 +805,30 @@ class CurseAddon(BaseCurseInstance):
     authors: Tuple[CurseAuthor, ...]
     attachments: Tuple[CurseAttachment, ...]
     category_id: int
+    root_category: int
+    all_categories: Tuple[CurseAddon, ...]
     is_featured: bool
     popularity_score: int
     popularity_rank: int
-    game_name: str
+    allow_distribute: bool
+    main_file_id: int
+    status: int
+    wiki_url: str
+    issues_url: str
+    source_url: str
+
+    # Class constants for identifying status:
+
+    NEW = 1
+    CHANGES_REQUIRED = 2
+    UNDER_SOFT_REVIEW = 3
+    APPROVED = 4
+    REJECTED = 5
+    CHANGES_MADE = 6
+    INACTIVE = 7
+    ABANDONED = 8
+    DELETED = 9
+    UNDER_REVIEW = 10
 
     INS_ID = 5
 
@@ -721,7 +853,7 @@ class CurseAddon(BaseCurseInstance):
         :return: Tuple of CurseFile instances
         :rtype: Tuple[CurseFile, ...]
         """
-        
+
         return self.hands.addon_files(self.id)
 
     def file(self, file_id: int) -> CurseFile:
@@ -763,7 +895,6 @@ class CurseAddon(BaseCurseInstance):
 
 @dataclass
 class CurseCategory(BaseCurseInstance):
-
     """
     CurseCategory - Represents a category for a specific game. 
 
@@ -796,7 +927,9 @@ class CurseCategory(BaseCurseInstance):
         * root_id - ID of the root category
         * parent_id - ID of the parent category
         * icon - CurseAttachment of this catagories icon
-        * date - Date this category was created 
+        * url - URL to the category page
+        * date - Date this category was created
+        * slug - Slug of the category 
     """
 
     id: int
@@ -805,7 +938,9 @@ class CurseCategory(BaseCurseInstance):
     root_id: int
     parent_id: int
     icon: CurseAttachment
+    url: str
     date: str
+    slug: str
 
     INST_ID = 1
 
@@ -817,7 +952,7 @@ class CurseCategory(BaseCurseInstance):
         :rtype: Tuple[CurseCategory, ...]
         """
 
-        return self.hands.sub_category(self.id)
+        return self.hands.sub_category(self.game_id, self.id)
 
     def parent_category(self) -> CurseCategory:
         """
@@ -863,40 +998,9 @@ class CurseCategory(BaseCurseInstance):
 
         return self.hands.category(self.root_id)
 
-    def search(self, search_param: Optional[SearchParam]=None) -> Tuple[CurseAddon]:
-        """
-        Searches this category with the given search parameters.
-
-        :param search_param: Search parameter object to use, defaults to None
-        :type search_param: Optional[BaseSearch], optional
-        :return: Tuple of curse addons found in the search
-        :rtype: Tuple[CurseAddon, ...]
-        """
-
-        return self.hands.search(self.game_id, self.id, search_param)
-
-    def iter_search(self, search_param: Optional[SearchParam]=None) -> CurseAddon:
-        """
-        Invokes the 'iter_search' method of the HC with the given search parameters.
-
-        You should check out HC's documentation on 'iter_search',
-        but in a nutshell it basically allows you to iterate
-        though all found addons, automatically incrementing the index when necessary.
-
-        :param search_param: [description], defaults to None
-        :type search_param: Optional[SearchParam], optional
-        :return: Each curse addon found
-        :rtype: CurseAddon
-        """
-
-        # Return the results from 'iter_search':
-
-        return self.hands.iter_search(self.game_id, self.id, search_param)
-
 
 @dataclass
 class CurseGame(BaseCurseInstance):
-
     """
     CurseGame - Represents a game on curseforge.
 
@@ -924,15 +1028,40 @@ class CurseGame(BaseCurseInstance):
         * slug - Slug of the game
         * id - ID of the game
         * support_addons - Boolean determining if this game supports addons
-        * cat_ids - ID's of the root categories associated with this game,
-            use the 'categories' method to get CategoryInstances for these ID's
+        * icon_url - URL to the icon of the game
+        * tile_url - URL to the tile picture of the game
+        * cover_url - URL to the banner/cover of the game
+        * status - Status of this game (draft, test, approved, ect.), use constants for defining this!
+        * api_status - Weather this game is public or private, use constants for defining this!
     """
 
     name: str
     slug: str
     id: int
     support_addons: float
-    cat_ids: Tuple[int,...]
+
+    # Optional values:
+
+    icon_url: str = ''
+    tile_url: str = ''
+    cover_url: str = ''
+
+    # Values only used by the official CurseForge API:
+
+    status: int = -1
+    api_status: int = -1
+
+    # Constants for determining status:
+
+    DRAFT = 1
+    TEST = 2
+    PENDING_REVIEW = 3
+    REJECTED = 4
+    APPROVED = 5
+    LIVE = 6
+
+    PRIVATE = 1
+    PUBLIC = 2
 
     INST_ID = 2
 
@@ -944,10 +1073,67 @@ class CurseGame(BaseCurseInstance):
         :rtype: Tuple[CurseCategory, ...]
         """
 
-        # Get all categories for this game:
+        return self.hands.catagories(self.id)
 
-        final = [self.hands.category(cat_id) for cat_id in self.cat_ids]
+    def search(self, search: Optional[SearchParam]=None) -> Tuple[CurseAddon, ...]:
+        """
+        Searches for addons under this game.
 
-        # Return the final tuple:
+        :param search: Search object to use, defaults to None
+        :type search: BaseSearch, optional
+        :return: Tuple of CurseAddon objects
+        :rtype: Tuple[CurseAddon, ...]
+        """
 
-        return tuple(final)
+        # Return the results from searching:
+
+        return self.hands.search(self.id, search)
+
+    def iter_search(self, search_param: Optional[SearchParam]=None) -> CurseAddon:
+        """
+        Invokes the 'iter_search' method of the HC with the given search parameters.
+
+        You should check out HC's documentation on 'iter_search',
+        but in a nutshell it basically allows you to iterate
+        though all found addons, automatically incrementing the index when necessary.
+
+        :param search_param: [description], defaults to None
+        :type search_param: Optional[SearchParam], optional
+        :return: Each curse addon found
+        :rtype: CurseAddon
+        """
+
+        # Return the results from 'iter_search':
+
+        return self.hands.iter_search(self.id, search_param)
+
+
+@dataclass
+class CurseHash(BaseCurseInstance):
+    """
+    CurseHash - Represents a hash of some kind.
+
+    Some backends distribute hashes for some reason or another.
+    In most cases, these hashes are of files to ensure 
+    that the downloaded data is valid.
+
+    This class keeps track of the hash value,
+    as well as the possible algorithms used to determine the hash.
+    You can use the constants attached to this class to determine the hashing algorithm.
+
+    We contain the following parameters:
+
+        * hash - Raw hash value
+        * algorithm - Hashing algorithm used, used constants to identify this!
+
+    We also contain the following constants:
+
+        * SHA1 - Secure Hash Algorithm 1
+        * MD5 - Message Digest 5 algorithm
+    """
+
+    hash: str
+    algorithm: int
+
+    SHA1 = 1
+    MD5 = 2

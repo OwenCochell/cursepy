@@ -1,3 +1,5 @@
+.. _intro_tutorial:
+
 ==================
 Usage Introduction
 ==================
@@ -154,12 +156,12 @@ handlers are the components that offer the functionality!
 
     If you want to know more about handlers
     and handler development, then check out the 
-    Advanced Tutorial!
+    :ref:`Advanced Tutorial!<advanced-tutorial>`
 
-CurseClient
+BaseClient
 -----------
 
-A 'CurseClient' is a class
+A 'BaseClient' is a class
 that manages handlers, and offers 
 entry points into them.
 This ensures that no matter the handler type,
@@ -173,7 +175,7 @@ Wrappers
 
 Wrappers are similar to HandlerCollections,
 except they change or optimize one or all features
-to work well with a specific game.
+to work well with a specific game or backend.
 
 For example, wrappers would offer methods that ony return
 info relevant to a specific game.
