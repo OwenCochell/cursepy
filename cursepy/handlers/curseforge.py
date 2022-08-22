@@ -27,7 +27,6 @@ class BaseCFHandler(URLHandler):
 
         super().__init__("CurseForge", "https://api.curse.tools/", 'v1/cf/', '')
 
-        self.key = None  # API Key to use
         self.raw = ""  # RAW data of the last event
 
     def pre_process(self, data: bytes) -> dict:
