@@ -13,7 +13,7 @@ Here is an example of cursepy in action:
 
    # Create the CurseClient:
 
-   curse = CurseClient(API_KEY)
+   curse = CurseClient()
 
    ADDON_ID = 1234
 
