@@ -25,7 +25,7 @@ class BaseCFHandler(URLHandler):
 
     def __init__(self):
 
-        super().__init__("CurseForge", "https://api.curse.tools/", '/v1/cf/', '')
+        super().__init__("CurseForge", "https://api.curse.tools/", '/v1/cf', '')
 
         self.key = None  # API Key to use
         self.raw = ""  # RAW data of the last event
