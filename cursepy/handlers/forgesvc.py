@@ -22,7 +22,7 @@ class BaseSVCHandler(URLHandler):
 
     def __init__(self):
 
-        super().__init__('ForgeSVC', 'https://api.curse.tools/', extra='/v1/cf/', path='')
+        super().__init__('ForgeSVC', 'https://addons-ecs.forgesvc.net', extra='/api/v2/', path='')
 
         self.raw: Any  # Raw data before formatting and post-processing
 
