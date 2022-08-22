@@ -282,9 +282,7 @@ class CurseClient(BaseClient):
     https://docs.curseforge.com/#getting-started
     """
 
-    def __init__(self, curse_api_key, load_default=True):
-
-        self.curse_api_key = curse_api_key  # API key to use
+    def __init__(self, load_default=True):
 
         super().__init__(load_default)
 
