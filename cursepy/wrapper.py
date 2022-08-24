@@ -275,7 +275,11 @@ class BaseClient(HandlerCollection):
 
 class CurseClient(BaseClient):
     """
-    CurseClient - Implements curseforge handlers, using Curse.tools technology.
+    CurseClient - Implements curseforge handlers.
+
+    We require an API key to work correctly,
+    you can get one here:
+    https://docs.curseforge.com/#getting-started
     """
 
     def __init__(self, load_default=True):
