@@ -17,7 +17,7 @@ Features Added
 * New values in SearchParam that allows for more advanced searching and sorting
 * Many curse instances have more parameters available
 * New curse instance, CurseHash, represents fille hashes
-* Added handlers for interacting with the official CurseForge API (Using curse.tools for non-key method)
+* Added handlers for interacting with the official CurseForge API (Needs an API key!)
 * Added new wrapper, CurseClient (different from old CurseClient) that makes working with the official API easier
 
 Bug Fixes
