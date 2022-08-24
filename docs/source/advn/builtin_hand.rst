@@ -16,8 +16,11 @@ protocols, and backends in use by these handlers.
 Official CurseForge Handlers
 ============================
 
-CFHandlers handlers get info from the official CurseForge API (Using Curse.tools).
+CFHandlers handlers get info from the official CurseForge API.
 
+.. note::
+
+    These handlers require an `API key <https://forms.monday.com/forms/dce5ccb7afda9a1c21dab1a1aa1d84eb?r=use1>`_ to work correctly.
 
 CF Basic Info
 -------------
@@ -75,6 +78,24 @@ You can load the handler map by using the svc_map:
     from cursepy.handlers.curseforge import cf_map
 
     client.load_handlers(cf_map)
+
+These handlers require an API key to work correctly.
+One way to get an API key to the handlers is to attach the key to each handler:
+
+.. code-block:: python
+
+    hand.key = API_KEY
+
+Simply attach it to the 'key' parameter of the handler.
+CFhandlers will also attempt to extract the key from the :ref:`HandlerCollection<collec_advn>` it is attached to.
+Simply attach a key to the 'curse_api_key' parameter of the collection it is attached to:
+
+.. code-block:: python
+
+    hands.curse_api_key - API_KEY
+
+Finally, you can use the :ref:`CurseClient<curse_client>`, which requires a key to instantiate,
+and will put it in the required locations.
 
 SVCHandlers
 ===========
