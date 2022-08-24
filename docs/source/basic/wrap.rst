@@ -44,7 +44,9 @@ you will need to provide an API key when this wrapper is instantiated:
 
     from cursepy.wrapper import CurseClient
 
-    client = CurseClient()
+    client = CurseClient(API_KEY)
+
+Where API_KEY is the API key you `obtained from CurseForge <https://docs.curseforge.com/#what-is-curseforge-core>`_.
 
 CurseClient also requires a game ID when getting sub-catagories:
 
