@@ -25,10 +25,40 @@ class BaseCFHandler(URLHandler):
 
     def __init__(self):
 
+<<<<<<< HEAD
         super().__init__("CurseForge", "https://api.curse.tools/", 'v1/cf/', '')
+=======
+        super().__init__("CurseForge", "https://api.curseforge.com/", 'v1/', '')
+>>>>>>> parent of 480903b (Update curseforge.py)
 
         self.key = None  # API Key to use
         self.raw = ""  # RAW data of the last event
+
+    def start(self):
+        """
+        We extract the API key from the HandlerCollection we are apart of.
+        """
+
+        self.set_key(self.hand_collection.curse_api_key)
+
+        super().start()
+
+    def set_key(self, key: str):
+        """
+        Sets the API key for this handler.
+
+        :param key: API key to use
+        :type key: str
+        """
+
+        # Set the key:
+
+        self.key = key
+
+        # Create the headers:
+
+        self.proto.headers.update({"Accept": "application/json",
+                                   "x-api-key": self.key})
 
     def pre_process(self, data: bytes) -> dict:
         """
