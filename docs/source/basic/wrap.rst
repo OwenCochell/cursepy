@@ -61,6 +61,32 @@ Finally, because the :ref:`CurseForge handlers<curse_handlers>` do not support i
 you will be unable to use the 'category()' method.
 This is a limitation with the official CurseForge API.
 
+.. _ct_client:
+
+CTClient
+========
+
+The CTClient is a wrapper that is altered to work with the curse.tools backend.
+
+It loads the :ref:`CT handlers<ct_handlers>` by default.
+The `CurseTools API <https://api.curse.tools/>`_ requests that all users have a custom user-agent string
+defined in the header, likely so the API can determine who is using the service.
+By default, this value is set to 'cursepy', but it is recommended to set this value to the name of your app.
+To do this, simply pass the name to the client upon instantiation:
+
+.. code-block:: python
+
+    client = CTClient(NAME)
+
+Where 'USER_AGENT' is the name of your app.
+Be default, this value is 'cursepy'.
+It is recommended to change this to something unique,
+such as the name of your app.
+
+This backend does not require an API key,
+but it can be unreliable.
+You can read more about this in the :ref:`CT handlers<ct_handlers>` documentation.
+
 MinecraftWrapper
 ================
 

@@ -11,7 +11,7 @@ from typing import Tuple
 from cursepy.handlers.base import HandlerCollection
 from cursepy.classes import base
 from cursepy.classes.search import SearchParam
-from cursepy.handlers.maps import DEFAULT_MAP
+from cursepy.handlers.maps import DEFAULT_MAP, ct_map
 
 
 class BaseClient(HandlerCollection):
@@ -137,8 +137,6 @@ class BaseClient(HandlerCollection):
 
         :param game_id: ID of the game to search under
         :type game_id: int
-        :param category_id: Category to search under
-        :type category_id: int
         :param search: Search options to fine tune the search, optional
         :type search: Any
         :return: Tuple of addons that matched the search parameters
@@ -179,8 +177,6 @@ class BaseClient(HandlerCollection):
 
         :param game_id: Game ID to search under
         :type game_id: int
-        :param category_id: Category ID to search under
-        :type cat_id: int
         :param search: Search Parameter to use
         :type search: SearchParam
         :return: Each CurseAddon that returned during the search operation.
@@ -305,6 +301,32 @@ class CurseClient(BaseClient):
         return self.handle(4, game_id, category_id)
 
 
+class CTClient(CurseClient):
+    """
+    CTClient - Implements curse.tools handlers.
+
+    Unlike the official curseforge handlers,
+    the curse.tools handlers do NOT require an API key.
+
+    This backend does request that an app name be set,
+    probably so the API maintainer can understand where requests are coming from.
+    You can specify this when creating this client.
+    If a name is not provided, then 'cursepy' will be used.
+    """
+
+    def __init__(self, name: str='cursepy', load_default=True):
+
+        super().__init__(None, load_default=False)
+
+        self.ct_name = name
+
+        if load_default:
+
+            # Load the CT handlers:
+
+            self.load_handlers(ct_map)
+
+
 class MinecraftWrapper(CurseClient):
     """
     MinecraftWrap - Wrapper for working with Minecraft data on CUrseForge!
@@ -373,9 +395,9 @@ class MinecraftWrapper(CurseClient):
         # Search the resource packs:
 
         if search is None:
-            
+
             search = self.get_search()
-            
+
         search.categoryId = MinecraftWrapper.RESOURCE_PACKS
 
         return self.search(MinecraftWrapper.GAME_ID, search)
@@ -420,7 +442,7 @@ class MinecraftWrapper(CurseClient):
 
         search.categoryId = MinecraftWrapper.MODS
 
-        return self.search(MinecraftWrapper.GAME_ID, MinecraftWrapper.MODS, search)
+        return self.search(MinecraftWrapper.GAME_ID, search)
 
     def search_worlds(self, search: SearchParam=None) -> Tuple[base.CurseAddon, ...]:
         """
@@ -462,4 +484,4 @@ class MinecraftWrapper(CurseClient):
 
         search.categoryId = MinecraftWrapper.BUKKIT
 
-        return self.search(MinecraftWrapper.GAME_ID, MinecraftWrapper.BUKKIT, search)
+        return self.search(MinecraftWrapper.GAME_ID, search)

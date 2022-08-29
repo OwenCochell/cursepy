@@ -77,7 +77,7 @@ class BaseHandler(object):
     ID: int = -1
 
     def __init__(self, name: str='') -> None:
-        
+
         self.hand_collection: HandlerCollection  # Handlers instance we are apart of
         self.name = name  # Name of this handler, used to identify like-minded handlers
 
@@ -273,7 +273,7 @@ class BaseHandler(object):
 
                 return target
 
-            # Invalid handler, let's do someting!
+            # Invalid handler, let's do something!
 
             raise ProtocolMismatch(
                 f"Protocol is of type: '{type(temp_proto)}', must be of type: '{type(target)}'!"
@@ -589,7 +589,7 @@ class HandlerCollection(object):
         """
         Adds the given handler to the HandlerCollection.
 
-        By default, we pull the instance ID out of thew handler.
+        By default, we pull the instance ID out of the handler.
         However, the developer can manually provide an instance ID to register the handler to.
         If this is the case, then the ID on the handler will be ignored.
 
@@ -685,7 +685,7 @@ class HandlerCollection(object):
         (Tuples are recommended for memory and speed reasons,
         and are the iterable method used for built in handlers).
         You can also use a dictionary to denote ordering.
-        The keys for the dictionary should be an intiger.
+        The keys for the dictionary should be an integer.
         Higher integers mean they are lower priority.
         
         If the dictionary is used as a handler map,
@@ -797,7 +797,7 @@ class HandlerCollection(object):
 
                 continue
 
-            # Something else, lets use some recurision!
+            # Something else, lets use some recursion!
 
             self.load_handlers(value)
 

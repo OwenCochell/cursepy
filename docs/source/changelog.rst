@@ -2,6 +2,22 @@
 Changelog
 =========
 
+2.1.0
+=====
+
+This update fixes some bugs and adds support for a new backend
+
+Features Added
+--------------
+
+* Added handlers for interacting with the curse.tools backend
+* Added meta CurseForge handlers, which make developing for CurseForge like backends easier
+
+Bug Fixes
+---------
+
+* Fixed an issue with the MinecraftWrapper passing a category ID to the search() and iter_search() methods.
+
 2.0.0
 =====
 
