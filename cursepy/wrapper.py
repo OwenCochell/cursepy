@@ -369,7 +369,7 @@ class MinecraftWrapper(CurseClient):
     def sub_category(self, category_id: int) -> Tuple[base.CurseCategory, ...]:
         """
         Returns all sub-catagories for the given category.
-        
+
         We automatically pass the game ID when called,
         so the user can fetch sub-categories without passing a game ID.
         This allows us to operate like the BaseClient method for getting sub-categories.
@@ -398,7 +398,7 @@ class MinecraftWrapper(CurseClient):
 
             search = self.get_search()
 
-        search.categoryId = MinecraftWrapper.RESOURCE_PACKS
+        search.rootCategoryId = MinecraftWrapper.RESOURCE_PACKS
 
         return self.search(MinecraftWrapper.GAME_ID, search)
 
@@ -419,7 +419,7 @@ class MinecraftWrapper(CurseClient):
 
             search = self.get_search()
 
-        search.categoryId = MinecraftWrapper.MODPACKS
+        search.rootCategoryId = MinecraftWrapper.MODPACKS
 
         return self.search(MinecraftWrapper.GAME_ID, search)
 
@@ -440,7 +440,7 @@ class MinecraftWrapper(CurseClient):
 
             search = self.get_search()
 
-        search.categoryId = MinecraftWrapper.MODS
+        search.rootCategoryId = MinecraftWrapper.MODS
 
         return self.search(MinecraftWrapper.GAME_ID, search)
 
@@ -461,7 +461,7 @@ class MinecraftWrapper(CurseClient):
 
             search = self.get_search()
 
-        search.categoryId = MinecraftWrapper.WORLDS
+        search.rootCategoryId = MinecraftWrapper.WORLDS
 
         return self.search(MinecraftWrapper.GAME_ID, search)
 
@@ -482,6 +482,6 @@ class MinecraftWrapper(CurseClient):
 
             search = self.get_search()
 
-        search.categoryId = MinecraftWrapper.BUKKIT
+        search.rootCategoryId = MinecraftWrapper.BUKKIT
 
         return self.search(MinecraftWrapper.GAME_ID, search)

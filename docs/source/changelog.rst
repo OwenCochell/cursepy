@@ -17,6 +17,7 @@ Bug Fixes
 ---------
 
 * Fixed an issue with the MinecraftWrapper passing a category ID to the search() and iter_search() methods.
+* MinecraftWrapper now uses 'rootCategoryId' instead of 'categoryId' on the SearchParam when searching
 
 2.0.0
 =====
