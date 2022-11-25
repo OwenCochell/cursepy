@@ -13,6 +13,7 @@ Features Added
 Bug Fixes
 ---------
 
+* Fixed a bug where cursepy fails if the addon does not have a logo
 * Fixed a syntax error while getting the file a dependency is apart of 
 
 2.1.0

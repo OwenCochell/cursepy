@@ -20,6 +20,9 @@ from cursepy.classes import base
 from cursepy.classes.search import SearchParam, url_convert
 from cursepy.errors import HandlerNotSupported
 
+# TODO: Remove this
+
+import pprint
 
 class BaseMetaCFHandler(URLHandler):
     """
@@ -309,12 +312,6 @@ class MetaCFAddon(BaseMetaCFHandler):
             for auth in data['authors']
         ]
 
-        # Create the logo attachment:
-
-        logoa = data['logo']
-
-        logo = base.CurseAttachment(logoa['title'], logoa['id'], logoa['thumbnailUrl'] if 'thumbnailUrl' in logoa.keys() else logoa['thumbnailurl'], logoa['url'], True, data['id'], logoa['description'])
-
         # Create other attachments, named screenshots by CF:
 
         attach = [
@@ -322,7 +319,17 @@ class MetaCFAddon(BaseMetaCFHandler):
             for att in data['screenshots']
         ]
 
-        attach.insert(0, logo)
+        # Create the logo attachment:
+
+        logoa = data['logo']
+
+        if logoa is not None:
+
+            logo = base.CurseAttachment(logoa['title'], logoa['id'], logoa['thumbnailUrl'] if 'thumbnailUrl' in logoa.keys() else logoa['thumbnailurl'], logoa['url'], True, data['id'], logoa['description'])
+
+            # Append the logo to the attachments
+
+            attach.insert(0, logo)
 
         # Create catagories:
 
