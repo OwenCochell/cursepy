@@ -2,6 +2,19 @@
 Changelog
 =========
 
+2.2.0
+=====
+
+Features Added
+--------------
+
+* CurseFile can now generate a guess download URL if the backend does not serve a valid download URL
+
+Bug Fixes
+---------
+
+* Fixed a syntax error while getting the file a dependency is apart of 
+
 2.1.0
 =====
 

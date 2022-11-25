@@ -543,6 +543,8 @@ class CurseFile(BaseDownloader):
     AWAITING_PUBLISHING = 14
     FAILED_PUBLISHING = 15
 
+    CDN_URL = 'https://edge.forgecdn.net/files/'
+
     INST_ID = 6
 
     @property
@@ -645,6 +647,59 @@ class CurseFile(BaseDownloader):
         
         return self.is_available and self.release_type == CurseFile.RELEASE and self.file_status == CurseFile.RELEASED
 
+    def guess_download(self) -> str:
+        """
+        This method will attempt to guess the download URL.
+
+        Some addons do not allow distribution on 3rd party services and APIs.
+        If this is the case, then the download URL will be 'None'.
+        This method will use available info to make a best guess URL for use.
+
+        We do this by splitting up the file ID into parts of 4
+        and merging some attributes together.
+        For example, if we have an id of '1234567' and a filename of
+        'test.jar', we will get the following download URL:
+
+        https://edge.forgecdn.net/files/1234/567/test.jar
+
+        Please note, this method is experimental and might not work!
+        It is ALWAYS recommended to use the provided download URL,
+        if one is provided.
+        Also, this method will generate a URL for the official CurseForge CDN.
+
+        Once you have this guess, you can set the 'download_url' parameter to the value
+        returned from this method, and download the file from there:
+
+        .. code-block:: python
+
+            file.download_url = file.guess_download()
+            file.download(PATH)
+
+        Or, you can use this URL directly in the download operation:
+
+        .. code-block:: python
+        
+            file.low_download(file.guess_download(), PATH)
+
+        We use the 'low_download()' method, as it accepts a custom URL.
+
+        :return: The best guess download URL
+        :rtype: str
+        """
+
+        download_url = CurseFile.CDN_URL
+        id = str(self.id)
+
+        # Split up the file ID with 4 digits in each part:
+
+        for i in range(0, len(id), 4):
+
+            download_url += id[i:i+4] + '/'
+
+        # Finally, add the filename:
+
+        return download_url + self.file_name
+
 
 @dataclass
 class CurseDependency(BaseCurseInstance):
@@ -725,7 +780,7 @@ class CurseDependency(BaseCurseInstance):
         :rtype: CurseFile
         """
 
-        return self.hands.file(self,addon_id, self.file_id)
+        return self.hands.file(self.addon_id, self.file_id)
 
 
 @dataclass

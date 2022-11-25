@@ -598,6 +598,7 @@ Our only understanding of the file is what the backend says it is.
 Production ready files could be poorly made,
 and non-production ready experimental files could also be valid.
 
+
 To get the changelog of the file,
 you can use the 'changelog' property:
 
@@ -628,6 +629,42 @@ object representing the addon this file is attached to.
 
 The CurseFile class also has :ref:`download functionality<curse_download>`.
 You can use the 'download()' method to download this file.
+
+.. note:: 
+
+    This next section is only relevant to the official CurseForge API!
+
+    If you aren't using the CurseForge backend, then this information
+    (probably) won't apply to you.
+
+In the official CurseForge API, addons can specify if they
+are approved for distribution over 3rd party services.
+Any projects created before the release of the official CurseForge API (around 2020-2021)
+will have this enabled by default.
+All new projects created afterwards will have this disabled by default.
+
+If 3rd party distribution is enabled, then the CurseForge API will serve a download
+URL for each addon file.
+Otherwise, the CurseForge API will simply server 'None', and the 'download()' method will fail.
+You can get around this by using the 'guess_download()' method:
+
+.. code-block:: python 
+
+    url = inst.guess_download()
+
+This method uses some attributes to create a best guess download URL that may work 
+(more testing is required!).
+This URL will download the addon files from the official CurseForge Content Distribution Network,
+regardless of the handler that retrieved the data.
+
+It is highly recommended to use a download URL provided by the backend if possible!
+
+Once you have the URL, you can set the 'download_url' parameter and then download the file:
+
+.. code-block:: python
+
+    inst.download_url = inst.guess_download()
+    inst.download()
 
 .. _curse_dependency:
 
